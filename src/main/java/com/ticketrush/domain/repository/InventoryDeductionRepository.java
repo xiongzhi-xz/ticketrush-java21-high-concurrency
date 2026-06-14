@@ -15,4 +15,8 @@ public interface InventoryDeductionRepository {
     InventoryDeductionStrategy strategy();
 
     InventoryDeductionResult reserve(InventoryDeductionCommand command);
+
+    void release(Long skuId, int quantity);
+
+    void confirm(Long skuId, int quantity);
 }

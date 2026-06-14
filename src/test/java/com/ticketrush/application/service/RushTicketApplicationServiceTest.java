@@ -2,6 +2,7 @@ package com.ticketrush.application.service;
 
 import com.ticketrush.application.command.PreloadInventoryCommand;
 import com.ticketrush.application.command.RushTicketCommand;
+import com.ticketrush.application.dto.OrderCreateMessage;
 import com.ticketrush.application.dto.PreloadInventoryResult;
 import com.ticketrush.application.dto.RushTicketResult;
 import com.ticketrush.common.api.ErrorCode;
@@ -20,6 +21,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -30,6 +32,7 @@ class RushTicketApplicationServiceTest {
     @Test
     void shouldReserveStockByVirtualThread() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
         repository.reserveResult = InventoryDeductionResult.success(
                 1001L,
                 1,
@@ -41,6 +44,7 @@ class RushTicketApplicationServiceTest {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
                     List.of(repository),
+                    publisher,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -53,6 +57,8 @@ class RushTicketApplicationServiceTest {
             assertThat(result.processedThreadName()).startsWith("rush-test-vt-");
             assertThat(repository.latestCommand.get().idempotentKey())
                     .isEqualTo("rush:2001:3001:1001:req-001");
+            assertThat(publisher.latestMessage.get().idempotentKey())
+                    .isEqualTo("rush:2001:3001:1001:req-001");
         } finally {
             executor.shutdownNow();
         }
@@ -61,6 +67,7 @@ class RushTicketApplicationServiceTest {
     @Test
     void shouldUseRequestedDeductionStrategy() {
         FakeInventoryRepository repository = new FakeInventoryRepository(InventoryDeductionStrategy.REDIS_LOCK);
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
         repository.reserveResult = InventoryDeductionResult.success(
                 1001L,
                 1,
@@ -72,6 +79,7 @@ class RushTicketApplicationServiceTest {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
                     List.of(repository),
+                    publisher,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -90,8 +98,41 @@ class RushTicketApplicationServiceTest {
     }
 
     @Test
+    void shouldReleaseReservedStockWhenOrderMessagePublishFailed() {
+        FakeInventoryRepository repository = new FakeInventoryRepository();
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        publisher.publishResult = false;
+        repository.reserveResult = InventoryDeductionResult.success(
+                1001L,
+                1,
+                InventoryDeductionStrategy.REDIS_LUA,
+                99
+        );
+        ExecutorService executor = virtualThreadExecutor();
+        try {
+            RushTicketApplicationService service = new RushTicketApplicationService(
+                    repository,
+                    List.of(repository),
+                    publisher,
+                    executor,
+                    Duration.ofSeconds(2)
+            );
+
+            assertThatThrownBy(() -> service.rush(command("req-003", null)))
+                    .isInstanceOfSatisfying(BusinessException.class, exception -> {
+                        BusinessException businessException = (BusinessException) exception;
+                        assertThat(businessException.errorCode()).isEqualTo(ErrorCode.SERVICE_DEGRADED);
+                    });
+            assertThat(repository.releaseCount.get()).isEqualTo(1);
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
     void shouldMapDuplicatedRequestToBusinessException() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
         repository.reserveResult = InventoryDeductionResult.failure(
                 1001L,
                 1,
@@ -104,6 +145,7 @@ class RushTicketApplicationServiceTest {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
                     List.of(repository),
+                    publisher,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -121,11 +163,13 @@ class RushTicketApplicationServiceTest {
     @Test
     void shouldPreloadInventory() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
         ExecutorService executor = virtualThreadExecutor();
         try {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
                     List.of(repository),
+                    publisher,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -171,6 +215,7 @@ class RushTicketApplicationServiceTest {
 
         private final AtomicReference<InventoryDeductionCommand> latestCommand = new AtomicReference<>();
         private final AtomicReference<TicketInventory> savedInventory = new AtomicReference<>();
+        private final AtomicInteger releaseCount = new AtomicInteger();
         private final InventoryDeductionStrategy strategy;
         private InventoryDeductionResult reserveResult;
 
@@ -205,10 +250,23 @@ class RushTicketApplicationServiceTest {
 
         @Override
         public void release(Long skuId, int quantity) {
+            releaseCount.incrementAndGet();
         }
 
         @Override
         public void confirm(Long skuId, int quantity) {
+        }
+    }
+
+    private static class FakeOrderCreateMessagePublisher implements OrderCreateMessagePublisher {
+
+        private final AtomicReference<OrderCreateMessage> latestMessage = new AtomicReference<>();
+        private boolean publishResult = true;
+
+        @Override
+        public boolean publish(OrderCreateMessage message) {
+            latestMessage.set(message);
+            return publishResult;
         }
     }
 }

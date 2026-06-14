@@ -81,6 +81,16 @@ public class MySqlOptimisticLockInventoryDeductionRepository implements Inventor
         }
     }
 
+    @Override
+    public void release(Long skuId, int quantity) {
+        ticketInventoryMapper.release(skuId, quantity);
+    }
+
+    @Override
+    public void confirm(Long skuId, int quantity) {
+        ticketInventoryMapper.confirm(skuId, quantity);
+    }
+
     private InventoryDeductionResult failure(
             InventoryDeductionCommand command,
             Integer remainingStock,

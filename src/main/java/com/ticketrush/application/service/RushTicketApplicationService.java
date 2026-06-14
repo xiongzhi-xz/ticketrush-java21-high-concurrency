@@ -2,6 +2,7 @@ package com.ticketrush.application.service;
 
 import com.ticketrush.application.command.PreloadInventoryCommand;
 import com.ticketrush.application.command.RushTicketCommand;
+import com.ticketrush.application.dto.OrderCreateMessage;
 import com.ticketrush.application.dto.PreloadInventoryResult;
 import com.ticketrush.application.dto.RushTicketResult;
 import com.ticketrush.common.api.ErrorCode;
@@ -41,17 +42,20 @@ public class RushTicketApplicationService {
 
     private final TicketInventoryRepository inventoryRepository;
     private final Map<InventoryDeductionStrategy, InventoryDeductionRepository> deductionRepositories;
+    private final OrderCreateMessagePublisher orderCreateMessagePublisher;
     private final ExecutorService virtualThreadExecutor;
     private final Duration reserveTimeout;
 
     public RushTicketApplicationService(
             TicketInventoryRepository inventoryRepository,
             List<InventoryDeductionRepository> deductionRepositories,
+            OrderCreateMessagePublisher orderCreateMessagePublisher,
             @Qualifier("ticketRushVirtualThreadExecutor") ExecutorService virtualThreadExecutor,
             @Value("${ticketrush.rush.reserve-timeout:2s}") Duration reserveTimeout
     ) {
         this.inventoryRepository = inventoryRepository;
         this.deductionRepositories = toStrategyMap(deductionRepositories);
+        this.orderCreateMessagePublisher = orderCreateMessagePublisher;
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.reserveTimeout = reserveTimeout;
     }
@@ -80,6 +84,7 @@ public class RushTicketApplicationService {
         if (!deductionResult.success()) {
             throw toBusinessException(deductionResult);
         }
+        publishOrderCreateMessage(deductionCommand);
 
         return new RushTicketResult(
                 true,
@@ -96,6 +101,35 @@ public class RushTicketApplicationService {
                 workerVirtual.get(),
                 Instant.now()
         );
+    }
+
+    private void publishOrderCreateMessage(InventoryDeductionCommand command) {
+        OrderCreateMessage message = new OrderCreateMessage(
+                command.requestId(),
+                command.userId(),
+                command.eventId(),
+                command.skuId(),
+                command.quantity(),
+                command.strategy(),
+                command.idempotentKey(),
+                Instant.now()
+        );
+        try {
+            boolean published = orderCreateMessagePublisher.publish(message);
+            if (!published) {
+                releaseReservedStock(command);
+                throw new BusinessException(ErrorCode.SERVICE_DEGRADED, "订单创建消息发送失败，库存已释放");
+            }
+        } catch (BusinessException exception) {
+            throw exception;
+        } catch (RuntimeException exception) {
+            releaseReservedStock(command);
+            throw new BusinessException(ErrorCode.SERVICE_DEGRADED, "订单创建消息发送异常，库存已释放");
+        }
+    }
+
+    private void releaseReservedStock(InventoryDeductionCommand command) {
+        deductionRepository(command.strategy()).release(command.skuId(), command.quantity());
     }
 
     public PreloadInventoryResult preloadInventory(PreloadInventoryCommand command) {

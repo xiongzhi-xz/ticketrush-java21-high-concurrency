@@ -114,6 +114,9 @@ mvn clean verify
 - 库存扣减策略适配器单元测试
 - 虚拟线程 vs 传统线程池对比接口
 - 第一版 k6 抢票压测脚本
+- RocketMQ 异步订单创建消息
+- 订单创建消费者
+- 订单消费幂等
 
 下一步：
 
@@ -123,6 +126,7 @@ mvn clean verify
 - 使用 Redis 运行 Lua 和分布式锁集成测试
 - 使用 MySQL 运行乐观锁集成测试
 - 使用 k6 对三种库存策略跑第一轮本地压测
+- 实现订单超时关闭和库存释放补偿
 
 ## 基础接口
 
@@ -271,6 +275,29 @@ src/main/resources/lua/reserve_stock.lua
 | MySQL Optimistic Lock | `version` + 条件更新 | 不依赖 Redis 库存缓存 | 热点行冲突高，数据库压力大 |
 
 MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行还需要确认表结构并补充 MyBatis SQL。
+
+## 异步下单
+
+抢票成功后的链路：
+
+```text
+/api/rush/tickets
+  -> 库存预占
+  -> 发布 OrderCreateMessage
+  -> RocketMQ Topic: ticketrush-order-create-topic
+  -> orderCreateConsumer
+  -> OrderApplicationService
+  -> TicketOrderRepository
+```
+
+当前订单创建为 `PENDING` 状态，库存保持锁定。后续会通过订单超时关闭任务释放未支付订单的锁定库存。
+
+消费幂等：
+
+- 幂等键：`idempotentKey`
+- 重复消息：直接跳过，不重复创建订单
+- 消费失败：抛出异常，交给 RocketMQ/Spring Cloud Stream 重试
+- 发送失败：抢票入口释放已预占库存并返回服务繁忙
 
 ## 压测脚本
 

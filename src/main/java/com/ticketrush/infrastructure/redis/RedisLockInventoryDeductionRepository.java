@@ -94,6 +94,22 @@ public class RedisLockInventoryDeductionRepository implements InventoryDeduction
         }
     }
 
+    @Override
+    public void release(Long skuId, int quantity) {
+        String inventoryKey = keyFactory.inventoryHash(skuId);
+        redisTemplate.opsForHash().increment(inventoryKey, InventoryRedisFields.AVAILABLE, quantity);
+        redisTemplate.opsForHash().increment(inventoryKey, InventoryRedisFields.LOCKED, -quantity);
+        redisTemplate.opsForHash().increment(inventoryKey, InventoryRedisFields.VERSION, 1);
+    }
+
+    @Override
+    public void confirm(Long skuId, int quantity) {
+        String inventoryKey = keyFactory.inventoryHash(skuId);
+        redisTemplate.opsForHash().increment(inventoryKey, InventoryRedisFields.LOCKED, -quantity);
+        redisTemplate.opsForHash().increment(inventoryKey, InventoryRedisFields.SOLD, quantity);
+        redisTemplate.opsForHash().increment(inventoryKey, InventoryRedisFields.VERSION, 1);
+    }
+
     private Optional<Integer> readAvailableStock(Long skuId) {
         Object value = redisTemplate.opsForHash().get(
                 keyFactory.inventoryHash(skuId),

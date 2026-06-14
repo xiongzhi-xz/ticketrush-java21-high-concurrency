@@ -211,10 +211,10 @@ src/main/java/com/ticketrush
 
 产出：
 
-- [ ] 抢票成功消息发送
-- [ ] RocketMQ 订单消费者
-- [ ] 消费幂等
-- [ ] 失败重试
+- [x] 抢票成功消息发送
+- [x] RocketMQ 订单消费者
+- [x] 消费幂等
+- [x] 失败重试
 - [ ] 订单超时关闭任务
 - [ ] 库存回滚补偿
 - [ ] Seata 示例或最终一致性说明
@@ -225,6 +225,17 @@ src/main/java/com/ticketrush
 - 订单异步创建
 - 消息重复消费不产生重复订单
 - 失败场景有补偿路径
+
+当前状态：
+
+- 抢票成功后会发布 `OrderCreateMessage` 到 RocketMQ，抢票入口快速返回。
+- 已通过 Spring Cloud Stream `StreamBridge` 发送订单创建消息。
+- 已提供 `orderCreateConsumer` 函数式消费者，消费端调用 `OrderApplicationService` 创建订单。
+- 消费幂等基于 `idempotentKey`，重复消息不会重复创建订单。
+- 消费失败会抛出异常交给 RocketMQ/Spring Cloud Stream 重试，当前配置 `max-attempts=3`。
+- 如果抢票入口库存预占成功但消息发送失败，会释放已预占库存。
+- 订单当前创建为 `PENDING`，库存仍保持锁定；订单超时关闭释放库存尚未实现。
+- MyBatis 订单仓储实现已完成，真实落库还需要确认 schema 和 SQL。
 
 ### 阶段 6：限流、热点保护与稳定性治理
 
@@ -295,3 +306,11 @@ src/main/java/com/ticketrush
 - [x] 增加传统线程池与虚拟线程对比入口
 - [x] 编写第一版抢票压测脚本
 - [ ] 使用 k6 对三种库存策略跑第一轮本地压测
+
+阶段 5 后续任务：
+
+- [ ] 确认订单表结构并补充 MyBatis SQL
+- [ ] 实现订单超时关闭任务
+- [ ] 超时关闭时释放锁定库存
+- [ ] 补充 RocketMQ 集成测试
+- [ ] 编写最终一致性和失败补偿说明

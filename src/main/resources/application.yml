@@ -57,6 +57,29 @@ spring:
       transport:
         dashboard: localhost:8858
         port: 8719
+    function:
+      definition: orderCreateConsumer
+    stream:
+      bindings:
+        orderCreate-out-0:
+          destination: ticketrush-order-create-topic
+          content-type: application/json
+        orderCreateConsumer-in-0:
+          destination: ticketrush-order-create-topic
+          group: ticketrush-order-consumer-group
+          content-type: application/json
+          consumer:
+            max-attempts: 3
+      rocketmq:
+        binder:
+          name-server: ${rocketmq.name-server}
+        bindings:
+          orderCreate-out-0:
+            producer:
+              group: ticketrush-order-producer-group
+          orderCreateConsumer-in-0:
+            consumer:
+              orderly: true
 
 mybatis:
   mapper-locations: classpath*:mapper/**/*.xml
@@ -118,5 +141,7 @@ ticketrush:
     request-token-ttl: 2m
     reserve-timeout: 2s
     lock-ttl: 3s
+  order:
+    expire-ttl: 15m
   redis:
     key-prefix: ticketrush
