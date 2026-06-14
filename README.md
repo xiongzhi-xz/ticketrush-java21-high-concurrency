@@ -129,6 +129,7 @@ mvn clean verify
 - 稳定性治理 k6 压测脚本和记录模板
 - Sentinel Dashboard 动态规则演示文档和样例
 - Prometheus 抓取配置和 Grafana 自动面板
+- Arthas 抢票链路诊断案例
 
 下一步：
 
@@ -424,6 +425,8 @@ docker/grafana/dashboards/ticketrush-overview.json
 ```
 
 说明详见 [docs/observability.md](./docs/observability.md)。
+
+Arthas 抢票链路诊断案例见 [docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
 
 ## 文档规划
 
