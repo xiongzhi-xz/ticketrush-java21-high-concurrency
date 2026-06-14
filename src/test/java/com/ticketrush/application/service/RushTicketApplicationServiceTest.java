@@ -33,6 +33,7 @@ class RushTicketApplicationServiceTest {
     void shouldReserveStockByVirtualThread() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
         FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
         repository.reserveResult = InventoryDeductionResult.success(
                 1001L,
                 1,
@@ -45,6 +46,7 @@ class RushTicketApplicationServiceTest {
                     repository,
                     List.of(repository),
                     publisher,
+                    trafficGuard,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -68,6 +70,7 @@ class RushTicketApplicationServiceTest {
     void shouldUseRequestedDeductionStrategy() {
         FakeInventoryRepository repository = new FakeInventoryRepository(InventoryDeductionStrategy.REDIS_LOCK);
         FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
         repository.reserveResult = InventoryDeductionResult.success(
                 1001L,
                 1,
@@ -80,6 +83,7 @@ class RushTicketApplicationServiceTest {
                     repository,
                     List.of(repository),
                     publisher,
+                    trafficGuard,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -101,6 +105,7 @@ class RushTicketApplicationServiceTest {
     void shouldReleaseReservedStockWhenOrderMessagePublishFailed() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
         FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
         publisher.publishResult = false;
         repository.reserveResult = InventoryDeductionResult.success(
                 1001L,
@@ -114,6 +119,7 @@ class RushTicketApplicationServiceTest {
                     repository,
                     List.of(repository),
                     publisher,
+                    trafficGuard,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -130,9 +136,45 @@ class RushTicketApplicationServiceTest {
     }
 
     @Test
+    void shouldRejectRushWhenTrafficGuardBlocked() {
+        FakeInventoryRepository repository = new FakeInventoryRepository();
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
+        trafficGuard.blocked = true;
+        repository.reserveResult = InventoryDeductionResult.success(
+                1001L,
+                1,
+                InventoryDeductionStrategy.REDIS_LUA,
+                99
+        );
+        ExecutorService executor = virtualThreadExecutor();
+        try {
+            RushTicketApplicationService service = new RushTicketApplicationService(
+                    repository,
+                    List.of(repository),
+                    publisher,
+                    trafficGuard,
+                    executor,
+                    Duration.ofSeconds(2)
+            );
+
+            assertThatThrownBy(() -> service.rush(command("req-004", null)))
+                    .isInstanceOfSatisfying(BusinessException.class, exception -> {
+                        BusinessException businessException = (BusinessException) exception;
+                        assertThat(businessException.errorCode()).isEqualTo(ErrorCode.RATE_LIMITED);
+                    });
+            assertThat(repository.latestCommand.get()).isNull();
+            assertThat(publisher.latestMessage.get()).isNull();
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
     void shouldMapDuplicatedRequestToBusinessException() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
         FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
         repository.reserveResult = InventoryDeductionResult.failure(
                 1001L,
                 1,
@@ -146,6 +188,7 @@ class RushTicketApplicationServiceTest {
                     repository,
                     List.of(repository),
                     publisher,
+                    trafficGuard,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -164,12 +207,14 @@ class RushTicketApplicationServiceTest {
     void shouldPreloadInventory() {
         FakeInventoryRepository repository = new FakeInventoryRepository();
         FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
         ExecutorService executor = virtualThreadExecutor();
         try {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
                     List.of(repository),
                     publisher,
+                    trafficGuard,
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -267,6 +312,20 @@ class RushTicketApplicationServiceTest {
         public boolean publish(OrderCreateMessage message) {
             latestMessage.set(message);
             return publishResult;
+        }
+    }
+
+    private static class FakeRushTrafficGuard implements RushTrafficGuard {
+
+        private boolean blocked;
+
+        @Override
+        public Permit enter(Long skuId) {
+            if (blocked) {
+                throw new BusinessException(ErrorCode.RATE_LIMITED, "抢票请求过于频繁，请稍后再试");
+            }
+            return () -> {
+            };
         }
     }
 }

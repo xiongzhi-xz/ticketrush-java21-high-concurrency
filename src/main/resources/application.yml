@@ -147,5 +147,11 @@ ticketrush:
       enabled: true
       fixed-delay-ms: 30000
       batch-size: 100
+  sentinel:
+    enabled: true
+    rush-qps: 1000
+    hotspot-sku-qps: 100
+    hotspot-duration-seconds: 1
+    hotspot-burst-count: 20
   redis:
     key-prefix: ticketrush

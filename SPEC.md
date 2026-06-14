@@ -246,18 +246,27 @@ src/main/java/com/ticketrush
 
 产出：
 
-- [ ] Sentinel 限流规则
-- [ ] 热点参数限流
-- [ ] 降级和兜底响应
+- [x] Sentinel 限流规则
+- [x] 热点参数限流
+- [x] 降级和兜底响应
 - [ ] Redis 热点库存预热
 - [ ] 请求令牌或排队策略
-- [ ] 稳定性测试记录
+- [x] 稳定性治理说明
 
 验收标准：
 
 - 高并发流量下接口不会被直接打穿
 - 热门票档有单独保护策略
 - 限流和降级行为可演示
+
+当前状态：
+
+- 已完成 `RushTrafficGuard`，抢票入口进入库存扣减前先经过 Sentinel。
+- 已配置全局抢票资源 `ticketrush:rush:ticket`，用于控制整体 QPS。
+- 已配置热点票档资源 `ticketrush:rush:ticket:sku`，按 `skuId` 做热点参数限流。
+- Sentinel 拦截后统一返回 `C0429`，不会继续访问 Redis、MySQL 或 RocketMQ。
+- 已补充稳定性治理说明：`docs/stability-governance.md`。
+- 请求令牌/排队策略和 Redis 热点库存自动预热尚未完成。
 
 ### 阶段 7：压测、监控、部署与文档
 
@@ -318,3 +327,10 @@ src/main/java/com/ticketrush
 - [ ] 补充 RocketMQ 集成测试
 - [x] 编写最终一致性和失败补偿说明
 - [ ] 补充 Seata 示例
+
+阶段 6 后续任务：
+
+- [ ] Redis 热点库存自动预热
+- [ ] 请求令牌或排队策略
+- [ ] 使用 k6 对限流前后做稳定性测试记录
+- [ ] 接入 Sentinel Dashboard 动态规则演示

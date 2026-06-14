@@ -43,6 +43,7 @@ public class RushTicketApplicationService {
     private final TicketInventoryRepository inventoryRepository;
     private final Map<InventoryDeductionStrategy, InventoryDeductionRepository> deductionRepositories;
     private final OrderCreateMessagePublisher orderCreateMessagePublisher;
+    private final RushTrafficGuard rushTrafficGuard;
     private final ExecutorService virtualThreadExecutor;
     private final Duration reserveTimeout;
 
@@ -50,17 +51,25 @@ public class RushTicketApplicationService {
             TicketInventoryRepository inventoryRepository,
             List<InventoryDeductionRepository> deductionRepositories,
             OrderCreateMessagePublisher orderCreateMessagePublisher,
+            RushTrafficGuard rushTrafficGuard,
             @Qualifier("ticketRushVirtualThreadExecutor") ExecutorService virtualThreadExecutor,
             @Value("${ticketrush.rush.reserve-timeout:2s}") Duration reserveTimeout
     ) {
         this.inventoryRepository = inventoryRepository;
         this.deductionRepositories = toStrategyMap(deductionRepositories);
         this.orderCreateMessagePublisher = orderCreateMessagePublisher;
+        this.rushTrafficGuard = rushTrafficGuard;
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.reserveTimeout = reserveTimeout;
     }
 
     public RushTicketResult rush(RushTicketCommand command) {
+        try (RushTrafficGuard.Permit ignored = rushTrafficGuard.enter(command.skuId())) {
+            return doRush(command);
+        }
+    }
+
+    private RushTicketResult doRush(RushTicketCommand command) {
         String idempotentKey = normalizeIdempotentKey(command);
         InventoryDeductionStrategy strategy = normalizeStrategy(command.strategy());
         InventoryDeductionCommand deductionCommand = new InventoryDeductionCommand(

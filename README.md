@@ -120,6 +120,9 @@ mvn clean verify
 - 订单超时关闭任务
 - 锁定库存释放补偿
 - 最终一致性说明文档
+- Sentinel 全局抢票限流
+- Sentinel 热点票档参数限流
+- 限流兜底响应
 
 下一步：
 
@@ -131,6 +134,8 @@ mvn clean verify
 - 使用 k6 对三种库存策略跑第一轮本地压测
 - 补充 RocketMQ 集成测试
 - 补充 Seata 示例
+- 增加请求令牌或排队策略
+- 对限流前后做 k6 稳定性测试
 
 ## 基础接口
 
@@ -310,6 +315,29 @@ MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行
 - 行为：批量扫描已过期 `PENDING` 订单，原子关闭成功后释放锁定库存
 
 最终一致性说明详见 [docs/final-consistency.md](./docs/final-consistency.md)。
+
+## 稳定性治理
+
+抢票入口已接入 Sentinel：
+
+- 全局资源：`ticketrush:rush:ticket`
+- 热点票档资源：`ticketrush:rush:ticket:sku`
+- 热点参数：`skuId`
+- 限流错误码：`C0429`
+
+本地规则配置：
+
+```yaml
+ticketrush:
+  sentinel:
+    enabled: true
+    rush-qps: 1000
+    hotspot-sku-qps: 100
+    hotspot-duration-seconds: 1
+    hotspot-burst-count: 20
+```
+
+说明详见 [docs/stability-governance.md](./docs/stability-governance.md)。
 
 ## 压测脚本
 
