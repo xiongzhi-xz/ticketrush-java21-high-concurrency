@@ -128,6 +128,7 @@ mvn clean verify
 - 准入令牌与预热任务单元测试
 - 稳定性治理 k6 压测脚本和记录模板
 - Sentinel Dashboard 动态规则演示文档和样例
+- Prometheus 抓取配置和 Grafana 自动面板
 
 下一步：
 
@@ -406,6 +407,23 @@ k6 run `
 该脚本会统计 `rush_rate_limited`、`rush_accepted`、`rush_service_degraded`、`unexpected_response_rate` 等指标，用于对比 Sentinel 和 Redis 准入门开启前后的效果。记录模板见 [docs/stability-benchmark.md](./docs/stability-benchmark.md)。
 
 Sentinel Dashboard 动态规则演示见 [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md)，规则样例位于 `scripts/sentinel/`。
+
+## 可观测性
+
+Prometheus 会抓取本机应用的 `/actuator/prometheus`：
+
+```text
+docker/prometheus/prometheus.yml
+```
+
+Grafana 会自动配置 Prometheus 数据源和 `TicketRush Overview` 面板：
+
+```text
+docker/grafana/provisioning
+docker/grafana/dashboards/ticketrush-overview.json
+```
+
+说明详见 [docs/observability.md](./docs/observability.md)。
 
 ## 文档规划
 

@@ -280,10 +280,10 @@ src/main/java/com/ticketrush
 
 产出：
 
-- [ ] JMeter 或 k6 压测脚本
+- [x] JMeter 或 k6 压测脚本
 - [ ] Virtual Threads vs 传统线程池压测报告
-- [ ] Prometheus 配置
-- [ ] Grafana 面板说明
+- [x] Prometheus 配置
+- [x] Grafana 面板说明
 - [ ] Arthas 诊断案例
 - [ ] Kubernetes/K3s 部署配置
 - [ ] 专业 README
@@ -341,3 +341,13 @@ src/main/java/com/ticketrush
 - [x] 编写稳定性治理 k6 脚本
 - [ ] 使用 k6 对限流前后做稳定性测试记录
 - [x] 接入 Sentinel Dashboard 动态规则演示
+
+阶段 7 后续任务：
+
+- [x] JMeter 或 k6 压测脚本
+- [x] Prometheus 配置
+- [x] Grafana 面板说明
+- [ ] Arthas 诊断案例
+- [ ] Kubernetes/K3s 部署配置
+- [ ] 架构图
+- [ ] 踩坑记录
