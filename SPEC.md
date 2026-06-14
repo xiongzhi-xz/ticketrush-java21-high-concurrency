@@ -286,7 +286,7 @@ src/main/java/com/ticketrush
 - [x] Grafana 面板说明
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
-- [ ] 专业 README
+- [x] 专业 README
 - [x] 架构图
 - [x] 踩坑记录
 
@@ -349,5 +349,6 @@ src/main/java/com/ticketrush
 - [x] Grafana 面板说明
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
+- [x] 专业 README
 - [x] 架构图
 - [x] 踩坑记录

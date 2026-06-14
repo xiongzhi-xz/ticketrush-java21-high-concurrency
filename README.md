@@ -133,6 +133,7 @@ mvn clean verify
 - Dockerfile 与 Kubernetes/K3s 应用部署清单
 - Mermaid 架构图与主链路说明
 - 项目踩坑记录
+- 专业 README 文档导航与运行入口
 
 下一步：
 
@@ -145,6 +146,27 @@ mvn clean verify
 - 补充 RocketMQ 集成测试
 - 补充 Seata 示例
 - 对限流前后做 k6 稳定性测试
+
+## 文档导航
+
+| 主题 | 文档 |
+| --- | --- |
+| 项目执行规格 | [SPEC.md](./SPEC.md) |
+| 架构图与主链路 | [docs/architecture.md](./docs/architecture.md) |
+| 最终一致性 | [docs/final-consistency.md](./docs/final-consistency.md) |
+| 稳定性治理 | [docs/stability-governance.md](./docs/stability-governance.md) |
+| Sentinel Dashboard 演示 | [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md) |
+| 稳定性压测记录 | [docs/stability-benchmark.md](./docs/stability-benchmark.md) |
+| 可观测性 | [docs/observability.md](./docs/observability.md) |
+| Arthas 诊断 | [docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md) |
+| Kubernetes/K3s 部署 | [deploy/k8s/README.md](./deploy/k8s/README.md) |
+| 踩坑记录 | [docs/pitfalls.md](./docs/pitfalls.md) |
+
+推荐阅读路径：
+
+```text
+README -> SPEC -> architecture -> stability-governance -> final-consistency -> observability -> k8s
+```
 
 ## 基础接口
 
