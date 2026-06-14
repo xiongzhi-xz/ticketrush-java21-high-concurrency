@@ -1,0 +1,13 @@
+.git
+.idea
+.vscode
+target
+logs
+tmp
+data
+docker-data
+*.log
+*.iml
+*.class
+*.jar
+*.war

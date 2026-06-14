@@ -130,6 +130,7 @@ mvn clean verify
 - Sentinel Dashboard 动态规则演示文档和样例
 - Prometheus 抓取配置和 Grafana 自动面板
 - Arthas 抢票链路诊断案例
+- Dockerfile 与 Kubernetes/K3s 应用部署清单
 
 下一步：
 
@@ -427,6 +428,22 @@ docker/grafana/dashboards/ticketrush-overview.json
 说明详见 [docs/observability.md](./docs/observability.md)。
 
 Arthas 抢票链路诊断案例见 [docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
+
+## Kubernetes/K3s 部署
+
+应用镜像：
+
+```bash
+docker build -t ghcr.io/xiongzhi-xz/ticketrush:latest .
+```
+
+部署清单：
+
+```bash
+kubectl apply -k deploy/k8s
+```
+
+说明详见 [deploy/k8s/README.md](./deploy/k8s/README.md)。
 
 ## 文档规划
 

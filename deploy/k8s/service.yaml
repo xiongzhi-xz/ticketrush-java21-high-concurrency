@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: ticketrush
+  namespace: ticketrush
+  labels:
+    app: ticketrush
+spec:
+  type: ClusterIP
+  selector:
+    app: ticketrush
+  ports:
+    - name: http
+      port: 8080
+      targetPort: http

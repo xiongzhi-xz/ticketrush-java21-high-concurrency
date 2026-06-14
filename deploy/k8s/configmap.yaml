@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ticketrush-config
+  namespace: ticketrush
+data:
+  SPRING_PROFILES_ACTIVE: "local"
+  SPRING_CONFIG_IMPORT: "optional:nacos:ticketrush.yml"
+  SPRING_DATASOURCE_URL: "jdbc:mysql://mysql:3306/ticketrush?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai"
+  SPRING_DATA_REDIS_HOST: "redis"
+  SPRING_DATA_REDIS_PORT: "6379"
+  SPRING_CLOUD_NACOS_DISCOVERY_SERVER_ADDR: "nacos:8848"
+  SPRING_CLOUD_NACOS_CONFIG_SERVER_ADDR: "nacos:8848"
+  SPRING_CLOUD_SENTINEL_TRANSPORT_DASHBOARD: "sentinel-dashboard:8858"
+  SPRING_ELASTICSEARCH_URIS: "http://elasticsearch:9200"
+  ROCKETMQ_NAME_SERVER: "rocketmq-namesrv:9876"
+  SEATA_SERVICE_GROUPLIST_DEFAULT: "seata:8091"
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  TICKETRUSH_SENTINEL_RUSH_QPS: "1000"
+  TICKETRUSH_SENTINEL_HOTSPOT_SKU_QPS: "100"
+  TICKETRUSH_RUSH_ADMISSION_MAX_IN_FLIGHT_PER_SKU: "500"
