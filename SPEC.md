@@ -112,13 +112,13 @@ src/main/java/com/ticketrush
 
 产出：
 
-- [ ] `TicketRushApplication`
-- [ ] 统一响应对象
-- [ ] 统一错误码
-- [ ] 全局异常处理
-- [ ] 参数校验示例
-- [ ] 基础健康检查接口
-- [ ] 虚拟线程基础配置类
+- [x] `TicketRushApplication`
+- [x] 统一响应对象
+- [x] 统一错误码
+- [x] 全局异常处理
+- [x] 参数校验示例
+- [x] 基础健康检查接口
+- [x] 虚拟线程基础配置类
 
 验收标准：
 
@@ -126,6 +126,13 @@ src/main/java/com/ticketrush
 - `/actuator/health` 可访问
 - 通用异常和响应格式统一
 - 虚拟线程配置有明确代码入口
+
+当前状态：
+
+- 已完成统一响应、错误码、业务异常和全局异常处理。
+- 已提供 `/api/system/health` 用于检查应用、Java 版本和当前请求线程类型。
+- 已提供 `/api/system/validation-check` 用于验证参数校验错误响应。
+- 当前机器使用 JDK 22，完整编译和启动验证需要切换 JDK 21 后执行。
 
 ### 阶段 3：领域模型与库存基础链路
 
@@ -236,3 +243,9 @@ src/main/java/com/ticketrush
 当前建议继续执行阶段 1 的剩余任务：
 
 - [ ] 使用 JDK 21 跑一次完整 Maven 校验
+
+阶段 2 后续验证：
+
+- [ ] 使用 JDK 21 执行 `mvn clean verify`
+- [ ] 启动应用并访问 `/api/system/health`
+- [ ] 调用 `/api/system/validation-check` 验证参数错误响应

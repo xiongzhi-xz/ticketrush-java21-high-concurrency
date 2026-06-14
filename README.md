@@ -97,12 +97,41 @@ mvn clean verify
 - Git 仓库初始化
 - 基础包结构和启动类
 - README 初稿
+- 统一响应、错误码和全局异常处理
+- 虚拟线程基础配置
+- 系统健康检查接口
+- 参数校验示例接口
 
 下一步：
 
-- 建立统一响应、错误码、全局异常处理
-- 增加虚拟线程配置类和健康检查接口
 - 使用 JDK 21 完整验证应用启动
+- 建立票务活动、票档、库存和订单领域模型
+- 设计库存扣减仓储接口
+
+## 基础接口
+
+### 健康检查
+
+```http
+GET /api/system/health
+```
+
+返回应用名、Java 版本、虚拟线程开关、当前请求线程是否为虚拟线程等信息。
+
+### 参数校验示例
+
+```http
+POST /api/system/validation-check
+Content-Type: application/json
+
+{
+  "requestId": "bench-001",
+  "scenario": "virtual-thread-health-check",
+  "concurrency": 1000
+}
+```
+
+该接口用于验证统一参数校验和全局异常响应格式，后续业务接口沿用同样的校验方式。
 
 ## 文档规划
 
