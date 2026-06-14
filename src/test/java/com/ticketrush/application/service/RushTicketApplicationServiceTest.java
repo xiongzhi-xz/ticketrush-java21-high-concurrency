@@ -10,11 +10,13 @@ import com.ticketrush.domain.model.InventoryDeductionCommand;
 import com.ticketrush.domain.model.InventoryDeductionResult;
 import com.ticketrush.domain.model.InventoryDeductionStrategy;
 import com.ticketrush.domain.model.TicketInventory;
+import com.ticketrush.domain.repository.InventoryDeductionRepository;
 import com.ticketrush.domain.repository.TicketInventoryRepository;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -38,6 +40,7 @@ class RushTicketApplicationServiceTest {
         try {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
+                    List.of(repository),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -50,6 +53,37 @@ class RushTicketApplicationServiceTest {
             assertThat(result.processedThreadName()).startsWith("rush-test-vt-");
             assertThat(repository.latestCommand.get().idempotentKey())
                     .isEqualTo("rush:2001:3001:1001:req-001");
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void shouldUseRequestedDeductionStrategy() {
+        FakeInventoryRepository repository = new FakeInventoryRepository(InventoryDeductionStrategy.REDIS_LOCK);
+        repository.reserveResult = InventoryDeductionResult.success(
+                1001L,
+                1,
+                InventoryDeductionStrategy.REDIS_LOCK,
+                98
+        );
+        ExecutorService executor = virtualThreadExecutor();
+        try {
+            RushTicketApplicationService service = new RushTicketApplicationService(
+                    repository,
+                    List.of(repository),
+                    executor,
+                    Duration.ofSeconds(2)
+            );
+
+            RushTicketResult result = service.rush(command(
+                    "req-002",
+                    InventoryDeductionStrategy.REDIS_LOCK,
+                    null
+            ));
+
+            assertThat(result.strategy()).isEqualTo(InventoryDeductionStrategy.REDIS_LOCK);
+            assertThat(repository.latestCommand.get().strategy()).isEqualTo(InventoryDeductionStrategy.REDIS_LOCK);
         } finally {
             executor.shutdownNow();
         }
@@ -69,6 +103,7 @@ class RushTicketApplicationServiceTest {
         try {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
+                    List.of(repository),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -90,6 +125,7 @@ class RushTicketApplicationServiceTest {
         try {
             RushTicketApplicationService service = new RushTicketApplicationService(
                     repository,
+                    List.of(repository),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -108,12 +144,21 @@ class RushTicketApplicationServiceTest {
     }
 
     private RushTicketCommand command(String requestId, String idempotentKey) {
+        return command(requestId, null, idempotentKey);
+    }
+
+    private RushTicketCommand command(
+            String requestId,
+            InventoryDeductionStrategy strategy,
+            String idempotentKey
+    ) {
         return new RushTicketCommand(
                 requestId,
                 2001L,
                 3001L,
                 1001L,
                 1,
+                strategy,
                 idempotentKey
         );
     }
@@ -122,11 +167,25 @@ class RushTicketApplicationServiceTest {
         return Executors.newThreadPerTaskExecutor(Thread.ofVirtual().name("rush-test-vt-", 0).factory());
     }
 
-    private static class FakeInventoryRepository implements TicketInventoryRepository {
+    private static class FakeInventoryRepository implements TicketInventoryRepository, InventoryDeductionRepository {
 
         private final AtomicReference<InventoryDeductionCommand> latestCommand = new AtomicReference<>();
         private final AtomicReference<TicketInventory> savedInventory = new AtomicReference<>();
+        private final InventoryDeductionStrategy strategy;
         private InventoryDeductionResult reserveResult;
+
+        private FakeInventoryRepository() {
+            this(InventoryDeductionStrategy.REDIS_LUA);
+        }
+
+        private FakeInventoryRepository(InventoryDeductionStrategy strategy) {
+            this.strategy = strategy;
+        }
+
+        @Override
+        public InventoryDeductionStrategy strategy() {
+            return strategy;
+        }
 
         @Override
         public Optional<TicketInventory> findBySkuId(Long skuId) {
@@ -139,7 +198,6 @@ class RushTicketApplicationServiceTest {
             return inventory;
         }
 
-        @Override
         public InventoryDeductionResult reserve(InventoryDeductionCommand command) {
             latestCommand.set(command);
             return reserveResult;

@@ -2,11 +2,15 @@ package com.ticketrush.infrastructure.redis;
 
 import com.ticketrush.domain.model.InventoryDeductionCommand;
 import com.ticketrush.domain.model.InventoryDeductionResult;
+import com.ticketrush.domain.model.InventoryDeductionStrategy;
 import com.ticketrush.domain.model.TicketInventory;
+import com.ticketrush.domain.repository.InventoryDeductionRepository;
 import com.ticketrush.domain.repository.TicketInventoryRepository;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.data.redis.core.script.RedisScript;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.time.Duration;
@@ -22,7 +26,8 @@ import java.util.Optional;
  * 是抢票入口的主防超卖方案。</p>
  */
 @Repository
-public class RedisLuaTicketInventoryRepository implements TicketInventoryRepository {
+@Primary
+public class RedisLuaTicketInventoryRepository implements TicketInventoryRepository, InventoryDeductionRepository {
 
     private static final long LUA_SUCCESS = 1L;
     private static final long LUA_STOCK_NOT_ENOUGH = 0L;
@@ -37,6 +42,7 @@ public class RedisLuaTicketInventoryRepository implements TicketInventoryReposit
     public RedisLuaTicketInventoryRepository(
             StringRedisTemplate redisTemplate,
             InventoryRedisKeyFactory keyFactory,
+            @Qualifier("reserveStockScript")
             RedisScript<Long> reserveStockScript,
             @Value("${ticketrush.rush.idempotent-key-ttl:10m}") Duration idempotentKeyTtl
     ) {
@@ -44,6 +50,11 @@ public class RedisLuaTicketInventoryRepository implements TicketInventoryReposit
         this.keyFactory = keyFactory;
         this.reserveStockScript = reserveStockScript;
         this.idempotentKeyTtl = idempotentKeyTtl;
+    }
+
+    @Override
+    public InventoryDeductionStrategy strategy() {
+        return InventoryDeductionStrategy.REDIS_LUA;
     }
 
     @Override

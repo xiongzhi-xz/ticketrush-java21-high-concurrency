@@ -37,6 +37,7 @@ public class RushTicketController {
                 request.eventId(),
                 request.skuId(),
                 request.quantity(),
+                request.strategy(),
                 request.idempotentKey()
         ));
         return ApiResponse.success(toResponse(result));

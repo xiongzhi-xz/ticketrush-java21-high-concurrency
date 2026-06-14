@@ -15,8 +15,6 @@ public interface TicketInventoryRepository {
 
     TicketInventory save(TicketInventory inventory);
 
-    InventoryDeductionResult reserve(InventoryDeductionCommand command);
-
     void release(Long skuId, int quantity);
 
     void confirm(Long skuId, int quantity);

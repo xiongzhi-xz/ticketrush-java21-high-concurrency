@@ -19,4 +19,12 @@ public class RedisScriptConfig {
         script.setResultType(Long.class);
         return script;
     }
+
+    @Bean
+    public DefaultRedisScript<Long> unlockInventoryLockScript() {
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
+        script.setLocation(new ClassPathResource(InventoryLuaScripts.UNLOCK_IF_OWNER));
+        script.setResultType(Long.class);
+        return script;
+    }
 }

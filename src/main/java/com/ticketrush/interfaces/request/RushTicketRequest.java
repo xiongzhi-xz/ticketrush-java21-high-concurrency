@@ -1,5 +1,6 @@
 package com.ticketrush.interfaces.request;
 
+import com.ticketrush.domain.model.InventoryDeductionStrategy;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
@@ -25,6 +26,8 @@ public record RushTicketRequest(
         @Min(value = 1, message = "购买数量不能小于 1")
         @Max(value = 10, message = "单次最多购买 10 张")
         Integer quantity,
+
+        InventoryDeductionStrategy strategy,
 
         String idempotentKey
 ) {

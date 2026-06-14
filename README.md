@@ -106,16 +106,20 @@ mvn clean verify
 - Redis 库存 Key 和 Lua 预占脚本
 - 库存领域服务和单元测试
 - Redis Lua 真实库存预占适配器
+- Redis 分布式锁库存扣减适配器
+- MySQL 乐观锁库存扣减适配器
 - 抢票核心接口
 - 本地库存预热接口
 - 抢票应用服务单元测试
+- 库存扣减策略适配器单元测试
 
 下一步：
 
 - 使用 JDK 21 完整验证应用启动
 - 确认数据库表结构后创建 schema
-- 接入 MySQL 乐观锁扣减对比方案
-- 接入 Redis 分布式锁扣减对比方案
+- 实现 MyBatis XML 或注解 SQL
+- 使用 Redis 运行 Lua 和分布式锁集成测试
+- 使用 MySQL 运行乐观锁集成测试
 - 增加传统线程池与虚拟线程对比入口
 
 ## 基础接口
@@ -168,11 +172,20 @@ Content-Type: application/json
   "userId": 2001,
   "eventId": 3001,
   "skuId": 1001,
-  "quantity": 1
+  "quantity": 1,
+  "strategy": "REDIS_LUA"
 }
 ```
 
-当前抢票链路会通过应用服务把 Redis Lua 库存预占提交到虚拟线程执行。响应中的 `processedByVirtualThread` 用于确认本次库存预占是否由虚拟线程处理。
+当前抢票链路会通过应用服务把库存预占提交到虚拟线程执行。响应中的 `processedByVirtualThread` 用于确认本次库存预占是否由虚拟线程处理。
+
+`strategy` 可选，默认值为 `REDIS_LUA`：
+
+| 策略 | 说明 |
+| --- | --- |
+| `REDIS_LUA` | Redis Lua 原子扣减，主推荐方案 |
+| `REDIS_LOCK` | Redis 分布式锁扣减，用于和 Lua 方案对比 |
+| `MYSQL_OPTIMISTIC_LOCK` | MySQL 乐观锁扣减，用于数据库热点写冲突对比 |
 
 常见错误码：
 
@@ -180,7 +193,7 @@ Content-Type: application/json
 | --- | --- |
 | `A0429` | 重复请求 |
 | `B0401` | 库存不足 |
-| `B0402` | 库存未预热或扣减失败 |
+| `B0402` | 库存未预热、锁竞争失败、版本冲突或扣减失败 |
 | `C0503` | 库存预占超时或执行失败 |
 
 ## 领域模型进度
@@ -220,6 +233,18 @@ src/main/resources/lua/reserve_stock.lua
 ```
 
 脚本负责原子完成库存检查、库存预占、版本递增和幂等 Key 写入。
+
+## 防超卖方案对比
+
+当前已完成三种库存预占代码路径：
+
+| 方案 | 一致性手段 | 优点 | 风险 |
+| --- | --- | --- | --- |
+| Redis Lua | 单线程执行 Lua 脚本 | 原子性强、网络往返少、适合热点票档 | 脚本复杂后维护成本上升 |
+| Redis Lock | 票档粒度分布式锁 | 容易理解、便于对比 | 锁竞争激烈时吞吐下降 |
+| MySQL Optimistic Lock | `version` + 条件更新 | 不依赖 Redis 库存缓存 | 热点行冲突高，数据库压力大 |
+
+MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行还需要确认表结构并补充 MyBatis SQL。
 
 ## 文档规划
 

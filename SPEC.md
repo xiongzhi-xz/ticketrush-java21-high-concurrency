@@ -174,8 +174,8 @@ src/main/java/com/ticketrush
 - [x] 抢票 API
 - [x] 请求幂等校验
 - [x] Redis Lua 原子扣减
-- [ ] Redis 分布式锁扣减方案
-- [ ] MySQL 乐观锁扣减方案
+- [x] Redis 分布式锁扣减方案
+- [x] MySQL 乐观锁扣减方案
 - [x] Virtual Threads 执行器
 - [ ] Virtual Threads 对比入口
 - [x] 单元测试
@@ -194,9 +194,13 @@ src/main/java/com/ticketrush
 - 已完成 `/api/rush/inventory/preload` 本地库存预热接口。
 - 抢票链路当前为：Controller 参数校验 -> Application Service -> Virtual Thread -> Redis Lua -> Redis Hash 库存预占。
 - Redis Lua 原子完成库存检查、库存预占、版本递增和幂等 Key 写入。
+- Redis 分布式锁方案通过票档粒度 `SET NX` 锁保护库存 Hash 读写，并使用 Lua 校验 token 后释放锁。
+- MySQL 乐观锁方案通过 `version` 和 `available_stock >= quantity` 条件更新防止并发超卖。
+- 抢票请求支持通过 `strategy` 选择 `REDIS_LUA`、`REDIS_LOCK`、`MYSQL_OPTIMISTIC_LOCK`，默认使用 `REDIS_LUA`。
 - 应用服务会将重复请求映射为 `A0429`，库存不足映射为 `B0401`，未预热库存映射为 `B0402`。
-- 已添加应用服务单元测试，验证虚拟线程执行、幂等冲突映射和库存预热。
-- Redis 分布式锁方案、MySQL 乐观锁方案和 Virtual Threads 对比入口尚未完成。
+- 已添加应用服务和策略适配器单元测试，验证虚拟线程执行、策略选择、幂等冲突、库存预热、Redis 锁扣减和 MySQL 乐观锁扣减。
+- MySQL 乐观锁方案目前完成代码路径和 Mapper 边界，真实集成测试需要先确认 schema 和 SQL。
+- Virtual Threads 对比入口尚未完成。
 
 ### 阶段 5：异步削峰与订单最终一致性
 
@@ -278,12 +282,12 @@ src/main/java/com/ticketrush
 - [ ] 确认数据库表结构后创建 schema
 - [ ] 实现 MyBatis XML 或注解 SQL
 - [x] 实现 Redis Lua 库存扣减适配器
-- [ ] 实现 MySQL 乐观锁库存扣减适配器
+- [x] 实现 MySQL 乐观锁库存扣减适配器
 
 阶段 4 后续任务：
 
 - [ ] 使用 Redis 运行集成测试验证 Lua 原子扣减
-- [ ] 实现 Redis 分布式锁库存扣减方案
-- [ ] 实现 MySQL 乐观锁库存扣减方案
+- [ ] 使用 Redis 运行集成测试验证分布式锁扣减
+- [ ] 确认 schema 后运行 MySQL 乐观锁集成测试
 - [ ] 增加传统线程池与虚拟线程对比入口
 - [ ] 编写第一版抢票压测脚本
