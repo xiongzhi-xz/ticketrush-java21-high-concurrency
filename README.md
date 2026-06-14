@@ -123,6 +123,9 @@ mvn clean verify
 - Sentinel 全局抢票限流
 - Sentinel 热点票档参数限流
 - 限流兜底响应
+- Redis 抢票准入令牌门禁
+- 热点库存自动预热 Runner
+- 准入令牌与预热任务单元测试
 
 下一步：
 
@@ -134,7 +137,6 @@ mvn clean verify
 - 使用 k6 对三种库存策略跑第一轮本地压测
 - 补充 RocketMQ 集成测试
 - 补充 Seata 示例
-- 增加请求令牌或排队策略
 - 对限流前后做 k6 稳定性测试
 
 ## 基础接口
@@ -209,6 +211,7 @@ Content-Type: application/json
 | `A0429` | 重复请求 |
 | `B0401` | 库存不足 |
 | `B0402` | 库存未预热、锁竞争失败、版本冲突或扣减失败 |
+| `C0429` | Sentinel 或准入令牌限流 |
 | `C0503` | 库存预占超时或执行失败 |
 
 ### 执行器对比
@@ -335,6 +338,29 @@ ticketrush:
     hotspot-sku-qps: 100
     hotspot-duration-seconds: 1
     hotspot-burst-count: 20
+```
+
+Sentinel 放行后，抢票链路还会进入 Redis 准入令牌门禁，用于限制同一票档同时进入库存扣减链路的请求数：
+
+```yaml
+ticketrush:
+  rush:
+    admission:
+      enabled: true
+      max-in-flight-per-sku: 500
+      token-ttl: 10s
+```
+
+热点库存可在应用启动时自动预热，默认关闭，适合本地演示或压测准备：
+
+```yaml
+ticketrush:
+  rush:
+    hot-inventory-preload:
+      enabled: false
+      items:
+        - sku-id: 1001
+          total-stock: 100000
 ```
 
 说明详见 [docs/stability-governance.md](./docs/stability-governance.md)。

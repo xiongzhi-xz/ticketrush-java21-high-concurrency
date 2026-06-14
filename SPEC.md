@@ -249,8 +249,8 @@ src/main/java/com/ticketrush
 - [x] Sentinel 限流规则
 - [x] 热点参数限流
 - [x] 降级和兜底响应
-- [ ] Redis 热点库存预热
-- [ ] 请求令牌或排队策略
+- [x] Redis 热点库存预热
+- [x] 请求令牌或排队策略
 - [x] 稳定性治理说明
 
 验收标准：
@@ -265,8 +265,10 @@ src/main/java/com/ticketrush
 - 已配置全局抢票资源 `ticketrush:rush:ticket`，用于控制整体 QPS。
 - 已配置热点票档资源 `ticketrush:rush:ticket:sku`，按 `skuId` 做热点参数限流。
 - Sentinel 拦截后统一返回 `C0429`，不会继续访问 Redis、MySQL 或 RocketMQ。
+- 已完成 Redis 准入令牌门禁，按票档限制同时进入库存扣减链路的请求数。
+- 已完成热点库存自动预热 Runner，可通过配置在应用启动时预热指定票档库存。
 - 已补充稳定性治理说明：`docs/stability-governance.md`。
-- 请求令牌/排队策略和 Redis 热点库存自动预热尚未完成。
+- 限流和准入门前后的 k6 稳定性实测记录尚未完成。
 
 ### 阶段 7：压测、监控、部署与文档
 
@@ -330,7 +332,7 @@ src/main/java/com/ticketrush
 
 阶段 6 后续任务：
 
-- [ ] Redis 热点库存自动预热
-- [ ] 请求令牌或排队策略
+- [x] Redis 热点库存自动预热
+- [x] 请求令牌或排队策略
 - [ ] 使用 k6 对限流前后做稳定性测试记录
 - [ ] 接入 Sentinel Dashboard 动态规则演示

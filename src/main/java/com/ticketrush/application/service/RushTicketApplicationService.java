@@ -44,6 +44,7 @@ public class RushTicketApplicationService {
     private final Map<InventoryDeductionStrategy, InventoryDeductionRepository> deductionRepositories;
     private final OrderCreateMessagePublisher orderCreateMessagePublisher;
     private final RushTrafficGuard rushTrafficGuard;
+    private final RushAdmissionGuard rushAdmissionGuard;
     private final ExecutorService virtualThreadExecutor;
     private final Duration reserveTimeout;
 
@@ -52,6 +53,7 @@ public class RushTicketApplicationService {
             List<InventoryDeductionRepository> deductionRepositories,
             OrderCreateMessagePublisher orderCreateMessagePublisher,
             RushTrafficGuard rushTrafficGuard,
+            RushAdmissionGuard rushAdmissionGuard,
             @Qualifier("ticketRushVirtualThreadExecutor") ExecutorService virtualThreadExecutor,
             @Value("${ticketrush.rush.reserve-timeout:2s}") Duration reserveTimeout
     ) {
@@ -59,12 +61,16 @@ public class RushTicketApplicationService {
         this.deductionRepositories = toStrategyMap(deductionRepositories);
         this.orderCreateMessagePublisher = orderCreateMessagePublisher;
         this.rushTrafficGuard = rushTrafficGuard;
+        this.rushAdmissionGuard = rushAdmissionGuard;
         this.virtualThreadExecutor = virtualThreadExecutor;
         this.reserveTimeout = reserveTimeout;
     }
 
     public RushTicketResult rush(RushTicketCommand command) {
-        try (RushTrafficGuard.Permit ignored = rushTrafficGuard.enter(command.skuId())) {
+        try (
+                RushTrafficGuard.Permit ignored = rushTrafficGuard.enter(command.skuId());
+                RushAdmissionGuard.Permit admission = rushAdmissionGuard.acquire(command.skuId())
+        ) {
             return doRush(command);
         }
     }

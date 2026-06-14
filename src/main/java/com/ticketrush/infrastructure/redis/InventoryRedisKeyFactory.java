@@ -29,4 +29,8 @@ public class InventoryRedisKeyFactory {
     public String idempotentKey(String idempotentKey) {
         return keyPrefix + ":idempotent:" + idempotentKey;
     }
+
+    public String rushAdmission(Long skuId) {
+        return keyPrefix + ":rush:admission:" + skuId;
+    }
 }

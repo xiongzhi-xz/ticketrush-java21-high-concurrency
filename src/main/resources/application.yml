@@ -141,6 +141,15 @@ ticketrush:
     request-token-ttl: 2m
     reserve-timeout: 2s
     lock-ttl: 3s
+    admission:
+      enabled: true
+      max-in-flight-per-sku: 500
+      token-ttl: 10s
+    hot-inventory-preload:
+      enabled: false
+      items:
+        - sku-id: 1001
+          total-stock: 100000
   order:
     expire-ttl: 15m
     timeout-close:

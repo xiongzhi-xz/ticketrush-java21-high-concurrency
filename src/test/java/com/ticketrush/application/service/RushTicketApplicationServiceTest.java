@@ -47,6 +47,7 @@ class RushTicketApplicationServiceTest {
                     List.of(repository),
                     publisher,
                     trafficGuard,
+                    new FakeRushAdmissionGuard(),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -84,6 +85,7 @@ class RushTicketApplicationServiceTest {
                     List.of(repository),
                     publisher,
                     trafficGuard,
+                    new FakeRushAdmissionGuard(),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -120,6 +122,7 @@ class RushTicketApplicationServiceTest {
                     List.of(repository),
                     publisher,
                     trafficGuard,
+                    new FakeRushAdmissionGuard(),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -154,11 +157,49 @@ class RushTicketApplicationServiceTest {
                     List.of(repository),
                     publisher,
                     trafficGuard,
+                    new FakeRushAdmissionGuard(),
                     executor,
                     Duration.ofSeconds(2)
             );
 
             assertThatThrownBy(() -> service.rush(command("req-004", null)))
+                    .isInstanceOfSatisfying(BusinessException.class, exception -> {
+                        BusinessException businessException = (BusinessException) exception;
+                        assertThat(businessException.errorCode()).isEqualTo(ErrorCode.RATE_LIMITED);
+                    });
+            assertThat(repository.latestCommand.get()).isNull();
+            assertThat(publisher.latestMessage.get()).isNull();
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void shouldRejectRushWhenAdmissionGuardBlocked() {
+        FakeInventoryRepository repository = new FakeInventoryRepository();
+        FakeOrderCreateMessagePublisher publisher = new FakeOrderCreateMessagePublisher();
+        FakeRushTrafficGuard trafficGuard = new FakeRushTrafficGuard();
+        FakeRushAdmissionGuard admissionGuard = new FakeRushAdmissionGuard();
+        admissionGuard.blocked = true;
+        repository.reserveResult = InventoryDeductionResult.success(
+                1001L,
+                1,
+                InventoryDeductionStrategy.REDIS_LUA,
+                99
+        );
+        ExecutorService executor = virtualThreadExecutor();
+        try {
+            RushTicketApplicationService service = new RushTicketApplicationService(
+                    repository,
+                    List.of(repository),
+                    publisher,
+                    trafficGuard,
+                    admissionGuard,
+                    executor,
+                    Duration.ofSeconds(2)
+            );
+
+            assertThatThrownBy(() -> service.rush(command("req-005", null)))
                     .isInstanceOfSatisfying(BusinessException.class, exception -> {
                         BusinessException businessException = (BusinessException) exception;
                         assertThat(businessException.errorCode()).isEqualTo(ErrorCode.RATE_LIMITED);
@@ -189,6 +230,7 @@ class RushTicketApplicationServiceTest {
                     List.of(repository),
                     publisher,
                     trafficGuard,
+                    new FakeRushAdmissionGuard(),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -215,6 +257,7 @@ class RushTicketApplicationServiceTest {
                     List.of(repository),
                     publisher,
                     trafficGuard,
+                    new FakeRushAdmissionGuard(),
                     executor,
                     Duration.ofSeconds(2)
             );
@@ -323,6 +366,20 @@ class RushTicketApplicationServiceTest {
         public Permit enter(Long skuId) {
             if (blocked) {
                 throw new BusinessException(ErrorCode.RATE_LIMITED, "抢票请求过于频繁，请稍后再试");
+            }
+            return () -> {
+            };
+        }
+    }
+
+    private static class FakeRushAdmissionGuard implements RushAdmissionGuard {
+
+        private boolean blocked;
+
+        @Override
+        public Permit acquire(Long skuId) {
+            if (blocked) {
+                throw new BusinessException(ErrorCode.RATE_LIMITED, "当前票档排队人数过多，请稍后再试");
             }
             return () -> {
             };
