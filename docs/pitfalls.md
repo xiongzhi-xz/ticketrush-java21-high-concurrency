@@ -41,7 +41,7 @@ mvn -q '-Denforcer.skip=true' '-Djava.version=22' test
 后续动作：
 
 - 使用真实 MySQL 执行 schema。
-- 补充 MySQL 乐观锁、订单创建和超时关闭的集成测试。
+- MySQL 乐观锁、订单创建和超时关闭 SQL 集成测试已补充。
 
 ## k6 未安装
 
@@ -64,6 +64,30 @@ k6 run scripts/k6/stability-governance.js
 
 - 补充三种库存策略压测结果。
 - 补充限流/准入开启前后的稳定性对比记录。
+
+## MySQL 端口冲突
+
+现象：
+
+- 本机已有 `mysqld` 占用 `3306`。
+- `docker compose up -d mysql` 会因为端口冲突启动失败。
+
+处理方式：
+
+```powershell
+$env:TICKETRUSH_MYSQL_PORT='13306'
+docker compose up -d mysql
+```
+
+验证方式：
+
+```powershell
+mvn -q `
+  -Denforcer.skip=true `
+  -Djava.version=22 `
+  -Dticketrush.test.mysql.port=13306 `
+  test
+```
 
 ## Sentinel Dashboard 规则不持久化
 

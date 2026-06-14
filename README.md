@@ -67,7 +67,7 @@ docker compose up -d
 
 | 组件 | 地址 |
 | --- | --- |
-| MySQL | `localhost:3306` |
+| MySQL | `localhost:3306`，端口冲突时可用 `TICKETRUSH_MYSQL_PORT=13306` 覆盖 |
 | Redis | `localhost:6379` |
 | Nacos | `http://localhost:8848` |
 | Sentinel Dashboard | `http://localhost:8858` |
@@ -136,11 +136,11 @@ mvn clean verify
 - 专业 README 文档导航与运行入口
 - 数据库 schema、MyBatis XML 和 MySQL 仓储实现
 - Redis Lua 与 Redis 分布式锁真实 Redis 集成测试
+- MySQL 乐观锁库存扣减与订单 SQL 集成测试
 
 下一步：
 
 - 使用 JDK 21 完整验证应用启动
-- 使用 MySQL 运行乐观锁集成测试
 - 使用 k6 对三种库存策略跑第一轮本地压测
 - 补充 RocketMQ 集成测试
 - 补充 Seata 示例
@@ -315,7 +315,7 @@ src/main/resources/lua/reserve_stock.lua
 | Redis Lock | 票档粒度分布式锁 | 容易理解、便于对比 | 锁竞争激烈时吞吐下降 |
 | MySQL Optimistic Lock | `version` + 条件更新 | 不依赖 Redis 库存缓存 | 热点行冲突高，数据库压力大 |
 
-MySQL 乐观锁方案已完成 Java 代码、Mapper XML 和 schema，真实运行还需要连接 MySQL 执行集成测试。
+MySQL 乐观锁方案已完成 Java 代码、Mapper XML、schema 和真实 MySQL 集成测试。
 
 ## 异步下单
 

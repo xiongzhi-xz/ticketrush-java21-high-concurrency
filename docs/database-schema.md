@@ -23,6 +23,23 @@ src/main/resources/mapper/TicketOrderMapper.xml
 mysql -h127.0.0.1 -P3306 -uticketrush -pticketrush ticketrush < src/main/resources/schema.sql
 ```
 
+如果本机 `3306` 已被占用，可以用项目 Compose 的可配置端口启动 MySQL：
+
+```powershell
+$env:TICKETRUSH_MYSQL_PORT='13306'
+docker compose up -d mysql
+```
+
+集成测试连接该端口：
+
+```powershell
+mvn -q `
+  -Denforcer.skip=true `
+  -Djava.version=22 `
+  -Dticketrush.test.mysql.port=13306 `
+  test
+```
+
 ## 表
 
 | 表 | 说明 |
@@ -66,5 +83,6 @@ WHERE sku_id = ?
 ## 后续验证
 
 - 使用真实 MySQL 执行 `schema.sql`。
-- 跑 MySQL 乐观锁集成测试。
-- 跑抢票入口端到端验证：预热库存 -> 抢票 -> RocketMQ 消费创建订单 -> 超时关闭释放库存。
+- MySQL 乐观锁库存扣减集成测试已覆盖。
+- 订单创建、过期订单扫描和超时关闭 SQL 集成测试已覆盖。
+- 后续继续跑抢票入口端到端验证：预热库存 -> 抢票 -> RocketMQ 消费创建订单 -> 超时关闭释放库存。

@@ -200,7 +200,7 @@ src/main/java/com/ticketrush
 - 抢票请求支持通过 `strategy` 选择 `REDIS_LUA`、`REDIS_LOCK`、`MYSQL_OPTIMISTIC_LOCK`，默认使用 `REDIS_LUA`。
 - 应用服务会将重复请求映射为 `A0429`，库存不足映射为 `B0401`，未预热库存映射为 `B0402`。
 - 已添加应用服务和策略适配器单元测试，验证虚拟线程执行、策略选择、幂等冲突、库存预热、Redis 锁扣减和 MySQL 乐观锁扣减。
-- MySQL 乐观锁方案已完成代码路径、schema 和 MyBatis SQL，真实集成测试需要连接 MySQL 验证。
+- MySQL 乐观锁方案已完成代码路径、schema、MyBatis SQL 和真实 MySQL 集成测试。
 - 已完成 `/api/benchmark/executors`，用于对比虚拟线程和传统固定线程池在同样阻塞任务下的耗时、吞吐和线程数量。
 - 已完成第一版 k6 抢票压测脚本：`scripts/k6/rush-ticket.js`。
 - 当前机器未安装 k6，脚本尚未执行真实压测。
@@ -238,7 +238,7 @@ src/main/java/com/ticketrush
 - 订单当前创建为 `PENDING`，库存保持锁定；订单超时关闭任务会释放锁定库存。
 - 已提供 `OrderTimeoutCloseJob`，批量关闭过期 `PENDING` 订单并释放库存。
 - 已补充最终一致性说明文档：`docs/final-consistency.md`。
-- MyBatis 订单仓储、schema 和 XML SQL 已完成，真实落库还需要连接 MySQL 验证。
+- MyBatis 订单仓储、schema、XML SQL 和真实 MySQL 订单 Mapper 集成测试已完成。
 
 ### 阶段 6：限流、热点保护与稳定性治理
 
@@ -320,7 +320,7 @@ src/main/java/com/ticketrush
 
 - [x] 使用 Redis 运行集成测试验证 Lua 原子扣减
 - [x] 使用 Redis 运行集成测试验证分布式锁扣减
-- [ ] 运行 MySQL 乐观锁集成测试
+- [x] 运行 MySQL 乐观锁集成测试
 - [x] 增加传统线程池与虚拟线程对比入口
 - [x] 编写第一版抢票压测脚本
 - [ ] 使用 k6 对三种库存策略跑第一轮本地压测
