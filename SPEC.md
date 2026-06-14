@@ -177,9 +177,10 @@ src/main/java/com/ticketrush
 - [x] Redis 分布式锁扣减方案
 - [x] MySQL 乐观锁扣减方案
 - [x] Virtual Threads 执行器
-- [ ] Virtual Threads 对比入口
+- [x] Virtual Threads 对比入口
 - [x] 单元测试
 - [x] Redis 库存预热接口
+- [x] 第一版抢票 k6 压测脚本
 
 验收标准：
 
@@ -200,7 +201,9 @@ src/main/java/com/ticketrush
 - 应用服务会将重复请求映射为 `A0429`，库存不足映射为 `B0401`，未预热库存映射为 `B0402`。
 - 已添加应用服务和策略适配器单元测试，验证虚拟线程执行、策略选择、幂等冲突、库存预热、Redis 锁扣减和 MySQL 乐观锁扣减。
 - MySQL 乐观锁方案目前完成代码路径和 Mapper 边界，真实集成测试需要先确认 schema 和 SQL。
-- Virtual Threads 对比入口尚未完成。
+- 已完成 `/api/benchmark/executors`，用于对比虚拟线程和传统固定线程池在同样阻塞任务下的耗时、吞吐和线程数量。
+- 已完成第一版 k6 抢票压测脚本：`scripts/k6/rush-ticket.js`。
+- 当前机器未安装 k6，脚本尚未执行真实压测。
 
 ### 阶段 5：异步削峰与订单最终一致性
 
@@ -289,5 +292,6 @@ src/main/java/com/ticketrush
 - [ ] 使用 Redis 运行集成测试验证 Lua 原子扣减
 - [ ] 使用 Redis 运行集成测试验证分布式锁扣减
 - [ ] 确认 schema 后运行 MySQL 乐观锁集成测试
-- [ ] 增加传统线程池与虚拟线程对比入口
-- [ ] 编写第一版抢票压测脚本
+- [x] 增加传统线程池与虚拟线程对比入口
+- [x] 编写第一版抢票压测脚本
+- [ ] 使用 k6 对三种库存策略跑第一轮本地压测

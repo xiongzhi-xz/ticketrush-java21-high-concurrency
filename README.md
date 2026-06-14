@@ -112,6 +112,8 @@ mvn clean verify
 - 本地库存预热接口
 - 抢票应用服务单元测试
 - 库存扣减策略适配器单元测试
+- 虚拟线程 vs 传统线程池对比接口
+- 第一版 k6 抢票压测脚本
 
 下一步：
 
@@ -120,7 +122,7 @@ mvn clean verify
 - 实现 MyBatis XML 或注解 SQL
 - 使用 Redis 运行 Lua 和分布式锁集成测试
 - 使用 MySQL 运行乐观锁集成测试
-- 增加传统线程池与虚拟线程对比入口
+- 使用 k6 对三种库存策略跑第一轮本地压测
 
 ## 基础接口
 
@@ -196,6 +198,30 @@ Content-Type: application/json
 | `B0402` | 库存未预热、锁竞争失败、版本冲突或扣减失败 |
 | `C0503` | 库存预占超时或执行失败 |
 
+### 执行器对比
+
+```http
+POST /api/benchmark/executors
+Content-Type: application/json
+
+{
+  "mode": "VIRTUAL_THREAD",
+  "taskCount": 10000,
+  "blockingMillis": 50,
+  "cpuTokens": 0,
+  "timeoutSeconds": 60
+}
+```
+
+`mode` 可选：
+
+| 模式 | 说明 |
+| --- | --- |
+| `VIRTUAL_THREAD` | 使用 Java 21 虚拟线程执行器 |
+| `TRADITIONAL_THREAD_POOL` | 使用固定平台线程池 |
+
+该接口用于构造相同的阻塞任务，对比两种执行器的耗时、吞吐、参与线程数和虚拟线程任务数。
+
 ## 领域模型进度
 
 当前已建立四个核心领域模型：
@@ -245,6 +271,30 @@ src/main/resources/lua/reserve_stock.lua
 | MySQL Optimistic Lock | `version` + 条件更新 | 不依赖 Redis 库存缓存 | 热点行冲突高，数据库压力大 |
 
 MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行还需要确认表结构并补充 MyBatis SQL。
+
+## 压测脚本
+
+第一版 k6 抢票压测脚本：
+
+```bash
+k6 run scripts/k6/rush-ticket.js
+```
+
+运行前需要先安装 k6，并启动应用与 Redis。
+
+常用环境变量：
+
+```powershell
+k6 run `
+  -e BASE_URL=http://localhost:8080 `
+  -e STRATEGY=REDIS_LUA `
+  -e VUS=200 `
+  -e DURATION=60s `
+  -e STOCK=100000 `
+  scripts/k6/rush-ticket.js
+```
+
+`STRATEGY` 可设置为 `REDIS_LUA`、`REDIS_LOCK` 或 `MYSQL_OPTIMISTIC_LOCK`，用于对比三种防超卖方案。脚本启动时会先调用库存预热接口，再压测抢票接口。
 
 ## 文档规划
 
