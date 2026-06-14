@@ -132,6 +132,7 @@ mvn clean verify
 - Arthas 抢票链路诊断案例
 - Dockerfile 与 Kubernetes/K3s 应用部署清单
 - Mermaid 架构图与主链路说明
+- 项目踩坑记录
 
 下一步：
 
@@ -449,6 +450,10 @@ kubectl apply -k deploy/k8s
 ## 架构图
 
 总体架构、抢票主链路、异步下单补偿、稳定性治理和部署视图见 [docs/architecture.md](./docs/architecture.md)。
+
+## 踩坑记录
+
+JDK 版本门禁、schema 暂缓、k6 未安装、Sentinel 规则持久化、Prometheus/Grafana 和 K8s 部署注意点见 [docs/pitfalls.md](./docs/pitfalls.md)。
 
 ## 文档规划
 

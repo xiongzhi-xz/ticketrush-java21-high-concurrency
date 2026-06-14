@@ -288,7 +288,7 @@ src/main/java/com/ticketrush
 - [x] Kubernetes/K3s 部署配置
 - [ ] 专业 README
 - [x] 架构图
-- [ ] 踩坑记录
+- [x] 踩坑记录
 
 验收标准：
 
@@ -350,4 +350,4 @@ src/main/java/com/ticketrush
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
 - [x] 架构图
-- [ ] 踩坑记录
+- [x] 踩坑记录
