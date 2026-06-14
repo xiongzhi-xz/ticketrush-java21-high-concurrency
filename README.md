@@ -135,11 +135,11 @@ mvn clean verify
 - 项目踩坑记录
 - 专业 README 文档导航与运行入口
 - 数据库 schema、MyBatis XML 和 MySQL 仓储实现
+- Redis Lua 与 Redis 分布式锁真实 Redis 集成测试
 
 下一步：
 
 - 使用 JDK 21 完整验证应用启动
-- 使用 Redis 运行 Lua 和分布式锁集成测试
 - 使用 MySQL 运行乐观锁集成测试
 - 使用 k6 对三种库存策略跑第一轮本地压测
 - 补充 RocketMQ 集成测试
