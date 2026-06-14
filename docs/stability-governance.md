@@ -105,4 +105,4 @@ HTTP 响应会保持统一响应格式，调用方可以根据错误码判断是
 ## 后续增强
 
 - 接入 Sentinel Dashboard 动态推送规则。
-- 用 k6 对限流前后 QPS、失败率、Redis 压力做对比记录。
+- 用 k6 对限流前后 QPS、失败率、Redis 压力做对比记录，记录模板见 [stability-benchmark.md](./stability-benchmark.md)。

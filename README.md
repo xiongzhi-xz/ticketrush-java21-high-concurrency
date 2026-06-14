@@ -126,6 +126,7 @@ mvn clean verify
 - Redis 抢票准入令牌门禁
 - 热点库存自动预热 Runner
 - 准入令牌与预热任务单元测试
+- 稳定性治理 k6 压测脚本和记录模板
 
 下一步：
 
@@ -388,6 +389,20 @@ k6 run `
 ```
 
 `STRATEGY` 可设置为 `REDIS_LUA`、`REDIS_LOCK` 或 `MYSQL_OPTIMISTIC_LOCK`，用于对比三种防超卖方案。脚本启动时会先调用库存预热接口，再压测抢票接口。
+
+稳定性治理压测脚本：
+
+```powershell
+k6 run `
+  -e BASE_URL=http://localhost:8080 `
+  -e SCENARIO_TAG=governed `
+  -e SKU_SPREAD=1 `
+  -e VUS=500 `
+  -e DURATION=60s `
+  scripts/k6/stability-governance.js
+```
+
+该脚本会统计 `rush_rate_limited`、`rush_accepted`、`rush_service_degraded`、`unexpected_response_rate` 等指标，用于对比 Sentinel 和 Redis 准入门开启前后的效果。记录模板见 [docs/stability-benchmark.md](./docs/stability-benchmark.md)。
 
 ## 文档规划
 
