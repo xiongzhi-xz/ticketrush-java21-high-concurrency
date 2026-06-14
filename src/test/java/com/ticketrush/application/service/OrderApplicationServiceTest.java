@@ -37,6 +37,7 @@ class OrderApplicationServiceTest {
         TicketOrder savedOrder = repository.savedOrder.get();
         assertThat(savedOrder).isNotNull();
         assertThat(savedOrder.status()).isEqualTo(OrderStatus.PENDING);
+        assertThat(savedOrder.inventoryDeductionStrategy()).isEqualTo(InventoryDeductionStrategy.REDIS_LUA);
         assertThat(savedOrder.idempotentKey()).isEqualTo("idem-001");
         assertThat(savedOrder.expireAt()).isAfter(savedOrder.createdAt());
         assertThat(repository.saveCount.get()).isEqualTo(1);
@@ -97,6 +98,16 @@ class OrderApplicationServiceTest {
             saveCount.incrementAndGet();
             savedOrder.set(order);
             return order;
+        }
+
+        @Override
+        public java.util.List<TicketOrder> findExpiredPendingOrders(java.time.LocalDateTime now, int limit) {
+            return java.util.List.of();
+        }
+
+        @Override
+        public boolean closeExpiredOrder(String orderNo, java.time.LocalDateTime closedAt) {
+            return false;
         }
     }
 }

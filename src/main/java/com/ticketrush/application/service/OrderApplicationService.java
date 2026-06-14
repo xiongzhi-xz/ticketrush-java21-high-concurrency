@@ -60,6 +60,7 @@ public class OrderApplicationService {
                 message.skuId(),
                 message.quantity(),
                 0L,
+                message.strategy(),
                 OrderStatus.PENDING,
                 message.idempotentKey(),
                 now,

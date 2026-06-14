@@ -117,6 +117,9 @@ mvn clean verify
 - RocketMQ 异步订单创建消息
 - 订单创建消费者
 - 订单消费幂等
+- 订单超时关闭任务
+- 锁定库存释放补偿
+- 最终一致性说明文档
 
 下一步：
 
@@ -126,7 +129,8 @@ mvn clean verify
 - 使用 Redis 运行 Lua 和分布式锁集成测试
 - 使用 MySQL 运行乐观锁集成测试
 - 使用 k6 对三种库存策略跑第一轮本地压测
-- 实现订单超时关闭和库存释放补偿
+- 补充 RocketMQ 集成测试
+- 补充 Seata 示例
 
 ## 基础接口
 
@@ -290,7 +294,7 @@ MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行
   -> TicketOrderRepository
 ```
 
-当前订单创建为 `PENDING` 状态，库存保持锁定。后续会通过订单超时关闭任务释放未支付订单的锁定库存。
+当前订单创建为 `PENDING` 状态，库存保持锁定。订单超时关闭任务会释放未支付订单的锁定库存。
 
 消费幂等：
 
@@ -298,6 +302,14 @@ MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行
 - 重复消息：直接跳过，不重复创建订单
 - 消费失败：抛出异常，交给 RocketMQ/Spring Cloud Stream 重试
 - 发送失败：抢票入口释放已预占库存并返回服务繁忙
+
+订单超时关闭：
+
+- 定时任务：`OrderTimeoutCloseJob`
+- 配置前缀：`ticketrush.order.timeout-close`
+- 行为：批量扫描已过期 `PENDING` 订单，原子关闭成功后释放锁定库存
+
+最终一致性说明详见 [docs/final-consistency.md](./docs/final-consistency.md)。
 
 ## 压测脚本
 
@@ -333,7 +345,7 @@ k6 run `
 - 防超卖方案对比
 - Sentinel 限流示例
 - RocketMQ 异步下单说明
-- Seata 与最终一致性说明
+- Seata 示例
 - Arthas 诊断案例
 - Kubernetes/K3s 部署说明
 - 踩坑记录

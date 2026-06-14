@@ -5,6 +5,8 @@ import com.ticketrush.domain.repository.TicketOrderRepository;
 import com.ticketrush.infrastructure.mysql.mapper.TicketOrderMapper;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -38,5 +40,20 @@ public class MyBatisTicketOrderRepository implements TicketOrderRepository {
     public TicketOrder save(TicketOrder order) {
         ticketOrderMapper.insert(order);
         return order;
+    }
+
+    @Override
+    public List<TicketOrder> findExpiredPendingOrders(LocalDateTime now, int limit) {
+        return ticketOrderMapper.findExpiredPendingOrders(now, limit);
+    }
+
+    @Override
+    public boolean closeExpiredOrder(String orderNo, LocalDateTime closedAt) {
+        return ticketOrderMapper.closeExpiredOrder(
+                orderNo,
+                closedAt,
+                com.ticketrush.domain.model.OrderStatus.PENDING,
+                com.ticketrush.domain.model.OrderStatus.CLOSED
+        ) == 1;
     }
 }

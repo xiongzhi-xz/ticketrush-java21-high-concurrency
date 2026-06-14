@@ -5,6 +5,8 @@ import com.ticketrush.domain.model.TicketOrder;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
+import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Optional;
 
 /**
@@ -22,4 +24,16 @@ public interface TicketOrderMapper {
     int insert(TicketOrder order);
 
     int updateStatus(@Param("orderNo") String orderNo, @Param("status") OrderStatus status);
+
+    List<TicketOrder> findExpiredPendingOrders(
+            @Param("now") LocalDateTime now,
+            @Param("limit") int limit
+    );
+
+    int closeExpiredOrder(
+            @Param("orderNo") String orderNo,
+            @Param("closedAt") LocalDateTime closedAt,
+            @Param("pendingStatus") OrderStatus pendingStatus,
+            @Param("closedStatus") OrderStatus closedStatus
+    );
 }

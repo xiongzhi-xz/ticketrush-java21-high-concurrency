@@ -143,5 +143,9 @@ ticketrush:
     lock-ttl: 3s
   order:
     expire-ttl: 15m
+    timeout-close:
+      enabled: true
+      fixed-delay-ms: 30000
+      batch-size: 100
   redis:
     key-prefix: ticketrush

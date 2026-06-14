@@ -17,6 +17,7 @@ public record TicketOrder(
         Long skuId,
         Integer quantity,
         Long amountFen,
+        InventoryDeductionStrategy inventoryDeductionStrategy,
         OrderStatus status,
         String idempotentKey,
         LocalDateTime createdAt,
@@ -32,6 +33,7 @@ public record TicketOrder(
         Objects.requireNonNull(skuId, "票档 ID 不能为空");
         Objects.requireNonNull(quantity, "购买数量不能为空");
         Objects.requireNonNull(amountFen, "订单金额不能为空");
+        Objects.requireNonNull(inventoryDeductionStrategy, "库存扣减策略不能为空");
         Objects.requireNonNull(status, "订单状态不能为空");
         Objects.requireNonNull(idempotentKey, "幂等键不能为空");
         Objects.requireNonNull(createdAt, "订单创建时间不能为空");
