@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ticketrush.infrastructure.mysql.mapper.TicketEventMapper">
+
+    <resultMap id="TicketEventResultMap" type="com.ticketrush.domain.model.TicketEvent">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Long"/>
+            <arg column="name" javaType="java.lang.String"/>
+            <arg column="venue_name" javaType="java.lang.String"/>
+            <arg column="event_time" javaType="java.time.LocalDateTime"/>
+            <arg column="sale_start_time" javaType="java.time.LocalDateTime"/>
+            <arg column="sale_end_time" javaType="java.time.LocalDateTime"/>
+            <arg column="status" javaType="com.ticketrush.domain.model.EventStatus"/>
+            <arg column="created_at" javaType="java.time.LocalDateTime"/>
+            <arg column="updated_at" javaType="java.time.LocalDateTime"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="TicketEventColumns">
+        id,
+        name,
+        venue_name,
+        event_time,
+        sale_start_time,
+        sale_end_time,
+        status,
+        created_at,
+        updated_at
+    </sql>
+
+    <select id="findById" resultMap="TicketEventResultMap">
+        SELECT
+        <include refid="TicketEventColumns"/>
+        FROM ticket_event
+        WHERE id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.ticketrush.domain.model.TicketEvent">
+        INSERT INTO ticket_event
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            name,
+            venue_name,
+            event_time,
+            sale_start_time,
+            sale_end_time,
+            status,
+            <if test="createdAt != null">created_at,</if>
+            <if test="updatedAt != null">updated_at,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            #{name},
+            #{venueName},
+            #{eventTime},
+            #{saleStartTime},
+            #{saleEndTime},
+            #{status},
+            <if test="createdAt != null">#{createdAt},</if>
+            <if test="updatedAt != null">#{updatedAt},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE ticket_event
+        SET status = #{status},
+            updated_at = CURRENT_TIMESTAMP(3)
+        WHERE id = #{id}
+    </update>
+</mapper>

@@ -1,0 +1,80 @@
+CREATE TABLE IF NOT EXISTS ticket_event (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    name VARCHAR(128) NOT NULL,
+    venue_name VARCHAR(128) NOT NULL,
+    event_time DATETIME(3) NOT NULL,
+    sale_start_time DATETIME(3) NOT NULL,
+    sale_end_time DATETIME(3) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+    KEY idx_ticket_event_sale_status (status, sale_start_time, sale_end_time),
+    CONSTRAINT chk_ticket_event_sale_window CHECK (sale_end_time > sale_start_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS ticket_sku (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    event_id BIGINT NOT NULL,
+    name VARCHAR(128) NOT NULL,
+    price_fen BIGINT NOT NULL,
+    total_stock INT NOT NULL,
+    sale_start_time DATETIME(3) NOT NULL,
+    sale_end_time DATETIME(3) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (id),
+    KEY idx_ticket_sku_event_id (event_id),
+    KEY idx_ticket_sku_sale_status (status, sale_start_time, sale_end_time),
+    CONSTRAINT fk_ticket_sku_event FOREIGN KEY (event_id) REFERENCES ticket_event (id),
+    CONSTRAINT chk_ticket_sku_price CHECK (price_fen >= 0),
+    CONSTRAINT chk_ticket_sku_total_stock CHECK (total_stock >= 0),
+    CONSTRAINT chk_ticket_sku_sale_window CHECK (sale_end_time > sale_start_time)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS ticket_inventory (
+    sku_id BIGINT NOT NULL,
+    total_stock INT NOT NULL,
+    available_stock INT NOT NULL,
+    locked_stock INT NOT NULL,
+    sold_stock INT NOT NULL,
+    version BIGINT NOT NULL DEFAULT 1,
+    updated_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3) ON UPDATE CURRENT_TIMESTAMP(3),
+    PRIMARY KEY (sku_id),
+    CONSTRAINT fk_ticket_inventory_sku FOREIGN KEY (sku_id) REFERENCES ticket_sku (id),
+    CONSTRAINT chk_ticket_inventory_total CHECK (total_stock >= 0),
+    CONSTRAINT chk_ticket_inventory_available CHECK (available_stock >= 0),
+    CONSTRAINT chk_ticket_inventory_locked CHECK (locked_stock >= 0),
+    CONSTRAINT chk_ticket_inventory_sold CHECK (sold_stock >= 0),
+    CONSTRAINT chk_ticket_inventory_version CHECK (version > 0),
+    CONSTRAINT chk_ticket_inventory_consistency CHECK (total_stock = available_stock + locked_stock + sold_stock)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS ticket_order (
+    id BIGINT NOT NULL AUTO_INCREMENT,
+    order_no VARCHAR(64) NOT NULL,
+    user_id BIGINT NOT NULL,
+    event_id BIGINT NOT NULL,
+    sku_id BIGINT NOT NULL,
+    quantity INT NOT NULL,
+    amount_fen BIGINT NOT NULL,
+    inventory_deduction_strategy VARCHAR(32) NOT NULL,
+    status VARCHAR(32) NOT NULL,
+    idempotent_key VARCHAR(191) NOT NULL,
+    created_at DATETIME(3) NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+    expire_at DATETIME(3) NOT NULL,
+    paid_at DATETIME(3) NULL,
+    canceled_at DATETIME(3) NULL,
+    PRIMARY KEY (id),
+    UNIQUE KEY uk_ticket_order_order_no (order_no),
+    UNIQUE KEY uk_ticket_order_idempotent_key (idempotent_key),
+    KEY idx_ticket_order_user_created (user_id, created_at),
+    KEY idx_ticket_order_sku_created (sku_id, created_at),
+    KEY idx_ticket_order_status_expire_id (status, expire_at, id),
+    CONSTRAINT fk_ticket_order_event FOREIGN KEY (event_id) REFERENCES ticket_event (id),
+    CONSTRAINT fk_ticket_order_sku FOREIGN KEY (sku_id) REFERENCES ticket_sku (id),
+    CONSTRAINT chk_ticket_order_quantity CHECK (quantity > 0),
+    CONSTRAINT chk_ticket_order_amount CHECK (amount_fen >= 0),
+    CONSTRAINT chk_ticket_order_expire CHECK (expire_at > created_at)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;

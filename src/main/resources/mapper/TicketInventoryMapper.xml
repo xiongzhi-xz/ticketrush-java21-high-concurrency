@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ticketrush.infrastructure.mysql.mapper.TicketInventoryMapper">
+
+    <resultMap id="TicketInventoryResultMap" type="com.ticketrush.domain.model.TicketInventory">
+        <constructor>
+            <idArg column="sku_id" javaType="java.lang.Long"/>
+            <arg column="total_stock" javaType="java.lang.Integer"/>
+            <arg column="available_stock" javaType="java.lang.Integer"/>
+            <arg column="locked_stock" javaType="java.lang.Integer"/>
+            <arg column="sold_stock" javaType="java.lang.Integer"/>
+            <arg column="version" javaType="java.lang.Long"/>
+            <arg column="updated_at" javaType="java.time.LocalDateTime"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="TicketInventoryColumns">
+        sku_id,
+        total_stock,
+        available_stock,
+        locked_stock,
+        sold_stock,
+        version,
+        updated_at
+    </sql>
+
+    <select id="findBySkuId" resultMap="TicketInventoryResultMap">
+        SELECT
+        <include refid="TicketInventoryColumns"/>
+        FROM ticket_inventory
+        WHERE sku_id = #{skuId}
+    </select>
+
+    <insert id="insert" parameterType="com.ticketrush.domain.model.TicketInventory">
+        INSERT INTO ticket_inventory (
+            sku_id,
+            total_stock,
+            available_stock,
+            locked_stock,
+            sold_stock,
+            version,
+            updated_at
+        )
+        VALUES (
+            #{skuId},
+            #{totalStock},
+            #{availableStock},
+            #{lockedStock},
+            #{soldStock},
+            #{version},
+            COALESCE(#{updatedAt,jdbcType=TIMESTAMP}, CURRENT_TIMESTAMP(3))
+        )
+        ON DUPLICATE KEY UPDATE
+            total_stock = VALUES(total_stock),
+            available_stock = VALUES(available_stock),
+            locked_stock = VALUES(locked_stock),
+            sold_stock = VALUES(sold_stock),
+            version = VALUES(version),
+            updated_at = VALUES(updated_at)
+    </insert>
+
+    <update id="reserveByOptimisticLock">
+        UPDATE ticket_inventory
+        SET available_stock = available_stock - #{quantity},
+            locked_stock = locked_stock + #{quantity},
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP(3)
+        WHERE sku_id = #{skuId}
+          AND version = #{version}
+          AND available_stock &gt;= #{quantity}
+    </update>
+
+    <update id="confirm">
+        UPDATE ticket_inventory
+        SET locked_stock = locked_stock - #{quantity},
+            sold_stock = sold_stock + #{quantity},
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP(3)
+        WHERE sku_id = #{skuId}
+          AND locked_stock &gt;= #{quantity}
+    </update>
+
+    <update id="release">
+        UPDATE ticket_inventory
+        SET available_stock = available_stock + #{quantity},
+            locked_stock = locked_stock - #{quantity},
+            version = version + 1,
+            updated_at = CURRENT_TIMESTAMP(3)
+        WHERE sku_id = #{skuId}
+          AND locked_stock &gt;= #{quantity}
+    </update>
+</mapper>

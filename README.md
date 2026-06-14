@@ -134,12 +134,11 @@ mvn clean verify
 - Mermaid 架构图与主链路说明
 - 项目踩坑记录
 - 专业 README 文档导航与运行入口
+- 数据库 schema、MyBatis XML 和 MySQL 仓储实现
 
 下一步：
 
 - 使用 JDK 21 完整验证应用启动
-- 确认数据库表结构后创建 schema
-- 实现 MyBatis XML 或注解 SQL
 - 使用 Redis 运行 Lua 和分布式锁集成测试
 - 使用 MySQL 运行乐观锁集成测试
 - 使用 k6 对三种库存策略跑第一轮本地压测
@@ -153,6 +152,7 @@ mvn clean verify
 | --- | --- |
 | 项目执行规格 | [SPEC.md](./SPEC.md) |
 | 架构图与主链路 | [docs/architecture.md](./docs/architecture.md) |
+| 数据库 schema | [docs/database-schema.md](./docs/database-schema.md) |
 | 最终一致性 | [docs/final-consistency.md](./docs/final-consistency.md) |
 | 稳定性治理 | [docs/stability-governance.md](./docs/stability-governance.md) |
 | Sentinel Dashboard 演示 | [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md) |
@@ -165,7 +165,7 @@ mvn clean verify
 推荐阅读路径：
 
 ```text
-README -> SPEC -> architecture -> stability-governance -> final-consistency -> observability -> k8s
+README -> SPEC -> architecture -> database-schema -> stability-governance -> final-consistency -> observability -> k8s
 ```
 
 ## 基础接口
@@ -315,7 +315,7 @@ src/main/resources/lua/reserve_stock.lua
 | Redis Lock | 票档粒度分布式锁 | 容易理解、便于对比 | 锁竞争激烈时吞吐下降 |
 | MySQL Optimistic Lock | `version` + 条件更新 | 不依赖 Redis 库存缓存 | 热点行冲突高，数据库压力大 |
 
-MySQL 乐观锁方案当前已完成 Java 代码和 Mapper 边界，真实运行还需要确认表结构并补充 MyBatis SQL。
+MySQL 乐观锁方案已完成 Java 代码、Mapper XML 和 schema，真实运行还需要连接 MySQL 执行集成测试。
 
 ## 异步下单
 
@@ -475,7 +475,7 @@ kubectl apply -k deploy/k8s
 
 ## 踩坑记录
 
-JDK 版本门禁、schema 暂缓、k6 未安装、Sentinel 规则持久化、Prometheus/Grafana 和 K8s 部署注意点见 [docs/pitfalls.md](./docs/pitfalls.md)。
+JDK 版本门禁、k6 未安装、Sentinel 规则持久化、Prometheus/Grafana 和 K8s 部署注意点见 [docs/pitfalls.md](./docs/pitfalls.md)。
 
 ## 文档规划
 

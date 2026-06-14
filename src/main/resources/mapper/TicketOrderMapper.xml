@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ticketrush.infrastructure.mysql.mapper.TicketOrderMapper">
+
+    <resultMap id="TicketOrderResultMap" type="com.ticketrush.domain.model.TicketOrder">
+        <constructor>
+            <idArg column="id" javaType="java.lang.Long"/>
+            <arg column="order_no" javaType="java.lang.String"/>
+            <arg column="user_id" javaType="java.lang.Long"/>
+            <arg column="event_id" javaType="java.lang.Long"/>
+            <arg column="sku_id" javaType="java.lang.Long"/>
+            <arg column="quantity" javaType="java.lang.Integer"/>
+            <arg column="amount_fen" javaType="java.lang.Long"/>
+            <arg column="inventory_deduction_strategy" javaType="com.ticketrush.domain.model.InventoryDeductionStrategy"/>
+            <arg column="status" javaType="com.ticketrush.domain.model.OrderStatus"/>
+            <arg column="idempotent_key" javaType="java.lang.String"/>
+            <arg column="created_at" javaType="java.time.LocalDateTime"/>
+            <arg column="expire_at" javaType="java.time.LocalDateTime"/>
+            <arg column="paid_at" javaType="java.time.LocalDateTime"/>
+            <arg column="canceled_at" javaType="java.time.LocalDateTime"/>
+        </constructor>
+    </resultMap>
+
+    <sql id="TicketOrderColumns">
+        id,
+        order_no,
+        user_id,
+        event_id,
+        sku_id,
+        quantity,
+        amount_fen,
+        inventory_deduction_strategy,
+        status,
+        idempotent_key,
+        created_at,
+        expire_at,
+        paid_at,
+        canceled_at
+    </sql>
+
+    <select id="findByOrderNo" resultMap="TicketOrderResultMap">
+        SELECT
+        <include refid="TicketOrderColumns"/>
+        FROM ticket_order
+        WHERE order_no = #{orderNo}
+    </select>
+
+    <select id="findByIdempotentKey" resultMap="TicketOrderResultMap">
+        SELECT
+        <include refid="TicketOrderColumns"/>
+        FROM ticket_order
+        WHERE idempotent_key = #{idempotentKey}
+    </select>
+
+    <select id="countByIdempotentKey" resultType="int">
+        SELECT COUNT(1)
+        FROM ticket_order
+        WHERE idempotent_key = #{idempotentKey}
+    </select>
+
+    <insert id="insert" parameterType="com.ticketrush.domain.model.TicketOrder">
+        INSERT INTO ticket_order
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">id,</if>
+            order_no,
+            user_id,
+            event_id,
+            sku_id,
+            quantity,
+            amount_fen,
+            inventory_deduction_strategy,
+            status,
+            idempotent_key,
+            created_at,
+            expire_at,
+            <if test="paidAt != null">paid_at,</if>
+            <if test="canceledAt != null">canceled_at,</if>
+        </trim>
+        <trim prefix="VALUES (" suffix=")" suffixOverrides=",">
+            <if test="id != null">#{id},</if>
+            #{orderNo},
+            #{userId},
+            #{eventId},
+            #{skuId},
+            #{quantity},
+            #{amountFen},
+            #{inventoryDeductionStrategy},
+            #{status},
+            #{idempotentKey},
+            #{createdAt},
+            #{expireAt},
+            <if test="paidAt != null">#{paidAt},</if>
+            <if test="canceledAt != null">#{canceledAt},</if>
+        </trim>
+    </insert>
+
+    <update id="updateStatus">
+        UPDATE ticket_order
+        SET status = #{status}
+        WHERE order_no = #{orderNo}
+    </update>
+
+    <select id="findExpiredPendingOrders" resultMap="TicketOrderResultMap">
+        SELECT
+        <include refid="TicketOrderColumns"/>
+        FROM ticket_order
+        WHERE status = 'PENDING'
+          AND expire_at &lt;= #{now}
+        ORDER BY expire_at ASC, id ASC
+        LIMIT #{limit}
+    </select>
+
+    <update id="closeExpiredOrder">
+        UPDATE ticket_order
+        SET status = #{closedStatus},
+            canceled_at = #{closedAt}
+        WHERE order_no = #{orderNo}
+          AND status = #{pendingStatus}
+          AND expire_at &lt;= #{closedAt}
+    </update>
+</mapper>

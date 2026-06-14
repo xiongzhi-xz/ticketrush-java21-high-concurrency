@@ -22,25 +22,26 @@ mvn -q '-Denforcer.skip=true' '-Djava.version=22' test
 
 - 在 JDK 21 环境执行 `mvn clean verify` 作为最终验收。
 
-## schema 暂不落地
+## schema 单独落地
 
 现象：
 
-- 当前已有 MyBatis Mapper 和 Repository 边界。
-- 尚未创建 `schema.sql` 或迁移脚本。
+- 当前已创建 `src/main/resources/schema.sql`。
+- 当前已补充 MyBatis XML 和 MySQL 仓储实现。
 
 原因：
 
-- 数据库迁移属于安全红线文件，表结构需要确认后再落地。
+- 数据库迁移属于安全红线文件，需要在表结构确认后单独提交，避免混入其他功能改动。
 
 处理方式：
 
-- 先完成领域模型、Mapper 边界、应用服务和单元测试。
-- 后续单独确认订单、库存、活动、票档表结构。
+- schema 使用 `CREATE TABLE IF NOT EXISTS`，不包含 `DROP TABLE`。
+- Spring Boot 不默认强制初始化 MySQL schema，建议本地手动执行。
 
 后续动作：
 
-- 单独提交数据库 schema，不混入其他功能提交。
+- 使用真实 MySQL 执行 schema。
+- 补充 MySQL 乐观锁、订单创建和超时关闭的集成测试。
 
 ## k6 未安装
 
