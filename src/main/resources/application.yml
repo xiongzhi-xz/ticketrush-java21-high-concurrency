@@ -1,0 +1,120 @@
+server:
+  port: 8080
+  shutdown: graceful
+
+spring:
+  application:
+    name: ticketrush
+  profiles:
+    active: local
+  config:
+    import:
+      - optional:nacos:${spring.application.name}.yml
+  threads:
+    virtual:
+      enabled: true
+  lifecycle:
+    timeout-per-shutdown-phase: 30s
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/ticketrush?useUnicode=true&characterEncoding=utf8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+    username: ticketrush
+    password: ticketrush
+    hikari:
+      pool-name: TicketRushHikariPool
+      maximum-pool-size: 40
+      minimum-idle: 10
+      connection-timeout: 3000
+      validation-timeout: 1000
+      max-lifetime: 1800000
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      database: 0
+      timeout: 2s
+      lettuce:
+        pool:
+          max-active: 128
+          max-idle: 32
+          min-idle: 8
+  elasticsearch:
+    uris:
+      - http://localhost:9200
+  cloud:
+    nacos:
+      discovery:
+        server-addr: localhost:8848
+        namespace: public
+      config:
+        server-addr: localhost:8848
+        namespace: public
+        file-extension: yml
+        import-check:
+          enabled: false
+    sentinel:
+      eager: true
+      transport:
+        dashboard: localhost:8858
+        port: 8719
+
+mybatis:
+  mapper-locations: classpath*:mapper/**/*.xml
+  configuration:
+    map-underscore-to-camel-case: true
+    default-fetch-size: 100
+    default-statement-timeout: 3
+
+rocketmq:
+  name-server: localhost:9876
+  producer:
+    group: ticketrush-order-producer-group
+    send-message-timeout: 3000
+    retry-times-when-send-failed: 2
+
+seata:
+  enabled: true
+  application-id: ${spring.application.name}
+  tx-service-group: ticketrush_tx_group
+  service:
+    vgroup-mapping:
+      ticketrush_tx_group: default
+    grouplist:
+      default: 127.0.0.1:8091
+  registry:
+    type: file
+  config:
+    type: file
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics,prometheus,threaddump,heapdump
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
+
+logging:
+  level:
+    root: info
+    com.ticketrush: debug
+    com.alibaba.cloud.sentinel: info
+    io.seata: info
+
+ticketrush:
+  concurrency:
+    virtual-threads:
+      enabled: true
+      name-prefix: ticketrush-vt-
+    benchmark:
+      traditional-pool-size: 200
+  rush:
+    stock-reserve-ttl: 10m
+    idempotent-key-ttl: 10m
+    request-token-ttl: 2m
+  redis:
+    key-prefix: ticketrush

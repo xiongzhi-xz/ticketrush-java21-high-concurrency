@@ -1,0 +1,37 @@
+# Maven
+target/
+*.jar
+*.war
+*.nar
+*.ear
+
+# Java
+*.class
+hs_err_pid*
+replay_pid*
+
+# IDE
+.idea/
+*.iml
+.vscode/
+.classpath
+.project
+.settings/
+
+# Logs
+logs/
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Local environment
+.env
+.env.*
+!.env.example
+
+# Docker and runtime data
+docker-data/
+data/
+tmp/

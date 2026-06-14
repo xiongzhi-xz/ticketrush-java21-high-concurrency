@@ -1,0 +1,176 @@
+name: ticketrush-local
+
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: ticketrush-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: ticketrush
+      MYSQL_USER: ticketrush
+      MYSQL_PASSWORD: ticketrush
+      TZ: Asia/Shanghai
+    ports:
+      - "3306:3306"
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_0900_ai_ci
+      - --default-time-zone=+08:00
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ticketrush
+
+  redis:
+    image: redis:7.2
+    container_name: ticketrush-redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    command: ["redis-server", "--appendonly", "yes", "--save", "60", "1000"]
+    volumes:
+      - redis-data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    networks:
+      - ticketrush
+
+  nacos:
+    image: nacos/nacos-server:v2.3.2
+    container_name: ticketrush-nacos
+    restart: unless-stopped
+    environment:
+      MODE: standalone
+      PREFER_HOST_MODE: hostname
+      NACOS_AUTH_ENABLE: "false"
+      JVM_XMS: 256m
+      JVM_XMX: 512m
+      JVM_XMN: 128m
+      TZ: Asia/Shanghai
+    ports:
+      - "8848:8848"
+      - "9848:9848"
+      - "9849:9849"
+    networks:
+      - ticketrush
+
+  sentinel-dashboard:
+    image: bladex/sentinel-dashboard:1.8.8
+    container_name: ticketrush-sentinel
+    restart: unless-stopped
+    environment:
+      JAVA_OPTS: "-Dserver.port=8858 -Dcsp.sentinel.dashboard.server=localhost:8858 -Dproject.name=sentinel-dashboard"
+      TZ: Asia/Shanghai
+    ports:
+      - "8858:8858"
+    networks:
+      - ticketrush
+
+  rocketmq-namesrv:
+    image: apache/rocketmq:5.2.0
+    container_name: ticketrush-rocketmq-namesrv
+    restart: unless-stopped
+    environment:
+      JAVA_OPT_EXT: "-Xms256m -Xmx256m -Xmn128m"
+      TZ: Asia/Shanghai
+    command: sh mqnamesrv
+    ports:
+      - "9876:9876"
+    networks:
+      - ticketrush
+
+  rocketmq-broker:
+    image: apache/rocketmq:5.2.0
+    container_name: ticketrush-rocketmq-broker
+    restart: unless-stopped
+    depends_on:
+      - rocketmq-namesrv
+    environment:
+      NAMESRV_ADDR: rocketmq-namesrv:9876
+      JAVA_OPT_EXT: "-Xms512m -Xmx512m -Xmn256m"
+      TZ: Asia/Shanghai
+    command: sh mqbroker -n rocketmq-namesrv:9876
+    ports:
+      - "10909:10909"
+      - "10911:10911"
+      - "10912:10912"
+    volumes:
+      - rocketmq-store:/home/rocketmq/store
+    networks:
+      - ticketrush
+
+  seata:
+    image: seataio/seata-server:2.0.0
+    container_name: ticketrush-seata
+    restart: unless-stopped
+    environment:
+      SEATA_IP: 127.0.0.1
+      SEATA_PORT: 8091
+      STORE_MODE: file
+      TZ: Asia/Shanghai
+    ports:
+      - "7091:7091"
+      - "8091:8091"
+    networks:
+      - ticketrush
+
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.13.4
+    container_name: ticketrush-elasticsearch
+    restart: unless-stopped
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+      ES_JAVA_OPTS: "-Xms512m -Xmx512m"
+      TZ: Asia/Shanghai
+    ports:
+      - "9200:9200"
+      - "9300:9300"
+    volumes:
+      - elasticsearch-data:/usr/share/elasticsearch/data
+    networks:
+      - ticketrush
+
+  prometheus:
+    image: prom/prometheus:v2.52.0
+    container_name: ticketrush-prometheus
+    restart: unless-stopped
+    ports:
+      - "9090:9090"
+    networks:
+      - ticketrush
+
+  grafana:
+    image: grafana/grafana:10.4.3
+    container_name: ticketrush-grafana
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_ADMIN_USER: admin
+      GF_SECURITY_ADMIN_PASSWORD: admin
+      TZ: Asia/Shanghai
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana-data:/var/lib/grafana
+    networks:
+      - ticketrush
+
+volumes:
+  mysql-data:
+  redis-data:
+  rocketmq-store:
+  elasticsearch-data:
+  grafana-data:
+
+networks:
+  ticketrush:
+    driver: bridge
