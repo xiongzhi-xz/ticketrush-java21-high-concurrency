@@ -1,0 +1,14 @@
+[
+  {
+    "resource": "ticketrush:rush:ticket:sku",
+    "limitApp": "default",
+    "grade": 1,
+    "paramIdx": 0,
+    "count": 10,
+    "durationInSec": 1,
+    "controlBehavior": 0,
+    "maxQueueingTimeMs": 0,
+    "burstCount": 0,
+    "clusterMode": false
+  }
+]

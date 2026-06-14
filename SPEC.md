@@ -253,6 +253,7 @@ src/main/java/com/ticketrush
 - [x] 请求令牌或排队策略
 - [x] 稳定性治理说明
 - [x] 稳定性治理 k6 脚本
+- [x] Sentinel Dashboard 动态规则演示
 
 验收标准：
 
@@ -270,6 +271,7 @@ src/main/java/com/ticketrush
 - 已完成热点库存自动预热 Runner，可通过配置在应用启动时预热指定票档库存。
 - 已补充稳定性治理说明：`docs/stability-governance.md`。
 - 已补充稳定性治理压测脚本和记录模板：`scripts/k6/stability-governance.js`、`docs/stability-benchmark.md`。
+- 已补充 Sentinel Dashboard 动态规则演示：`docs/sentinel-dashboard-demo.md`、`scripts/sentinel/*.json`。
 - 限流和准入门前后的 k6 稳定性实测记录尚未完成。
 
 ### 阶段 7：压测、监控、部署与文档
@@ -338,4 +340,4 @@ src/main/java/com/ticketrush
 - [x] 请求令牌或排队策略
 - [x] 编写稳定性治理 k6 脚本
 - [ ] 使用 k6 对限流前后做稳定性测试记录
-- [ ] 接入 Sentinel Dashboard 动态规则演示
+- [x] 接入 Sentinel Dashboard 动态规则演示
