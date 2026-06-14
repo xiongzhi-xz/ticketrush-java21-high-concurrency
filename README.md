@@ -131,6 +131,7 @@ mvn clean verify
 - Prometheus 抓取配置和 Grafana 自动面板
 - Arthas 抢票链路诊断案例
 - Dockerfile 与 Kubernetes/K3s 应用部署清单
+- Mermaid 架构图与主链路说明
 
 下一步：
 
@@ -444,6 +445,10 @@ kubectl apply -k deploy/k8s
 ```
 
 说明详见 [deploy/k8s/README.md](./deploy/k8s/README.md)。
+
+## 架构图
+
+总体架构、抢票主链路、异步下单补偿、稳定性治理和部署视图见 [docs/architecture.md](./docs/architecture.md)。
 
 ## 文档规划
 

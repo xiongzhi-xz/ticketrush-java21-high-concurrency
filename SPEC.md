@@ -287,7 +287,7 @@ src/main/java/com/ticketrush
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
 - [ ] 专业 README
-- [ ] 架构图
+- [x] 架构图
 - [ ] 踩坑记录
 
 验收标准：
@@ -349,5 +349,5 @@ src/main/java/com/ticketrush
 - [x] Grafana 面板说明
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
-- [ ] 架构图
+- [x] 架构图
 - [ ] 踩坑记录
