@@ -140,19 +140,30 @@ src/main/java/com/ticketrush
 
 产出：
 
-- [ ] 活动模型
-- [ ] 票档模型
-- [ ] 库存模型
-- [ ] 订单模型
-- [ ] 仓储接口
-- [ ] MyBatis Mapper
-- [ ] Redis 库存缓存结构
+- [x] 活动模型
+- [x] 票档模型
+- [x] 库存模型
+- [x] 订单模型
+- [x] 仓储接口
+- [x] MyBatis Mapper
+- [x] Redis 库存缓存结构
+- [x] 库存领域服务
+- [x] 库存领域单元测试
 
 验收标准：
 
 - 核心实体边界清晰
 - 库存扣减接口可测试
 - 支持后续 Redis Lua、分布式锁、乐观锁三种方案对比
+
+当前状态：
+
+- 已完成 `TicketEvent`、`TicketSku`、`TicketInventory`、`TicketOrder` 等核心领域模型。
+- `TicketInventory` 已内置库存守恒校验：总库存 = 可售库存 + 锁定库存 + 已售库存。
+- 已定义 `InventoryDeductionStrategy`，后续用于 Redis Lua、Redis 锁、MySQL 乐观锁压测对比。
+- 已完成领域仓储接口、MyBatis Mapper 边界和 Redis 库存 Hash/Lua 脚本结构。
+- 已添加库存预占领域测试，验证成功预占、库存不足和库存守恒异常。
+- 暂未创建数据库 schema/migration 文件，后续需要单独确认表结构后再落地。
 
 ### 阶段 4：高并发抢票核心接口
 
@@ -240,7 +251,7 @@ src/main/java/com/ticketrush
 
 ## 7. 下一步任务
 
-当前建议继续执行阶段 1 的剩余任务：
+跨阶段遗留验证：
 
 - [ ] 使用 JDK 21 跑一次完整 Maven 校验
 
@@ -249,3 +260,10 @@ src/main/java/com/ticketrush
 - [ ] 使用 JDK 21 执行 `mvn clean verify`
 - [ ] 启动应用并访问 `/api/system/health`
 - [ ] 调用 `/api/system/validation-check` 验证参数错误响应
+
+阶段 3 后续任务：
+
+- [ ] 确认数据库表结构后创建 schema
+- [ ] 实现 MyBatis XML 或注解 SQL
+- [ ] 实现 Redis Lua 库存扣减适配器
+- [ ] 实现 MySQL 乐观锁库存扣减适配器

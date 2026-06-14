@@ -1,0 +1,12 @@
+package com.ticketrush.infrastructure.redis;
+
+/**
+ * 库存 Lua 脚本位置。
+ */
+public final class InventoryLuaScripts {
+
+    public static final String RESERVE_STOCK = "lua/reserve_stock.lua";
+
+    private InventoryLuaScripts() {
+    }
+}

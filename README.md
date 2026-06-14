@@ -101,12 +101,17 @@ mvn clean verify
 - 虚拟线程基础配置
 - 系统健康检查接口
 - 参数校验示例接口
+- 票务活动、票档、库存、订单领域模型
+- 库存仓储接口、MyBatis Mapper 边界
+- Redis 库存 Key 和 Lua 预占脚本
+- 库存领域服务和单元测试
 
 下一步：
 
 - 使用 JDK 21 完整验证应用启动
-- 建立票务活动、票档、库存和订单领域模型
-- 设计库存扣减仓储接口
+- 确认数据库表结构后创建 schema
+- 接入 Redis Lua 真实库存扣减
+- 接入 MySQL 乐观锁扣减对比方案
 
 ## 基础接口
 
@@ -132,6 +137,44 @@ Content-Type: application/json
 ```
 
 该接口用于验证统一参数校验和全局异常响应格式，后续业务接口沿用同样的校验方式。
+
+## 领域模型进度
+
+当前已建立四个核心领域模型：
+
+- `TicketEvent`：票务活动，控制整体售卖窗口。
+- `TicketSku`：票档，控制价格、票档售卖窗口和总库存。
+- `TicketInventory`：库存，维护可售、锁定、已售三段库存。
+- `TicketOrder`：订单，维护幂等键、过期时间和订单状态。
+
+库存模型遵守以下不变量：
+
+```text
+totalStock = availableStock + lockedStock + soldStock
+```
+
+抢票阶段会先把可售库存转入锁定库存；订单创建成功后转入已售库存；订单失败或超时后释放回可售库存。
+
+## Redis 库存结构
+
+库存以票档为粒度缓存为 Redis Hash：
+
+```text
+ticketrush:inventory:{skuId}
+├─ total
+├─ available
+├─ locked
+├─ sold
+└─ version
+```
+
+Lua 脚本位置：
+
+```text
+src/main/resources/lua/reserve_stock.lua
+```
+
+脚本负责原子完成库存检查、库存预占、版本递增和幂等 Key 写入。
 
 ## 文档规划
 
