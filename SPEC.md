@@ -171,13 +171,15 @@ src/main/java/com/ticketrush
 
 产出：
 
-- [ ] 抢票 API
-- [ ] 请求幂等校验
-- [ ] Redis Lua 原子扣减
+- [x] 抢票 API
+- [x] 请求幂等校验
+- [x] Redis Lua 原子扣减
 - [ ] Redis 分布式锁扣减方案
 - [ ] MySQL 乐观锁扣减方案
-- [ ] Virtual Threads 执行器和对比入口
-- [ ] 单元测试或集成测试
+- [x] Virtual Threads 执行器
+- [ ] Virtual Threads 对比入口
+- [x] 单元测试
+- [x] Redis 库存预热接口
 
 验收标准：
 
@@ -185,6 +187,16 @@ src/main/java/com/ticketrush
 - 重复请求不会重复下单
 - 能解释三种库存方案优缺点
 - Virtual Threads 使用点明确，不只是配置开关
+
+当前状态：
+
+- 已完成 `/api/rush/tickets` 抢票接口。
+- 已完成 `/api/rush/inventory/preload` 本地库存预热接口。
+- 抢票链路当前为：Controller 参数校验 -> Application Service -> Virtual Thread -> Redis Lua -> Redis Hash 库存预占。
+- Redis Lua 原子完成库存检查、库存预占、版本递增和幂等 Key 写入。
+- 应用服务会将重复请求映射为 `A0429`，库存不足映射为 `B0401`，未预热库存映射为 `B0402`。
+- 已添加应用服务单元测试，验证虚拟线程执行、幂等冲突映射和库存预热。
+- Redis 分布式锁方案、MySQL 乐观锁方案和 Virtual Threads 对比入口尚未完成。
 
 ### 阶段 5：异步削峰与订单最终一致性
 
@@ -265,5 +277,13 @@ src/main/java/com/ticketrush
 
 - [ ] 确认数据库表结构后创建 schema
 - [ ] 实现 MyBatis XML 或注解 SQL
-- [ ] 实现 Redis Lua 库存扣减适配器
+- [x] 实现 Redis Lua 库存扣减适配器
 - [ ] 实现 MySQL 乐观锁库存扣减适配器
+
+阶段 4 后续任务：
+
+- [ ] 使用 Redis 运行集成测试验证 Lua 原子扣减
+- [ ] 实现 Redis 分布式锁库存扣减方案
+- [ ] 实现 MySQL 乐观锁库存扣减方案
+- [ ] 增加传统线程池与虚拟线程对比入口
+- [ ] 编写第一版抢票压测脚本

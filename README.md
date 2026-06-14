@@ -105,13 +105,18 @@ mvn clean verify
 - 库存仓储接口、MyBatis Mapper 边界
 - Redis 库存 Key 和 Lua 预占脚本
 - 库存领域服务和单元测试
+- Redis Lua 真实库存预占适配器
+- 抢票核心接口
+- 本地库存预热接口
+- 抢票应用服务单元测试
 
 下一步：
 
 - 使用 JDK 21 完整验证应用启动
 - 确认数据库表结构后创建 schema
-- 接入 Redis Lua 真实库存扣减
 - 接入 MySQL 乐观锁扣减对比方案
+- 接入 Redis 分布式锁扣减对比方案
+- 增加传统线程池与虚拟线程对比入口
 
 ## 基础接口
 
@@ -137,6 +142,46 @@ Content-Type: application/json
 ```
 
 该接口用于验证统一参数校验和全局异常响应格式，后续业务接口沿用同样的校验方式。
+
+### 本地库存预热
+
+```http
+POST /api/rush/inventory/preload
+Content-Type: application/json
+
+{
+  "skuId": 1001,
+  "totalStock": 100
+}
+```
+
+该接口用于本地开发和压测前把票档库存写入 Redis Hash。生产环境应改为后台任务或管控系统触发。
+
+### 抢票
+
+```http
+POST /api/rush/tickets
+Content-Type: application/json
+
+{
+  "requestId": "req-001",
+  "userId": 2001,
+  "eventId": 3001,
+  "skuId": 1001,
+  "quantity": 1
+}
+```
+
+当前抢票链路会通过应用服务把 Redis Lua 库存预占提交到虚拟线程执行。响应中的 `processedByVirtualThread` 用于确认本次库存预占是否由虚拟线程处理。
+
+常见错误码：
+
+| 错误码 | 含义 |
+| --- | --- |
+| `A0429` | 重复请求 |
+| `B0401` | 库存不足 |
+| `B0402` | 库存未预热或扣减失败 |
+| `C0503` | 库存预占超时或执行失败 |
 
 ## 领域模型进度
 

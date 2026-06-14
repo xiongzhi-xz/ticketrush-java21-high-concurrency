@@ -116,5 +116,6 @@ ticketrush:
     stock-reserve-ttl: 10m
     idempotent-key-ttl: 10m
     request-token-ttl: 2m
+    reserve-timeout: 2s
   redis:
     key-prefix: ticketrush
