@@ -67,6 +67,8 @@ services:
     image: bladex/sentinel-dashboard:1.8.8
     container_name: ticketrush-sentinel
     restart: unless-stopped
+    profiles:
+      - sentinel
     environment:
       JAVA_OPTS: "-Dserver.port=8858 -Dcsp.sentinel.dashboard.server=localhost:8858 -Dproject.name=sentinel-dashboard"
       TZ: Asia/Shanghai
@@ -98,14 +100,14 @@ services:
       NAMESRV_ADDR: rocketmq-namesrv:9876
       JAVA_OPT_EXT: "-Xms512m -Xmx512m -Xmn256m"
       TZ: Asia/Shanghai
-    command: sh mqbroker -n rocketmq-namesrv:9876 -c /home/rocketmq/conf/broker.conf
+    entrypoint: ["sh", "/home/rocketmq/conf/broker-entrypoint.sh"]
     ports:
       - "10909:10909"
       - "10911:10911"
       - "10912:10912"
     volumes:
-      - ./docker/rocketmq/broker.conf:/home/rocketmq/conf/broker.conf:ro
-      - rocketmq-store:/home/rocketmq/store
+      - ./docker/rocketmq/broker-entrypoint.sh:/home/rocketmq/conf/broker-entrypoint.sh:ro
+      - ./docker/rocketmq/store:/home/rocketmq/store
     networks:
       - ticketrush
 
@@ -141,14 +143,36 @@ services:
     networks:
       - ticketrush
 
+  app:
+    image: eclipse-temurin:21-jre
+    container_name: ticketrush-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      nacos:
+        condition: service_started
+      rocketmq-broker:
+        condition: service_started
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      JAVA_OPTS: "--enable-preview -XX:MaxRAMPercentage=75.0 -Duser.timezone=Asia/Shanghai"
+    entrypoint: ["sh", "-c", "java $$JAVA_OPTS -jar /app/ticketrush.jar"]
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./target/ticketrush-0.0.1-SNAPSHOT.jar:/app/ticketrush.jar:ro
+    networks:
+      - ticketrush
+
   prometheus:
     image: prom/prometheus:v2.52.0
     container_name: ticketrush-prometheus
     restart: unless-stopped
     ports:
       - "9090:9090"
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
     volumes:
       - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
     networks:
@@ -174,7 +198,6 @@ services:
 volumes:
   mysql-data:
   redis-data:
-  rocketmq-store:
   elasticsearch-data:
   grafana-data:
 

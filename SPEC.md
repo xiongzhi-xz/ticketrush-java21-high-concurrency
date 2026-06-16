@@ -302,12 +302,12 @@ src/main/java/com/ticketrush
 
 跨阶段遗留验证：
 
-- [ ] 使用 JDK 21 跑一次完整 Maven 校验
+- [x] 使用 JDK 21 跑一次完整 Maven 校验
 
 阶段 2 后续验证：
 
-- [ ] 使用 JDK 21 执行 `mvn clean verify`
-- [ ] 启动应用并访问 `/api/system/health`
+- [x] 使用 JDK 21 执行 `mvn clean verify`
+- [x] 启动应用并访问 `/api/system/health`
 - [ ] 调用 `/api/system/validation-check` 验证参数错误响应
 
 阶段 3 后续任务：

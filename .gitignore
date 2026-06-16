@@ -35,3 +35,6 @@ Thumbs.db
 docker-data/
 data/
 tmp/
+
+# RocketMQ broker runtime store (bind-mounted from docker/rocketmq/store/)
+docker/rocketmq/store/
