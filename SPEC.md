@@ -239,6 +239,7 @@ src/main/java/com/ticketrush
 - 已提供 `OrderTimeoutCloseJob`，批量关闭过期 `PENDING` 订单并释放库存。
 - 已补充最终一致性说明文档：`docs/final-consistency.md`。
 - MyBatis 订单仓储、schema、XML SQL 和真实 MySQL 订单 Mapper 集成测试已完成。
+- 已补充 Spring Cloud Stream 测试 Binder 集成测试，覆盖订单消息发布、消费落单和重复消息幂等。
 
 ### 阶段 6：限流、热点保护与稳定性治理
 
@@ -330,7 +331,7 @@ src/main/java/com/ticketrush
 - [x] 确认订单表结构并补充 MyBatis SQL
 - [x] 实现订单超时关闭任务
 - [x] 超时关闭时释放锁定库存
-- [ ] 补充 RocketMQ 集成测试
+- [x] 补充 RocketMQ 集成测试
 - [x] 编写最终一致性和失败补偿说明
 - [ ] 补充 Seata 示例
 
