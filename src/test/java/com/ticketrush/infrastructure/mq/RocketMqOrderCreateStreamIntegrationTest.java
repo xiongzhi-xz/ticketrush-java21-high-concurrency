@@ -48,11 +48,13 @@ import static org.mockito.Mockito.when;
         classes = RocketMqOrderCreateStreamIntegrationTest.TestApplication.class,
         webEnvironment = SpringBootTest.WebEnvironment.NONE,
         properties = {
+                "spring.profiles.active=test",
                 "spring.cloud.bootstrap.enabled=false",
                 "spring.cloud.nacos.config.enabled=false",
                 "spring.cloud.nacos.discovery.enabled=false",
                 "spring.config.import=",
                 "seata.enabled=false",
+                "spring.cloud.stream.enabled=true",
                 "spring.cloud.function.definition=orderCreateConsumer",
                 "spring.cloud.stream.defaultBinder=test",
                 "spring.cloud.stream.bindings.orderCreate-out-0.destination=ticketrush-order-create-topic",
