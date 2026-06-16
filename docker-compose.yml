@@ -76,7 +76,7 @@ services:
       - ticketrush
 
   rocketmq-namesrv:
-    image: apache/rocketmq:5.2.0
+    image: apache/rocketmq:5.1.4
     container_name: ticketrush-rocketmq-namesrv
     restart: unless-stopped
     environment:
@@ -89,7 +89,7 @@ services:
       - ticketrush
 
   rocketmq-broker:
-    image: apache/rocketmq:5.2.0
+    image: apache/rocketmq:5.1.4
     container_name: ticketrush-rocketmq-broker
     restart: unless-stopped
     depends_on:
@@ -98,12 +98,13 @@ services:
       NAMESRV_ADDR: rocketmq-namesrv:9876
       JAVA_OPT_EXT: "-Xms512m -Xmx512m -Xmn256m"
       TZ: Asia/Shanghai
-    command: sh mqbroker -n rocketmq-namesrv:9876
+    command: sh mqbroker -n rocketmq-namesrv:9876 -c /home/rocketmq/conf/broker.conf
     ports:
       - "10909:10909"
       - "10911:10911"
       - "10912:10912"
     volumes:
+      - ./docker/rocketmq/broker.conf:/home/rocketmq/conf/broker.conf:ro
       - rocketmq-store:/home/rocketmq/store
     networks:
       - ticketrush
