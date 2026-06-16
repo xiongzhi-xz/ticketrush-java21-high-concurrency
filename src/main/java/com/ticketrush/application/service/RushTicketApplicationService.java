@@ -13,6 +13,7 @@ import com.ticketrush.domain.model.InventoryDeductionStrategy;
 import com.ticketrush.domain.model.TicketInventory;
 import com.ticketrush.domain.repository.InventoryDeductionRepository;
 import com.ticketrush.domain.repository.TicketInventoryRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -48,6 +49,7 @@ public class RushTicketApplicationService {
     private final ExecutorService virtualThreadExecutor;
     private final Duration reserveTimeout;
 
+    @Autowired
     public RushTicketApplicationService(
             TicketInventoryRepository inventoryRepository,
             List<InventoryDeductionRepository> deductionRepositories,

@@ -5,6 +5,7 @@ import com.ticketrush.domain.model.InventoryDeductionStrategy;
 import com.ticketrush.domain.model.TicketOrder;
 import com.ticketrush.domain.repository.InventoryDeductionRepository;
 import com.ticketrush.domain.repository.TicketOrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -27,6 +28,7 @@ public class OrderTimeoutCloseApplicationService {
     private final Map<InventoryDeductionStrategy, InventoryDeductionRepository> deductionRepositories;
     private final Clock clock;
 
+    @Autowired
     public OrderTimeoutCloseApplicationService(
             TicketOrderRepository ticketOrderRepository,
             List<InventoryDeductionRepository> deductionRepositories

@@ -5,6 +5,7 @@ import com.ticketrush.common.id.OrderNoGenerator;
 import com.ticketrush.domain.model.OrderStatus;
 import com.ticketrush.domain.model.TicketOrder;
 import com.ticketrush.domain.repository.TicketOrderRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +27,7 @@ public class OrderApplicationService {
     private final Duration orderExpireTtl;
     private final Clock clock;
 
+    @Autowired
     public OrderApplicationService(
             TicketOrderRepository ticketOrderRepository,
             OrderNoGenerator orderNoGenerator,
