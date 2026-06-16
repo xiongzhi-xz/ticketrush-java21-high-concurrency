@@ -2,6 +2,7 @@ package com.ticketrush.infrastructure.mq;
 
 import com.ticketrush.application.dto.OrderCreateMessage;
 import com.ticketrush.application.service.OrderCreateMessagePublisher;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.cloud.stream.function.StreamBridge;
 import org.springframework.messaging.support.MessageBuilder;
 import org.springframework.stereotype.Component;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
  * RocketMQ 订单创建消息发布器。
  */
 @Component
+@ConditionalOnProperty(name = "spring.cloud.stream.enabled", havingValue = "true", matchIfMissing = true)
 public class RocketMqOrderCreateMessagePublisher implements OrderCreateMessagePublisher {
 
     public static final String ORDER_CREATE_OUT_BINDING = "orderCreate-out-0";

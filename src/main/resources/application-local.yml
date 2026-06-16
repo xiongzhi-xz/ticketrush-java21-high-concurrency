@@ -1,0 +1,52 @@
+# Local development profile — MySQL + Redis + Nacos required
+# RocketMQ, Sentinel, Seata, ES are disabled for quick startup
+# When RocketMQ is unavailable, NoOpOrderCreateMessagePublisher acts as fallback
+
+spring:
+  cloud:
+    nacos:
+      config:
+        import-check:
+          enabled: false
+    sentinel:
+      enabled: false
+      eager: false
+    function:
+      definition: ""
+    stream:
+      enabled: false
+  autoconfigure:
+    exclude:
+      # Spring Cloud Stream + RocketMQ — must be excluded when broker is unavailable
+      - org.springframework.cloud.stream.function.FunctionConfiguration
+      - com.alibaba.cloud.stream.binder.rocketmq.autoconfigurate.ExtendedBindingHandlerMappingsProviderConfiguration
+      # Seata — seata.enabled=false does NOT prevent auto-configuration
+      - com.alibaba.cloud.seata.rest.SeataRestTemplateAutoConfiguration
+      - com.alibaba.cloud.seata.web.SeataHandlerInterceptorConfiguration
+      - com.alibaba.cloud.seata.feign.SeataFeignClientAutoConfiguration
+      # Sentinel auto-configurations
+      - com.alibaba.cloud.sentinel.custom.SentinelAutoConfiguration
+      - com.alibaba.cloud.sentinel.SentinelWebAutoConfiguration
+      - com.alibaba.cloud.sentinel.endpoint.SentinelEndpointAutoConfiguration
+      - com.alibaba.cloud.sentinel.feign.SentinelFeignAutoConfiguration
+      # Nacos auto-registration (Nacos runs but we don't need to register)
+      - com.alibaba.cloud.nacos.registry.NacosServiceRegistryAutoConfiguration
+      - com.alibaba.cloud.nacos.discovery.NacosDiscoveryAutoConfiguration
+      - com.alibaba.cloud.nacos.discovery.NacosDiscoveryClientConfiguration
+      - com.alibaba.cloud.nacos.discovery.NacosDiscoveryHeartBeatConfiguration
+      - com.alibaba.cloud.nacos.endpoint.NacosDiscoveryEndpointAutoConfiguration
+      - com.alibaba.cloud.nacos.NacosServiceAutoConfiguration
+      # Spring Cloud Refresh — causes CGLIB proxy requiring no-arg constructor
+      - org.springframework.cloud.autoconfigure.RefreshAutoConfiguration
+
+seata:
+  enabled: false
+
+ticketrush:
+  sentinel:
+    enabled: false
+  order:
+    timeout-close:
+      enabled: false
+  hot-inventory-preload:
+    enabled: false
