@@ -110,6 +110,32 @@ Not verified:
 Next step:
 - Commit and push the safety cleanup, then continue README/showcase polishing or k6 pressure-test reporting.
 
+## 2026-06-17 Work Log - README Showcase Polish
+
+Current goal:
+- Turn TicketRush `README.md` into a GitHub/project-showcase entry page that pairs cleanly with SmartKB.
+
+Completed:
+- Rewrote the README around the high-concurrency ticket-rush main path:
+  - Sentinel guard -> Redis admission token -> Java 21 Virtual Threads -> inventory strategy -> RocketMQ async order -> timeout compensation.
+- Added a Mermaid architecture diagram, project highlights, technology table, feature checklist, Docker Compose startup path, manual smoke commands, k6 entry points, API overview, verification status, project structure, interview talking points, documentation navigation, and safety notes.
+- Kept Seata and Elasticsearch described as reserved/pending integration rather than completed business features.
+- Marked README showcase polish complete in `SPEC.md`.
+
+Modified files:
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+
+Verified:
+- README local link scan via PowerShell: passed (`README links ok: 21`).
+- Public-safety scan for private gateways, token patterns, private keys, and local absolute paths: no matches.
+- `git diff --check`: passed with no whitespace errors.
+- Maven tests were not rerun because this step only changed documentation.
+
+Next step:
+- Continue k6 pressure-test reporting for the three inventory strategies and stability-governance comparison.
+
 ## 接管开场模板
 
 新窗口或换模型时，先执行：

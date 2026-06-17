@@ -1,410 +1,206 @@
 # TicketRush
 
-TicketRush 是一个基于 Java 21 的高并发票务秒杀系统，用于模拟演出、景区、剧院、年卡等票务场景中的高并发抢票链路。
+Java 21 + Spring Boot 3 高并发票务秒杀系统，用于演示景区、剧院、演出、年卡等票务场景中的抢票、防超卖、限流、异步削峰、最终一致性、压测、监控和部署闭环。
 
-项目目标不是做一个简单 CRUD，而是完整展示生产级高并发系统的关键能力：抢票入口、库存防超卖、幂等控制、限流降级、异步削峰、分布式事务、可观测性、压测和本地部署。
+TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链路设计的后端作品项目。主链路从抢票入口开始，经过 Sentinel 限流、Redis 准入令牌、Virtual Threads 库存预占、Redis/MySQL 多策略防超卖、RocketMQ 异步下单、订单幂等、超时关闭补偿，最终落到 Prometheus/Grafana 可观测和 Docker/K3s 部署。
+
+## 项目亮点
+
+- **Java 21 Virtual Threads 实战**：抢票库存预占和执行器基准接口都走虚拟线程，响应中可看到 `processedByVirtualThread=true`。
+- **三种防超卖策略对比**：Redis Lua、Redis 分布式锁、MySQL 乐观锁共用同一抢票入口，便于压测横向比较。
+- **入口稳定性治理**：Sentinel 全局 QPS、热点票档参数限流、Redis 准入令牌三层保护，限流统一返回 `C0429`。
+- **RocketMQ 异步削峰**：抢票成功后发布订单创建消息，消费者幂等创建 `PENDING` 订单，入口失败时回滚预占库存。
+- **最终一致性补偿**：订单超时关闭任务批量关闭过期订单，并释放锁定库存。
+- **可观测和部署闭环**：Actuator + Prometheus + Grafana，Docker Compose 一键启动，Kubernetes/K3s 清单可演示。
+- **面试友好文档**：架构图、数据库 schema、稳定性治理、Arthas 诊断、踩坑记录和压测脚本都已落地。
 
 ## 技术栈
 
-- Java 21
-- Spring Boot 3
-- Spring Cloud Alibaba
-- Virtual Threads
-- Structured Concurrency
-- MySQL
-- Redis
-- RocketMQ
-- Nacos
-- Sentinel
-- Seata
-- Elasticsearch
-- Docker Compose
-- Kubernetes/K3s
-- Prometheus
-- Grafana
-- Arthas
+| 分类 | 技术 |
+| --- | --- |
+| Runtime | Java 21, Virtual Threads, Spring Boot 3.2.4 |
+| Cloud | Spring Cloud 2023, Spring Cloud Alibaba, Nacos, Sentinel, RocketMQ, Seata |
+| Storage | MySQL 8.4, Redis 7.2, Elasticsearch 8.13 |
+| Persistence | MyBatis, XML Mapper, SQL schema |
+| Concurrency | Redis Lua, Redis distributed lock, MySQL optimistic lock |
+| Observability | Spring Boot Actuator, Micrometer, Prometheus, Grafana, Arthas |
+| Delivery | Docker Compose, Dockerfile, Kubernetes/K3s manifests |
+| Test & Benchmark | JUnit 5, Spring Cloud Stream test binder, k6 |
 
-## 核心目标
+说明：Seata 和 Elasticsearch 依赖、配置与容器环境已预留，当前业务闭环优先采用最终一致性补偿；完整 Seata 示例和 ES 查询集成仍在后续任务中。
 
-- 高并发抢票核心接口：在真实业务链路中使用 Java 21 Virtual Threads。
-- 防超卖方案对比：Redis Lua、Redis 分布式锁、MySQL 乐观锁。
-- 流量治理：Sentinel 限流、热点参数保护、降级兜底。
-- 异步削峰：RocketMQ 解耦抢票入口和订单创建。
-- 一致性保障：幂等、补偿、订单超时关闭、Seata 示例。
-- 可观测性：Actuator、Prometheus、Grafana、Arthas。
-- 压测报告：Virtual Threads 与传统线程池的 QPS、CPU、内存、GC 对比。
+## 架构图
 
-## 架构分层
-
-```text
-com.ticketrush
-├─ common          # 通用响应、异常、错误码、工具、ID
-├─ config          # Web、虚拟线程、Redis、MQ、Sentinel、Seata、监控配置
-├─ interfaces      # Controller、Request、Response
-├─ application     # 应用服务、用例编排、命令对象、DTO
-├─ domain          # 领域模型、领域服务、仓储接口
-├─ infrastructure  # MySQL、Redis、MQ、ES、Seata、Sentinel 适配
-└─ job             # 定时任务、补偿任务、库存预热、订单关闭
+```mermaid
+flowchart LR
+    Client[k6 / Client] --> API[Spring Boot API]
+    API --> Sentinel[Sentinel global + hot sku limit]
+    Sentinel --> Admission[Redis admission tokens]
+    Admission --> Service[Rush Application Service]
+    Service --> VT[Java 21 Virtual Threads]
+    VT --> Strategy{Inventory Strategy}
+    Strategy --> Lua[Redis Lua]
+    Strategy --> Lock[Redis Lock]
+    Strategy --> Optimistic[MySQL Optimistic Lock]
+    Lua --> Redis[(Redis)]
+    Lock --> Redis
+    Optimistic --> MySQL[(MySQL)]
+    Service --> MQ[RocketMQ]
+    MQ --> Consumer[Order Consumer]
+    Consumer --> OrderDB[(MySQL Orders)]
+    Consumer --> Timeout[Timeout Close Job]
+    Timeout --> Redis
+    API --> Metrics[Actuator / Prometheus]
+    Metrics --> Grafana[Grafana]
 ```
 
-## 本地环境
+更完整的总体架构、抢票主链路、补偿链路和部署视图见 [docs/architecture.md](./docs/architecture.md)。
+
+## 核心链路
+
+```text
+POST /api/rush/tickets
+  -> request validation
+  -> Sentinel global and hot-sku guard
+  -> Redis admission token
+  -> Virtual Thread inventory reservation
+  -> Redis Lua / Redis Lock / MySQL optimistic lock
+  -> RocketMQ OrderCreateMessage
+  -> orderCreateConsumer
+  -> PENDING order
+  -> timeout close job releases locked stock
+```
+
+## 功能清单
+
+### 抢票与库存
+
+- 抢票入口：`POST /api/rush/tickets`。
+- 本地库存预热：`POST /api/rush/inventory/preload`。
+- 库存守恒模型：`totalStock = availableStock + lockedStock + soldStock`。
+- Redis Hash 库存结构：`ticketrush:inventory:{skuId}`。
+- Redis Lua 原子预占：库存检查、库存预占、版本递增、幂等 Key 写入。
+- Redis 分布式锁：票档粒度 `SET NX` 锁保护库存 Hash 读写。
+- MySQL 乐观锁：`version` + `available_stock >= quantity` 条件更新。
+
+### 异步削峰与一致性
+
+- 抢票成功后发布 `OrderCreateMessage`。
+- RocketMQ 消费者幂等创建订单。
+- 重复消息不会重复落单。
+- 消息发送失败时释放已预占库存。
+- 订单超时关闭任务释放锁定库存。
+- 最终一致性设计见 [docs/final-consistency.md](./docs/final-consistency.md)。
+
+### 稳定性治理
+
+- Sentinel 全局抢票资源：`ticketrush:rush:ticket`。
+- Sentinel 热点票档资源：`ticketrush:rush:ticket:sku`。
+- Redis 准入令牌按票档限制同时进入库存扣减链路的请求数。
+- 热点库存可通过配置在启动时自动预热。
+- 稳定性治理说明见 [docs/stability-governance.md](./docs/stability-governance.md)。
+
+### 压测与诊断
+
+- 抢票压测脚本：[scripts/k6/rush-ticket.js](./scripts/k6/rush-ticket.js)。
+- 稳定性治理压测脚本：[scripts/k6/stability-governance.js](./scripts/k6/stability-governance.js)。
+- Sentinel Dashboard 动态规则样例：[docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md)。
+- Arthas 抢票链路诊断案例：[docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
+
+## 快速启动
 
 ### 基础要求
 
-- JDK 21
-- Maven 3.9+
-- Docker Desktop 或兼容 Docker Compose 的本地环境
+- JDK 21。
+- Maven 3.9+。
+- Docker Desktop 或兼容 Docker Compose 的本地环境。
 
-当前项目使用 Java 21，并为 Structured Concurrency 预览能力保留 `--enable-preview` 编译参数。请使用 JDK 21 进行完整编译和测试。
+项目启用了 Java 21 版本门禁和 `--enable-preview` 编译参数，请使用 JDK 21 构建。
 
-### 启动中间件
+### 构建应用 JAR
 
 ```bash
-docker compose up -d
+mvn clean package -DskipTests
 ```
 
-本地服务端口：
-
-| 组件 | 地址 |
-| --- | --- |
-| MySQL | `localhost:3306`，端口冲突时可用 `TICKETRUSH_MYSQL_PORT=13306` 覆盖 |
-| Redis | `localhost:6379` |
-| Nacos | `http://localhost:8848` |
-| Sentinel Dashboard | `http://localhost:8858` |
-| RocketMQ NameServer | `localhost:9876` |
-| Seata | `localhost:8091` |
-| Elasticsearch | `http://localhost:9200` |
-| Prometheus | `http://localhost:9090` |
-| Grafana | `http://localhost:3000` |
-
-### Maven 校验
+如果要完整验证：
 
 ```bash
 mvn clean verify
 ```
 
-如果当前机器不是 JDK 21，项目中的 Java 版本门禁会阻止构建。这是有意设计，用于保证项目最终围绕 Java 21 能力交付。
-
-## 当前进度
-
-详见 [SPEC.md](./SPEC.md)。
-
-已完成：
-
-- Maven 基础配置
-- Spring Boot 配置文件
-- Docker Compose 本地中间件环境
-- Git 仓库初始化
-- 基础包结构和启动类
-- README 初稿
-- 统一响应、错误码和全局异常处理
-- 虚拟线程基础配置
-- 系统健康检查接口
-- 参数校验示例接口
-- 票务活动、票档、库存、订单领域模型
-- 库存仓储接口、MyBatis Mapper 边界
-- Redis 库存 Key 和 Lua 预占脚本
-- 库存领域服务和单元测试
-- Redis Lua 真实库存预占适配器
-- Redis 分布式锁库存扣减适配器
-- MySQL 乐观锁库存扣减适配器
-- 抢票核心接口
-- 本地库存预热接口
-- 抢票应用服务单元测试
-- 库存扣减策略适配器单元测试
-- 虚拟线程 vs 传统线程池对比接口
-- 第一版 k6 抢票压测脚本
-- RocketMQ 异步订单创建消息
-- 订单创建消费者
-- 订单消费幂等
-- 订单超时关闭任务
-- 锁定库存释放补偿
-- 最终一致性说明文档
-- Sentinel 全局抢票限流
-- Sentinel 热点票档参数限流
-- 限流兜底响应
-- Redis 抢票准入令牌门禁
-- 热点库存自动预热 Runner
-- 准入令牌与预热任务单元测试
-- 稳定性治理 k6 压测脚本和记录模板
-- Sentinel Dashboard 动态规则演示文档和样例
-- Prometheus 抓取配置和 Grafana 自动面板
-- Arthas 抢票链路诊断案例
-- Dockerfile 与 Kubernetes/K3s 应用部署清单
-- Mermaid 架构图与主链路说明
-- 项目踩坑记录
-- 专业 README 文档导航与运行入口
-- 数据库 schema、MyBatis XML 和 MySQL 仓储实现
-- Redis Lua 与 Redis 分布式锁真实 Redis 集成测试
-- MySQL 乐观锁库存扣减与订单 SQL 集成测试
-
-下一步：
-
-- 使用 JDK 21 完整验证应用启动
-- 使用 k6 对三种库存策略跑第一轮本地压测
-- 补充 RocketMQ 集成测试
-- 补充 Seata 示例
-- 对限流前后做 k6 稳定性测试
-
-## 文档导航
-
-| 主题 | 文档 |
-| --- | --- |
-| 项目执行规格 | [SPEC.md](./SPEC.md) |
-| 架构图与主链路 | [docs/architecture.md](./docs/architecture.md) |
-| 数据库 schema | [docs/database-schema.md](./docs/database-schema.md) |
-| 最终一致性 | [docs/final-consistency.md](./docs/final-consistency.md) |
-| 稳定性治理 | [docs/stability-governance.md](./docs/stability-governance.md) |
-| Sentinel Dashboard 演示 | [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md) |
-| 稳定性压测记录 | [docs/stability-benchmark.md](./docs/stability-benchmark.md) |
-| 可观测性 | [docs/observability.md](./docs/observability.md) |
-| Arthas 诊断 | [docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md) |
-| Kubernetes/K3s 部署 | [deploy/k8s/README.md](./deploy/k8s/README.md) |
-| 踩坑记录 | [docs/pitfalls.md](./docs/pitfalls.md) |
-
-推荐阅读路径：
-
-```text
-README -> SPEC -> architecture -> database-schema -> stability-governance -> final-consistency -> observability -> k8s
-```
-
-## 基础接口
-
-### 健康检查
-
-```http
-GET /api/system/health
-```
-
-返回应用名、Java 版本、虚拟线程开关、当前请求线程是否为虚拟线程等信息。
-
-### 参数校验示例
-
-```http
-POST /api/system/validation-check
-Content-Type: application/json
-
-{
-  "requestId": "bench-001",
-  "scenario": "virtual-thread-health-check",
-  "concurrency": 1000
-}
-```
-
-该接口用于验证统一参数校验和全局异常响应格式，后续业务接口沿用同样的校验方式。
-
-### 本地库存预热
-
-```http
-POST /api/rush/inventory/preload
-Content-Type: application/json
-
-{
-  "skuId": 1001,
-  "totalStock": 100
-}
-```
-
-该接口用于本地开发和压测前把票档库存写入 Redis Hash。生产环境应改为后台任务或管控系统触发。
-
-### 抢票
-
-```http
-POST /api/rush/tickets
-Content-Type: application/json
-
-{
-  "requestId": "req-001",
-  "userId": 2001,
-  "eventId": 3001,
-  "skuId": 1001,
-  "quantity": 1,
-  "strategy": "REDIS_LUA"
-}
-```
-
-当前抢票链路会通过应用服务把库存预占提交到虚拟线程执行。响应中的 `processedByVirtualThread` 用于确认本次库存预占是否由虚拟线程处理。
-
-`strategy` 可选，默认值为 `REDIS_LUA`：
-
-| 策略 | 说明 |
-| --- | --- |
-| `REDIS_LUA` | Redis Lua 原子扣减，主推荐方案 |
-| `REDIS_LOCK` | Redis 分布式锁扣减，用于和 Lua 方案对比 |
-| `MYSQL_OPTIMISTIC_LOCK` | MySQL 乐观锁扣减，用于数据库热点写冲突对比 |
-
-常见错误码：
-
-| 错误码 | 含义 |
-| --- | --- |
-| `A0429` | 重复请求 |
-| `B0401` | 库存不足 |
-| `B0402` | 库存未预热、锁竞争失败、版本冲突或扣减失败 |
-| `C0429` | Sentinel 或准入令牌限流 |
-| `C0503` | 库存预占超时或执行失败 |
-
-### 执行器对比
-
-```http
-POST /api/benchmark/executors
-Content-Type: application/json
-
-{
-  "mode": "VIRTUAL_THREAD",
-  "taskCount": 10000,
-  "blockingMillis": 50,
-  "cpuTokens": 0,
-  "timeoutSeconds": 60
-}
-```
-
-`mode` 可选：
-
-| 模式 | 说明 |
-| --- | --- |
-| `VIRTUAL_THREAD` | 使用 Java 21 虚拟线程执行器 |
-| `TRADITIONAL_THREAD_POOL` | 使用固定平台线程池 |
-
-该接口用于构造相同的阻塞任务，对比两种执行器的耗时、吞吐、参与线程数和虚拟线程任务数。
-
-## 领域模型进度
-
-当前已建立四个核心领域模型：
-
-- `TicketEvent`：票务活动，控制整体售卖窗口。
-- `TicketSku`：票档，控制价格、票档售卖窗口和总库存。
-- `TicketInventory`：库存，维护可售、锁定、已售三段库存。
-- `TicketOrder`：订单，维护幂等键、过期时间和订单状态。
-
-库存模型遵守以下不变量：
-
-```text
-totalStock = availableStock + lockedStock + soldStock
-```
-
-抢票阶段会先把可售库存转入锁定库存；订单创建成功后转入已售库存；订单失败或超时后释放回可售库存。
-
-## Redis 库存结构
-
-库存以票档为粒度缓存为 Redis Hash：
-
-```text
-ticketrush:inventory:{skuId}
-├─ total
-├─ available
-├─ locked
-├─ sold
-└─ version
-```
-
-Lua 脚本位置：
-
-```text
-src/main/resources/lua/reserve_stock.lua
-```
-
-脚本负责原子完成库存检查、库存预占、版本递增和幂等 Key 写入。
-
-## 防超卖方案对比
-
-当前已完成三种库存预占代码路径：
-
-| 方案 | 一致性手段 | 优点 | 风险 |
-| --- | --- | --- | --- |
-| Redis Lua | 单线程执行 Lua 脚本 | 原子性强、网络往返少、适合热点票档 | 脚本复杂后维护成本上升 |
-| Redis Lock | 票档粒度分布式锁 | 容易理解、便于对比 | 锁竞争激烈时吞吐下降 |
-| MySQL Optimistic Lock | `version` + 条件更新 | 不依赖 Redis 库存缓存 | 热点行冲突高，数据库压力大 |
-
-MySQL 乐观锁方案已完成 Java 代码、Mapper XML、schema 和真实 MySQL 集成测试。
-
-## 异步下单
-
-抢票成功后的链路：
-
-```text
-/api/rush/tickets
-  -> 库存预占
-  -> 发布 OrderCreateMessage
-  -> RocketMQ Topic: ticketrush-order-create-topic
-  -> orderCreateConsumer
-  -> OrderApplicationService
-  -> TicketOrderRepository
-```
-
-当前订单创建为 `PENDING` 状态，库存保持锁定。订单超时关闭任务会释放未支付订单的锁定库存。
-
-消费幂等：
-
-- 幂等键：`idempotentKey`
-- 重复消息：直接跳过，不重复创建订单
-- 消费失败：抛出异常，交给 RocketMQ/Spring Cloud Stream 重试
-- 发送失败：抢票入口释放已预占库存并返回服务繁忙
-
-订单超时关闭：
-
-- 定时任务：`OrderTimeoutCloseJob`
-- 配置前缀：`ticketrush.order.timeout-close`
-- 行为：批量扫描已过期 `PENDING` 订单，原子关闭成功后释放锁定库存
-
-最终一致性说明详见 [docs/final-consistency.md](./docs/final-consistency.md)。
-
-## 稳定性治理
-
-抢票入口已接入 Sentinel：
-
-- 全局资源：`ticketrush:rush:ticket`
-- 热点票档资源：`ticketrush:rush:ticket:sku`
-- 热点参数：`skuId`
-- 限流错误码：`C0429`
-
-本地规则配置：
-
-```yaml
-ticketrush:
-  sentinel:
-    enabled: true
-    rush-qps: 1000
-    hotspot-sku-qps: 100
-    hotspot-duration-seconds: 1
-    hotspot-burst-count: 20
-```
-
-Sentinel 放行后，抢票链路还会进入 Redis 准入令牌门禁，用于限制同一票档同时进入库存扣减链路的请求数：
-
-```yaml
-ticketrush:
-  rush:
-    admission:
-      enabled: true
-      max-in-flight-per-sku: 500
-      token-ttl: 10s
-```
-
-热点库存可在应用启动时自动预热，默认关闭，适合本地演示或压测准备：
-
-```yaml
-ticketrush:
-  rush:
-    hot-inventory-preload:
-      enabled: false
-      items:
-        - sku-id: 1001
-          total-stock: 100000
-```
-
-说明详见 [docs/stability-governance.md](./docs/stability-governance.md)。
-
-## 压测脚本
-
-第一版 k6 抢票压测脚本：
+### 启动全链路环境
 
 ```bash
-k6 run scripts/k6/rush-ticket.js
+docker compose up -d
 ```
 
-运行前需要先安装 k6，并启动应用与 Redis。
+默认会启动应用和核心中间件：MySQL、Redis、Nacos、RocketMQ、Seata、Elasticsearch、Prometheus、Grafana。
 
-常用环境变量：
+如果要同时启动 Sentinel Dashboard：
+
+```bash
+docker compose --profile sentinel up -d
+```
+
+服务入口：
+
+| 服务 | 地址 |
+| --- | --- |
+| TicketRush | http://localhost:8080 |
+| Health | http://localhost:8080/api/system/health |
+| Actuator Health | http://localhost:8080/actuator/health |
+| Prometheus | http://localhost:9090 |
+| Grafana | http://localhost:3000 |
+| Nacos | http://localhost:8848 |
+| Sentinel Dashboard | http://localhost:8858 |
+| Elasticsearch | http://localhost:9200 |
+
+端口冲突时，MySQL 可用环境变量覆盖：
+
+```bash
+TICKETRUSH_MYSQL_PORT=13306 docker compose up -d
+```
+
+### 手动验证抢票
+
+预热库存：
+
+```bash
+curl -X POST http://localhost:8080/api/rush/inventory/preload \
+  -H "Content-Type: application/json" \
+  -d '{"skuId":1001,"totalStock":1000}'
+```
+
+发起抢票：
+
+```bash
+curl -X POST http://localhost:8080/api/rush/tickets \
+  -H "Content-Type: application/json" \
+  -d '{
+    "requestId":"req-001",
+    "userId":2001,
+    "eventId":3001,
+    "skuId":1001,
+    "quantity":1,
+    "strategy":"REDIS_LUA",
+    "idempotentKey":"rush:demo:2001:1001:req-001"
+  }'
+```
+
+响应中重点看：
+
+```json
+{
+  "accepted": true,
+  "remainingStock": 999,
+  "processedByVirtualThread": true
+}
+```
+
+## 压测入口
+
+三种库存策略压测：
 
 ```powershell
 k6 run `
@@ -416,9 +212,15 @@ k6 run `
   scripts/k6/rush-ticket.js
 ```
 
-`STRATEGY` 可设置为 `REDIS_LUA`、`REDIS_LOCK` 或 `MYSQL_OPTIMISTIC_LOCK`，用于对比三种防超卖方案。脚本启动时会先调用库存预热接口，再压测抢票接口。
+`STRATEGY` 可选：
 
-稳定性治理压测脚本：
+| 策略 | 用途 |
+| --- | --- |
+| `REDIS_LUA` | 主推荐方案，验证 Redis 单线程 Lua 原子扣减 |
+| `REDIS_LOCK` | 对比锁竞争下的吞吐和延迟 |
+| `MYSQL_OPTIMISTIC_LOCK` | 对比数据库热点行写冲突 |
+
+稳定性治理压测：
 
 ```powershell
 k6 run `
@@ -430,64 +232,105 @@ k6 run `
   scripts/k6/stability-governance.js
 ```
 
-该脚本会统计 `rush_rate_limited`、`rush_accepted`、`rush_service_degraded`、`unexpected_response_rate` 等指标，用于对比 Sentinel 和 Redis 准入门开启前后的效果。记录模板见 [docs/stability-benchmark.md](./docs/stability-benchmark.md)。
+记录模板见 [docs/stability-benchmark.md](./docs/stability-benchmark.md)。
 
-Sentinel Dashboard 动态规则演示见 [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md)，规则样例位于 `scripts/sentinel/`。
+## API 概览
 
-## 可观测性
+| 方法 | 路径 | 说明 |
+| --- | --- | --- |
+| `GET` | `/api/system/health` | 应用名、Java 版本、虚拟线程开关和当前线程类型 |
+| `POST` | `/api/system/validation-check` | 参数校验和统一响应格式示例 |
+| `POST` | `/api/rush/inventory/preload` | 本地压测前预热票档库存 |
+| `POST` | `/api/rush/tickets` | 抢票入口，支持三种库存扣减策略 |
+| `POST` | `/api/benchmark/executors` | Virtual Threads 与传统线程池执行器对比 |
+| `GET` | `/actuator/prometheus` | Prometheus 指标抓取入口 |
 
-Prometheus 会抓取本机应用的 `/actuator/prometheus`：
+常见业务错误码：
+
+| 错误码 | 含义 |
+| --- | --- |
+| `A0429` | 重复请求 |
+| `B0401` | 库存不足 |
+| `B0402` | 库存未预热、锁竞争失败、版本冲突或扣减失败 |
+| `C0429` | Sentinel 或 Redis 准入令牌限流 |
+| `C0503` | 库存预占超时、消息发送失败或服务繁忙 |
+
+## 验证状态
+
+当前已验证：
+
+- `mvn clean verify`：35 tests，0 failures，0 errors。
+- Docker Compose 全链路启动：应用 + 9 个核心中间件容器。
+- `/api/system/health`：`UP`，Java 21，虚拟线程开关开启。
+- `/api/rush/inventory/preload`：库存预热成功。
+- `/api/rush/tickets`：抢票成功，返回 `processedByVirtualThread=true`。
+- `/actuator/prometheus`：指标正常输出。
+- Redis Lua、Redis Lock、MySQL optimistic lock、RocketMQ Stream binder、MyBatis XML/schema 均有测试覆盖。
+
+未完成或待补强：
+
+- k6 三种库存策略的真实压测数据报告。
+- Sentinel/Redis 准入门开启前后的稳定性对比记录。
+- Seata 分布式事务示例。
+- Elasticsearch 活动/票档查询集成。
+
+## 项目结构
 
 ```text
-docker/prometheus/prometheus.yml
+src/main/java/com/ticketrush
+├── common          # 统一响应、错误码、异常、ID
+├── config          # Web、虚拟线程、Redis、MQ、Sentinel、Seata、监控配置
+├── interfaces      # Controller、Request、Response
+├── application     # 应用服务、用例编排、命令对象、DTO
+├── domain          # 领域模型、领域服务、仓储接口
+├── infrastructure  # MySQL、Redis、RocketMQ、Elasticsearch、Seata、Sentinel 适配
+└── job             # 热点库存预热、订单超时关闭、补偿任务
 ```
 
-Grafana 会自动配置 Prometheus 数据源和 `TicketRush Overview` 面板：
+## 面试讲法
+
+30 秒版：
 
 ```text
-docker/grafana/provisioning
-docker/grafana/dashboards/ticketrush-overview.json
+TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区和演出票务抢票。它的主链路覆盖 Sentinel 限流、Redis 准入令牌、Virtual Threads 库存预占、Redis Lua/Redis Lock/MySQL 乐观锁三种防超卖策略、RocketMQ 异步下单、消费幂等、订单超时关闭补偿，以及 Prometheus/Grafana 监控和 Docker/K3s 部署。这个项目用来证明我能把高并发票务里的防超卖、削峰、幂等、一致性和可观测做成可运行、可压测、可解释的工程闭环。
 ```
 
-说明详见 [docs/observability.md](./docs/observability.md)。
+核心追问点：
 
-Arthas 抢票链路诊断案例见 [docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
+- 为什么 Redis Lua 是热点票档库存扣减的主推荐方案？
+- Redis 分布式锁和 MySQL 乐观锁在高并发下分别会暴露什么瓶颈？
+- Virtual Threads 适合抢票链路中的哪些 IO 密集环节，不适合解决什么问题？
+- Sentinel 热点参数限流和 Redis 准入令牌为什么要组合使用？
+- RocketMQ 异步下单后，如何保证消息重复、发送失败和订单超时场景下的最终一致性？
+- 如何用 k6、Prometheus、Grafana 和 Arthas 证明系统行为，而不是只讲架构图？
 
-## Kubernetes/K3s 部署
+## 文档导航
 
-应用镜像：
+| 文档 | 说明 |
+| --- | --- |
+| [SPEC.md](./SPEC.md) | 项目执行规格、阶段计划和当前进度 |
+| [HANDOFF.md](./HANDOFF.md) | 当前接管状态和最近验证记录 |
+| [PROJECT.md](./PROJECT.md) | 项目定位、质量标准和协作规则 |
+| [docs/architecture.md](./docs/architecture.md) | 架构图、主链路、补偿链路和部署视图 |
+| [docs/database-schema.md](./docs/database-schema.md) | MySQL schema、表结构、索引和乐观锁 SQL |
+| [docs/final-consistency.md](./docs/final-consistency.md) | 异步下单、消费幂等和补偿策略 |
+| [docs/stability-governance.md](./docs/stability-governance.md) | Sentinel、热点参数、Redis 准入令牌 |
+| [docs/stability-benchmark.md](./docs/stability-benchmark.md) | 稳定性压测记录模板 |
+| [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md) | Sentinel Dashboard 动态规则演示 |
+| [docs/observability.md](./docs/observability.md) | Prometheus/Grafana 配置说明 |
+| [docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md) | Arthas 抢票链路诊断案例 |
+| [docs/pitfalls.md](./docs/pitfalls.md) | JDK、k6、端口、Grafana、K8s 踩坑记录 |
+| [deploy/k8s/README.md](./deploy/k8s/README.md) | Kubernetes/K3s 部署说明 |
 
-```bash
-docker build -t ghcr.io/xiongzhi-xz/ticketrush:latest .
+推荐阅读路径：
+
+```text
+README -> SPEC -> architecture -> database-schema -> stability-governance -> final-consistency -> observability -> pitfalls
 ```
 
-部署清单：
+## 安全说明
 
-```bash
-kubectl apply -k deploy/k8s
-```
-
-说明详见 [deploy/k8s/README.md](./deploy/k8s/README.md)。
-
-## 架构图
-
-总体架构、抢票主链路、异步下单补偿、稳定性治理和部署视图见 [docs/architecture.md](./docs/architecture.md)。
-
-## 踩坑记录
-
-JDK 版本门禁、k6 未安装、Sentinel 规则持久化、Prometheus/Grafana 和 K8s 部署注意点见 [docs/pitfalls.md](./docs/pitfalls.md)。
-
-## 文档规划
-
-后续会逐步补齐：
-
-- 架构图
-- 压测报告
-- Virtual Threads 使用说明
-- 防超卖方案对比
-- Sentinel 限流示例
-- RocketMQ 异步下单说明
-- Seata 示例
-- Arthas 诊断案例
-- Kubernetes/K3s 部署说明
-- 踩坑记录
+- 不提交 `.env`、真实账号、token、cookie、私钥或本地运行数据。
+- `docker/rocketmq/store/` 是本地 RocketMQ 运行数据目录，已加入 `.gitignore`。
+- `deploy/k8s/secret.yaml` 只保留 `CHANGE_ME_*` 占位值，真实数据库凭据应在本地或集群 Secret 中替换。
+- Docker Compose 中的数据库账号密码只用于本地演示环境，不用于生产。

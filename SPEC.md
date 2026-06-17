@@ -288,6 +288,7 @@ src/main/java/com/ticketrush
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
+- [x] GitHub 展示首页 README 收口（抢票主链路、启动、压测、API、验证状态）
 - [x] 架构图
 - [x] 踩坑记录
 
