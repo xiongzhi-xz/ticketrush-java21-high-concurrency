@@ -1,6 +1,8 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
 
+http.setResponseCallback(http.expectedStatuses({ min: 200, max: 399 }, 409, 429, 503));
+
 export const options = {
   scenarios: {
     rush_ticket: {
