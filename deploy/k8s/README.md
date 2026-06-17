@@ -45,4 +45,4 @@ curl http://localhost:8080/actuator/health
 | Seata | `seata:8091` |
 | Elasticsearch | `elasticsearch:9200` |
 
-如使用云厂商托管中间件，修改 `configmap.yaml` 和 `secret.yaml` 即可。
+如使用云厂商托管中间件，修改 `configmap.yaml` 和 `secret.yaml` 即可。`secret.yaml` 只保留占位值，部署前必须替换为真实数据库账号，不要把真实密码提交到仓库。
