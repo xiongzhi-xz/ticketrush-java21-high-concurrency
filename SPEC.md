@@ -282,7 +282,7 @@ src/main/java/com/ticketrush
 产出：
 
 - [x] JMeter 或 k6 压测脚本
-- [ ] Virtual Threads vs 传统线程池压测报告
+- [x] Virtual Threads vs 传统线程池压测报告
 - [x] Prometheus 配置
 - [x] Grafana 面板说明
 - [x] Arthas 诊断案例
@@ -353,5 +353,6 @@ src/main/java/com/ticketrush
 - [x] Arthas 诊断案例
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
+- [x] Virtual Threads vs 传统线程池压测报告
 - [x] 架构图
 - [x] 踩坑记录

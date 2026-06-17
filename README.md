@@ -104,6 +104,7 @@ POST /api/rush/tickets
 
 - 抢票压测脚本：[scripts/k6/rush-ticket.js](./scripts/k6/rush-ticket.js)。
 - 本地压测报告：[docs/rush-benchmark-report.md](./docs/rush-benchmark-report.md)。
+- Virtual Threads 执行器基准报告：[docs/executor-benchmark-report.md](./docs/executor-benchmark-report.md)。
 - 稳定性治理压测脚本：[scripts/k6/stability-governance.js](./scripts/k6/stability-governance.js)。
 - Sentinel Dashboard 动态规则样例：[docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md)。
 - Arthas 抢票链路诊断案例：[docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
@@ -267,11 +268,11 @@ k6 run `
 - `/api/rush/tickets`：抢票成功，返回 `processedByVirtualThread=true`。
 - `/actuator/prometheus`：指标正常输出。
 - Dockerized k6 本地压测：三种库存策略低负载 baseline 和单热点票档默认治理观察已完成。
+- Virtual Threads vs 传统线程池执行器 benchmark：纯 I/O 等待场景虚拟线程吞吐约为传统固定线程池的 22.55 倍。
 - Redis Lua、Redis Lock、MySQL optimistic lock、RocketMQ Stream binder、MyBatis XML/schema 均有测试覆盖。
 
 未完成或待补强：
 
-- Virtual Threads vs 传统线程池压测报告。
 - Sentinel/Redis 准入门开启前后的稳定性对照记录。
 - Seata 分布式事务示例。
 - Elasticsearch 活动/票档查询集成。
@@ -315,6 +316,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 | [PROJECT.md](./PROJECT.md) | 项目定位、质量标准和协作规则 |
 | [docs/architecture.md](./docs/architecture.md) | 架构图、主链路、补偿链路和部署视图 |
 | [docs/database-schema.md](./docs/database-schema.md) | MySQL schema、表结构、索引和乐观锁 SQL |
+| [docs/executor-benchmark-report.md](./docs/executor-benchmark-report.md) | Virtual Threads 执行器基准报告 |
 | [docs/final-consistency.md](./docs/final-consistency.md) | 异步下单、消费幂等和补偿策略 |
 | [docs/rush-benchmark-report.md](./docs/rush-benchmark-report.md) | k6 本地压测报告 |
 | [docs/stability-governance.md](./docs/stability-governance.md) | Sentinel、热点参数、Redis 准入令牌 |

@@ -130,6 +130,5 @@ docker run --rm `
 
 ## 下一步
 
-- 跑 `POST /api/benchmark/executors`，补 Virtual Threads vs traditional thread pool 对比报告。
 - 做稳定性治理 before/after 对照：默认保护、调低阈值、关闭准入门三组对比。
 - 用 Prometheus/Grafana 截取压测期间指标，补充 CPU、线程和 HTTP p95 视角。
