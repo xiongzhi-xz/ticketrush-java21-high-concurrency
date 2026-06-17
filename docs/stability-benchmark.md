@@ -58,13 +58,14 @@ k6 run `
 | 日期 | Commit | 场景 | VUS | Duration | QPS/吞吐 | `C0429` 占比 | p95 | 非预期响应 | 结论 |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 2026-06-17 | `c264471` 后工作区 | 单热点票档，默认治理开启，`REDIS_LUA` | 30 | 20s | 35,765.45 req/s | 99.76% | 1.18ms | 0.00% | 热点流量被稳定快速拒绝，核心库存链路未被打穿 |
+| 2026-06-17 | `91d0ba9` 后工作区 | 默认治理开启，单热点票档，`REDIS_LUA` | 10 | 10s | 741.53 req/s | 86.25% | 3.21ms | 0.00% | 7,510 次限流，1,197 次受理，热点保护生效 |
+| 2026-06-17 | `91d0ba9` 后工作区 | Sentinel/Redis 准入门关闭，单热点票档，`REDIS_LUA` | 10 | 10s | 724.48 req/s | 0.00% | 4.94ms | 0.00% | 7,501 次全部进入核心链路，最大延迟升至 350.89ms |
 
 ## 当前状态
 
-已使用 Dockerized k6 完成一轮默认治理开启状态下的单热点票档实测。结果见上表和 [rush-benchmark-report.md](./rush-benchmark-report.md)。
+已使用 Dockerized k6 完成默认治理开启状态下的单热点票档实测，以及治理开启/关闭 before-after 对照。结果见上表、[rush-benchmark-report.md](./rush-benchmark-report.md) 和 [governance-comparison-report.md](./governance-comparison-report.md)。
 
 仍待补充：
 
-- 关闭或调低治理配置后的 before/after 对照。
 - 多票档 `SKU_SPREAD > 1` 下的全局限流与热点分摊对比。
 - Prometheus/Grafana 指标截图或导出数据。

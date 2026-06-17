@@ -120,7 +120,7 @@ docker run --rm `
 - 单热点票档在 30 VU、无 sleep 的冲击下，大部分流量被稳定归类为 `C0429`。
 - 非预期响应为 0，说明限流、业务错误码和脚本分类口径一致。
 - p95 很低是因为绝大多数请求在入口被快速拒绝，不代表库存扣减链路承受了 35k req/s。
-- 这轮证明了默认保护生效；严格的“限流前后对比”仍需要单独调低/关闭治理配置后再跑一组对照。
+- 这轮证明了默认保护生效；治理开启/关闭的 before-after 对照见 [governance-comparison-report.md](./governance-comparison-report.md)。
 
 ## 注意事项
 
@@ -130,5 +130,4 @@ docker run --rm `
 
 ## 下一步
 
-- 做稳定性治理 before/after 对照：默认保护、调低阈值、关闭准入门三组对比。
 - 用 Prometheus/Grafana 截取压测期间指标，补充 CPU、线程和 HTTP p95 视角。

@@ -11,7 +11,7 @@
 
 ## 当前阶段
 
-Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告已完成。下一步是稳定性治理 before/after 对照。
+Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照已完成。下一步是 Prometheus/Grafana 指标视角或 Seata 示例。
 
 ## 已完成
 
@@ -32,6 +32,7 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 - Dockerized k6 三种库存策略低负载 baseline 报告。
 - Dockerized k6 单热点票档默认治理观察记录。
 - Virtual Threads vs 传统线程池执行器 benchmark 报告。
+- Dockerized k6 稳定性治理 before/after 对照报告。
 - Prometheus 配置、Grafana 说明、Arthas 诊断案例、Kubernetes/K3s 部署清单。
 - README、架构图、数据库 schema、踩坑记录等求职展示文档。
 - **Docker Compose 全链路一键启动**（app + 9 中间件）。
@@ -63,14 +64,13 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 
 ## 下一步
 
-1. 用 k6 跑稳定性压测 before/after 对照，产出治理效果报告。
-2. 用 Prometheus/Grafana 补压测期间指标视角。
-3. 补 Seata 分布式事务示例。
+1. 用 Prometheus/Grafana 补压测期间指标视角。
+2. 补 Seata 分布式事务示例。
+3. 做多票档 `SKU_SPREAD > 1` 的热点分摊对比。
 4. ES 集成（优先级最低）。
 
 ## 未验证
 
-- 限流前后稳定性压测对照记录。
 - Seata 示例仍未完成。
 - Elasticsearch 集成未实现。
 
@@ -135,7 +135,7 @@ Verified:
 - Maven tests were not rerun because this step only changed documentation.
 
 Next step:
-- Continue with stability before/after comparisons.
+- Continue with Prometheus/Grafana metric evidence or Seata example.
 
 ## 2026-06-17 Work Log - k6 Benchmark Report
 
@@ -180,7 +180,50 @@ Not verified:
 - Prometheus/Grafana metric screenshots or exports during the k6 runs.
 
 Next step:
-- Run stability before/after comparisons and add a governance effect report.
+- Continue with Prometheus/Grafana metric evidence or Seata example.
+
+## 2026-06-17 Work Log - Governance Comparison Report
+
+Current goal:
+- Produce a stability-governance before/after comparison report.
+
+Completed:
+- Confirmed the working tree was clean before the task.
+- Read Sentinel and Redis admission guard implementations.
+- Confirmed Sentinel disabled mode means rules are not loaded, while the guard still allows traffic.
+- Confirmed Redis admission can be disabled via `TICKETRUSH_RUSH_ADMISSION_ENABLED=false`.
+- Started a temporary `ticketrush-app-noguard` container on the same Docker network with:
+  - `TICKETRUSH_SENTINEL_ENABLED=false`
+  - `TICKETRUSH_RUSH_ADMISSION_ENABLED=false`
+- Ran default protected hot-sku k6 comparison against `http://app:8080`.
+- Ran no-guard hot-sku k6 comparison against `http://ticketrush-app-noguard:8080`.
+- Removed the temporary `ticketrush-app-noguard` container after the run.
+- Added `docs/governance-comparison-report.md`.
+- Updated README, SPEC, HANDOFF, and `docs/stability-benchmark.md`.
+
+Key results:
+- Protected: 8,708 requests, 741.53 req/s, 1,197 accepted, 7,510 rate-limited, 86.25% rate-limit ratio, p95 3.21ms, max 16.52ms.
+- No Guard: 7,502 requests, 724.48 req/s, 7,501 accepted, 0 rate-limited, p95 4.94ms, max 350.89ms.
+- Both runs had 0.00% unexpected responses and 0.00% HTTP failed.
+
+Modified files:
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+- `docs/governance-comparison-report.md`
+- `docs/stability-benchmark.md`
+
+Verified:
+- Dockerized k6 protected and no-guard runs passed thresholds.
+- Main `ticketrush-app` health remained `UP` after the comparison.
+- Raw k6 summary JSON was generated under `target/governance-comparison/` and was not intended for git.
+
+Not verified:
+- Prometheus/Grafana metric screenshots or exports during the comparison.
+- Multi-SKU spread comparison with `SKU_SPREAD > 1`.
+
+Next step:
+- Add Prometheus/Grafana metric evidence or move to the Seata example.
 
 ## 2026-06-17 Work Log - Executor Benchmark Report
 
@@ -216,10 +259,10 @@ Verified:
 
 Not verified:
 - Prometheus/Grafana metric screenshots or exports during the executor benchmark.
-- Stability before/after comparison with governance disabled or threshold-tuned.
+- Stability multi-SKU spread comparison with `SKU_SPREAD > 1`.
 
 Next step:
-- Run stability before/after comparisons and add a governance effect report.
+- Continue with Prometheus/Grafana metric evidence or Seata example.
 
 ## 接管开场模板
 

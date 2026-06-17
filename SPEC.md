@@ -273,7 +273,7 @@ src/main/java/com/ticketrush
 - 已补充稳定性治理说明：`docs/stability-governance.md`。
 - 已补充稳定性治理压测脚本和记录模板：`scripts/k6/stability-governance.js`、`docs/stability-benchmark.md`。
 - 已补充 Sentinel Dashboard 动态规则演示：`docs/sentinel-dashboard-demo.md`、`scripts/sentinel/*.json`。
-- 已使用 Dockerized k6 完成默认治理开启下的单热点票档实测记录，限流和准入门前后的 before/after 对照尚未完成。
+- 已使用 Dockerized k6 完成默认治理开启下的单热点票档实测记录，以及限流和准入门 before/after 对照。
 
 ### 阶段 7：压测、监控、部署与文档
 
@@ -342,7 +342,7 @@ src/main/java/com/ticketrush
 - [x] 请求令牌或排队策略
 - [x] 编写稳定性治理 k6 脚本
 - [x] 使用 k6 跑默认保护下的热点票档稳定性观察
-- [ ] 使用 k6 对限流前后做稳定性测试记录
+- [x] 使用 k6 对限流前后做稳定性测试记录
 - [x] 接入 Sentinel Dashboard 动态规则演示
 
 阶段 7 后续任务：
