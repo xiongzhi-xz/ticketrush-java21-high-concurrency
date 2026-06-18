@@ -8,12 +8,14 @@ Current goal:
 Current stage:
 - Docker Compose full stack, k6 benchmark reports, Virtual Threads benchmark, Sentinel/Redis governance, Prometheus evidence, hotspot-spread comparison, Seata AT demo, and Elasticsearch activity/SKU search code are complete.
 - Elasticsearch is a read-side model only; the rush write path remains Sentinel -> Redis admission -> inventory deduction -> RocketMQ async order -> timeout compensation.
+- Elasticsearch runtime smoke is now verified against Docker Compose with MySQL seed data and the local Elasticsearch container.
 
 Recently completed:
 - Added `TicketSearchApplicationService`, `TicketSearchRepository`, and an Elasticsearch adapter backed by `ElasticsearchOperations`.
 - Added `POST /api/search/events/{eventId}/index` to rebuild search documents from existing MySQL event/SKU data.
 - Added `GET /api/search/ticket-skus` with keyword, event ID, event status, SKU status, and pagination filters.
 - Added `docs/elasticsearch-search.md` plus README/SPEC updates.
+- Fixed runtime search after smoke found that date-only Elasticsearch `_source` values could not be mapped back to `LocalDateTime`.
 
 Workspace status:
 - Check with `git status --short --branch`.
@@ -21,15 +23,54 @@ Workspace status:
 - Known JDK 21 path on this machine: `C:\Users\xz\.antigravity\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64`.
 
 Verified latest:
-- With JDK 21: `mvn "-Dtest=TicketSearchApplicationServiceTest,ElasticsearchTicketSearchRepositoryTest" test`: 7 tests passed.
-- With JDK 21: `mvn test`: 47 tests passed.
+- With JDK 21: `mvn "-Dtest=TicketSearchApplicationServiceTest,ElasticsearchTicketSearchRepositoryTest" test`: 8 tests passed.
+- With JDK 21: `mvn test`: 48 tests passed.
 - `git diff --check`: passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker Compose app restart: `docker compose up -d --no-deps --force-recreate app`: app health became `UP`.
+- Runtime smoke:
+  - `POST /api/search/events/9101781814509/index`: `success=true`, `indexedSkuCount=2`.
+  - `GET /api/search/ticket-skus?keyword=Codex%20Smoke&eventId=9101781814509&eventStatus=SELLING&skuStatus=ON_SALE&page=0&size=10`: `success=true`, `total=2`.
+  - ES `_source` now stores LocalDateTime values as ISO date-time strings while still using ES date mapping.
 
 Not verified latest:
-- Runtime Elasticsearch smoke against Docker Compose. It requires a running stack plus MySQL activity/SKU seed data before calling the index/search APIs.
+- No known gap for the Elasticsearch smoke slice. Nacos still logs local gRPC reconnect noise in Docker, but app health remains `UP` and search works.
 
 Next step only:
-- Run final verification, then commit and push this Elasticsearch search slice. Do not start another feature unless explicitly requested.
+- Commit and push this runtime fix, then stop. Do not start another feature unless explicitly requested.
+
+## 2026-06-18 Work Log - Elasticsearch Runtime Smoke Fix
+
+Current goal:
+- Finish the Elasticsearch activity/SKU search slice by making the runtime Docker smoke pass.
+
+Problem found:
+- `GET /api/search/ticket-skus` returned HTTP 500 only when the query had hits.
+- Empty-hit queries returned 200, and direct Elasticsearch `_search` showed the expected two documents.
+- Root cause: Spring Data Elasticsearch could return date-only `_source` values such as `2026-06-25` for `LocalDateTime` fields, which failed when mapping hits back to the document record.
+
+Completed:
+- Marked the production `TicketSearchApplicationService` constructor with `@Autowired` so Spring chooses it instead of the test-only constructor.
+- Changed `TicketSearchDocument` date fields to string-backed ES date fields and parse them explicitly back into the domain record.
+- Kept compatibility with both full ISO date-time strings and older date-only demo documents.
+- Added a regression test for date-only Elasticsearch source values.
+
+Modified files:
+- `src/main/java/com/ticketrush/application/service/TicketSearchApplicationService.java`
+- `src/main/java/com/ticketrush/infrastructure/elasticsearch/TicketSearchDocument.java`
+- `src/test/java/com/ticketrush/infrastructure/elasticsearch/ElasticsearchTicketSearchRepositoryTest.java`
+- `HANDOFF.md`
+
+Verified:
+- With JDK 21: `mvn "-Dtest=TicketSearchApplicationServiceTest,ElasticsearchTicketSearchRepositoryTest" test`: 8 tests passed.
+- With JDK 21: `mvn test`: 48 tests passed.
+- `git diff --check`: passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker app health: `UP`.
+- Runtime search smoke returned `total=2` for the seeded `Codex Smoke` event.
+
+Next step:
+- Commit and push this fix, then wait for user direction.
 
 ## 2026-06-18 Work Log - Elasticsearch Activity/SKU Search
 

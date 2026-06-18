@@ -14,6 +14,7 @@ import com.ticketrush.domain.model.TicketSku;
 import com.ticketrush.domain.repository.TicketEventRepository;
 import com.ticketrush.domain.repository.TicketSearchRepository;
 import com.ticketrush.domain.repository.TicketSkuRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
@@ -28,6 +29,7 @@ public class TicketSearchApplicationService {
     private final TicketSearchRepository ticketSearchRepository;
     private final Clock clock;
 
+    @Autowired
     public TicketSearchApplicationService(
             TicketEventRepository ticketEventRepository,
             TicketSkuRepository ticketSkuRepository,

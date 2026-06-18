@@ -89,6 +89,33 @@ class ElasticsearchTicketSearchRepositoryTest {
         assertThat(mapped).isEqualTo(record);
     }
 
+    @Test
+    void shouldReadDateOnlyValuesFromElasticsearchSource() {
+        TicketSearchDocument document = new TicketSearchDocument(
+                "3001:1001",
+                3001L,
+                1001L,
+                "TicketRush Live",
+                "Main Hall",
+                "VIP",
+                19900L,
+                100,
+                "SELLING",
+                "ON_SALE",
+                "2026-06-19",
+                "2026-06-18",
+                "2026-06-18",
+                "2026-06-18T01:20:00Z"
+        );
+
+        TicketSearchRecord mapped = document.toRecord();
+
+        assertThat(mapped.eventTime()).isEqualTo(LocalDateTime.of(2026, 6, 19, 0, 0));
+        assertThat(mapped.saleStartTime()).isEqualTo(LocalDateTime.of(2026, 6, 18, 0, 0));
+        assertThat(mapped.saleEndTime()).isEqualTo(LocalDateTime.of(2026, 6, 18, 0, 0));
+        assertThat(mapped.indexedAt()).isEqualTo(Instant.parse("2026-06-18T01:20:00Z"));
+    }
+
     private TicketSearchRecord record() {
         return new TicketSearchRecord(
                 "3001:1001",
