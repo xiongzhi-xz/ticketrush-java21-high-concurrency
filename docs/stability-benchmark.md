@@ -60,12 +60,13 @@ k6 run `
 | 2026-06-17 | `c264471` 后工作区 | 单热点票档，默认治理开启，`REDIS_LUA` | 30 | 20s | 35,765.45 req/s | 99.76% | 1.18ms | 0.00% | 热点流量被稳定快速拒绝，核心库存链路未被打穿 |
 | 2026-06-17 | `91d0ba9` 后工作区 | 默认治理开启，单热点票档，`REDIS_LUA` | 10 | 10s | 741.53 req/s | 86.25% | 3.21ms | 0.00% | 7,510 次限流，1,197 次受理，热点保护生效 |
 | 2026-06-17 | `91d0ba9` 后工作区 | Sentinel/Redis 准入门关闭，单热点票档，`REDIS_LUA` | 10 | 10s | 724.48 req/s | 0.00% | 4.94ms | 0.00% | 7,501 次全部进入核心链路，最大延迟升至 350.89ms |
+| 2026-06-18 | `eb6c99e` 后工作区 | 默认治理开启，单热点票档，`SKU_SPREAD=1`，`REDIS_LUA` | 10 | 10s | 871.47 req/s | 87.56% | 3.23ms | 0.00% | 7,638 次限流，1,085 次受理，单票档热点保护生效 |
+| 2026-06-18 | `eb6c99e` 后工作区 | 默认治理开启，多票档分摊，`SKU_SPREAD=20`，`REDIS_LUA` | 10 | 10s | 749.51 req/s | 0.00% | 4.32ms | 0.00% | 流量分散后本轮无 `C0429`，7,496 次全部受理 |
 
 ## 当前状态
 
-已使用 Dockerized k6 完成默认治理开启状态下的单热点票档实测，以及治理开启/关闭 before-after 对照。结果见上表、[rush-benchmark-report.md](./rush-benchmark-report.md) 和 [governance-comparison-report.md](./governance-comparison-report.md)。
+已使用 Dockerized k6 完成默认治理开启状态下的单热点票档实测、治理开启/关闭 before-after 对照，以及多票档热点分摊对比。结果见上表、[rush-benchmark-report.md](./rush-benchmark-report.md)、[governance-comparison-report.md](./governance-comparison-report.md) 和 [hotspot-spread-benchmark-report.md](./hotspot-spread-benchmark-report.md)。
 
 仍待补充：
 
-- 多票档 `SKU_SPREAD > 1` 下的全局限流与热点分摊对比。
-- Prometheus/Grafana 指标截图或导出数据。
+- 更高 VUS 下多票档分摊与全局限流共同生效的边界观察。

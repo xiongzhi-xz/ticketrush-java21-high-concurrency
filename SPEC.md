@@ -344,6 +344,7 @@ src/main/java/com/ticketrush
 - [x] 编写稳定性治理 k6 脚本
 - [x] 使用 k6 跑默认保护下的热点票档稳定性观察
 - [x] 使用 k6 对限流前后做稳定性测试记录
+- [x] 使用 k6 跑多票档 `SKU_SPREAD > 1` 热点分摊对比
 - [x] 接入 Sentinel Dashboard 动态规则演示
 
 阶段 7 后续任务：

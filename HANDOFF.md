@@ -11,7 +11,7 @@
 
 ## 当前阶段
 
-Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标证据已完成。下一步是 Seata 示例或多票档热点分摊对比。
+Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标证据、多票档热点分摊对比已完成。下一步是 Seata 示例或 Elasticsearch 活动/票档查询集成。
 
 ## 已完成
 
@@ -34,6 +34,7 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 - Virtual Threads vs 传统线程池执行器 benchmark 报告。
 - Dockerized k6 稳定性治理 before/after 对照报告。
 - Prometheus/Grafana 压测指标证据报告。
+- Dockerized k6 多票档热点分摊对比报告。
 - Prometheus 配置、Grafana 说明、Arthas 诊断案例、Kubernetes/K3s 部署清单。
 - README、架构图、数据库 schema、踩坑记录等求职展示文档。
 - **Docker Compose 全链路一键启动**（app + 9 中间件）。
@@ -66,13 +67,14 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 ## 下一步
 
 1. 补 Seata 分布式事务示例。
-2. 做多票档 `SKU_SPREAD > 1` 的热点分摊对比。
-3. 补 Elasticsearch 活动/票档查询集成。
+2. 补 Elasticsearch 活动/票档查询集成。
+3. 按需做更高 VUS 下多票档分摊与全局限流边界观察。
 
 ## 未验证
 
 - Seata 示例仍未完成。
 - Elasticsearch 集成未实现。
+- 更高 VUS 下多票档分摊与全局限流共同生效的边界尚未观察。
 
 ## 风险和注意事项
 
@@ -309,6 +311,42 @@ Not verified:
 
 Next step:
 - Continue with Prometheus/Grafana metric evidence or Seata example.
+
+## 2026-06-18 Work Log - Hotspot Spread Benchmark
+
+Current goal:
+- Produce a multi-SKU hotspot-spread comparison for TicketRush stability governance.
+
+Completed:
+- Confirmed the working tree was clean before the task.
+- Confirmed `/api/system/health` returned `UP`, Java 21.0.11, `virtualThreadsEnabled=true`, and `currentThreadVirtual=true`.
+- Confirmed Docker Compose services were running.
+- Ran Dockerized k6 single-hotspot comparison with `SKU_SPREAD=1`, `VUS=10`, `DURATION=10s`, `SLEEP=0.01`, `STRATEGY=REDIS_LUA`.
+- Ran Dockerized k6 multi-SKU comparison with `SKU_SPREAD=20` under the same VUS, duration, sleep, stock, and strategy.
+- Added `docs/hotspot-spread-benchmark-report.md`.
+- Updated README, SPEC, HANDOFF, and `docs/stability-benchmark.md`.
+
+Key results:
+- `SKU_SPREAD=1`: 8,724 requests, 871.47 req/s, 1,085 accepted, 7,638 rate-limited, 87.56% `C0429`, p95 3.23ms.
+- `SKU_SPREAD=20`: 7,516 requests, 749.51 req/s, 7,496 accepted, 0 rate-limited, 0.00% `C0429`, p95 4.32ms.
+- Both runs had 0.00% unexpected responses and 0.00% HTTP failed.
+
+Modified files:
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+- `docs/stability-benchmark.md`
+- `docs/hotspot-spread-benchmark-report.md`
+
+Verified:
+- Dockerized k6 single-hotspot and multi-SKU runs passed thresholds.
+- Raw k6 summary JSON was generated under `target/multi-sku-comparison/` and was not intended for git.
+
+Not verified:
+- Higher-VUS boundary where multi-SKU spread and global QPS limiting are both active.
+
+Next step:
+- Continue with Seata example or Elasticsearch activity/SKU query integration.
 
 ## 接管开场模板
 
