@@ -45,7 +45,18 @@
 
 ## 当前边界
 
-- MyBatis SQL 和数据库表结构尚未落地，真实数据库集成测试需要后续补齐。
 - 当前没有引入事务消息，订单创建消息和库存预占之间采用补偿式最终一致性。
 - 如果订单关闭成功但释放库存失败，需要后续引入补偿日志或人工修复任务增强兜底。
-- Seata 示例尚未完成，会在后续阶段补充用于解释强一致和最终一致性的取舍。
+- Seata AT 示例已补充，见 [seata-transaction-demo.md](./seata-transaction-demo.md)。该示例只包裹 MySQL 库存和订单写入，不用于回滚 Redis Lua 或 RocketMQ 消息。
+
+## Seata 示例取舍
+
+`SeataOrderTransactionDemoService` 演示的是同步强一致链路：
+
+```text
+@GlobalTransactional
+  -> MySQL 乐观锁预占库存
+  -> MySQL 创建 PENDING 订单
+```
+
+它适合解释 Seata AT 的事务边界和数据库回滚能力。主抢票链路没有直接改为 Seata，是因为热点票档更依赖 Redis 原子扣减、入口快返回和 RocketMQ 削峰；这类链路更适合通过幂等、补偿任务和监控告警做最终一致性闭环。

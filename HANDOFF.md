@@ -11,7 +11,7 @@
 
 ## 当前阶段
 
-Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标证据、多票档热点分摊对比已完成。下一步是 Seata 示例或 Elasticsearch 活动/票档查询集成。
+Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标证据、多票档热点分摊对比、Seata AT 示例已完成。下一步是 Elasticsearch 活动/票档查询集成。
 
 ## 已完成
 
@@ -35,6 +35,7 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 - Dockerized k6 稳定性治理 before/after 对照报告。
 - Prometheus/Grafana 压测指标证据报告。
 - Dockerized k6 多票档热点分摊对比报告。
+- Seata AT 模式 MySQL 库存预占 + 订单落库示例。
 - Prometheus 配置、Grafana 说明、Arthas 诊断案例、Kubernetes/K3s 部署清单。
 - README、架构图、数据库 schema、踩坑记录等求职展示文档。
 - **Docker Compose 全链路一键启动**（app + 9 中间件）。
@@ -66,15 +67,15 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 
 ## 下一步
 
-1. 补 Seata 分布式事务示例。
-2. 补 Elasticsearch 活动/票档查询集成。
-3. 按需做更高 VUS 下多票档分摊与全局限流边界观察。
+1. 补 Elasticsearch 活动/票档查询集成。
+2. 按需做更高 VUS 下多票档分摊与全局限流边界观察。
+3. 按需补 Seata AT 真实 Docker MySQL + undo_log 联调记录。
 
 ## 未验证
 
-- Seata 示例仍未完成。
 - Elasticsearch 集成未实现。
 - 更高 VUS 下多票档分摊与全局限流共同生效的边界尚未观察。
+- Seata AT 示例已通过单元测试，尚未做真实 Docker MySQL + undo_log 联调。
 
 ## 风险和注意事项
 
@@ -347,6 +348,37 @@ Not verified:
 
 Next step:
 - Continue with Seata example or Elasticsearch activity/SKU query integration.
+
+## 2026-06-18 Work Log - Seata Transaction Demo
+
+Current goal:
+- Add a scoped Seata distributed-transaction example without changing the proven Redis/RocketMQ main rush path.
+
+Completed:
+- Added `SeataOrderTransactionDemoService`.
+- The example uses `@GlobalTransactional(name = "ticketrush-seata-mysql-rush-order", rollbackFor = Exception.class)`.
+- The example only allows `MYSQL_OPTIMISTIC_LOCK`, then reserves MySQL inventory and creates a `PENDING` order in one global transaction.
+- Kept Redis Lua and RocketMQ on the existing final-consistency path.
+- Added `docs/seata-transaction-demo.md`.
+- Updated README, SPEC, HANDOFF, and `docs/final-consistency.md`.
+
+Modified files:
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+- `docs/final-consistency.md`
+- `docs/seata-transaction-demo.md`
+- `src/main/java/com/ticketrush/infrastructure/seata/SeataOrderTransactionDemoService.java`
+- `src/test/java/com/ticketrush/infrastructure/seata/SeataOrderTransactionDemoServiceTest.java`
+
+Verified:
+- `mvn -Dtest=SeataOrderTransactionDemoServiceTest test`: 5 tests, 0 failures, 0 errors with JDK 21.0.7 JBR.
+
+Not verified:
+- Real Seata AT integration against Docker MySQL with `undo_log`; this task intentionally avoids modifying business schema.
+
+Next step:
+- Continue with Elasticsearch activity/SKU query integration.
 
 ## 接管开场模板
 

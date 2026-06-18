@@ -27,7 +27,7 @@ TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链
 | Delivery | Docker Compose, Dockerfile, Kubernetes/K3s manifests |
 | Test & Benchmark | JUnit 5, Spring Cloud Stream test binder, k6 |
 
-说明：Seata 和 Elasticsearch 依赖、配置与容器环境已预留，当前业务闭环优先采用最终一致性补偿；完整 Seata 示例和 ES 查询集成仍在后续任务中。
+说明：Seata 依赖、配置与 MySQL AT 示例已落地，当前高并发主链路仍优先采用 Redis/RocketMQ 最终一致性补偿；Elasticsearch 查询集成仍在后续任务中。
 
 ## 架构图
 
@@ -91,6 +91,7 @@ POST /api/rush/tickets
 - 消息发送失败时释放已预占库存。
 - 订单超时关闭任务释放锁定库存。
 - 最终一致性设计见 [docs/final-consistency.md](./docs/final-consistency.md)。
+- Seata AT 示例见 [docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md)，用于演示 MySQL 库存预占和订单落库的同步全局事务。
 
 ### 稳定性治理
 
@@ -108,6 +109,7 @@ POST /api/rush/tickets
 - 稳定性治理 before/after 报告：[docs/governance-comparison-report.md](./docs/governance-comparison-report.md)。
 - 热点票档分摊压测报告：[docs/hotspot-spread-benchmark-report.md](./docs/hotspot-spread-benchmark-report.md)。
 - Prometheus/Grafana 指标证据报告：[docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md)。
+- Seata 分布式事务示例：[docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md)。
 - 稳定性治理压测脚本：[scripts/k6/stability-governance.js](./scripts/k6/stability-governance.js)。
 - Sentinel Dashboard 动态规则样例：[docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md)。
 - Arthas 抢票链路诊断案例：[docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
@@ -275,11 +277,11 @@ k6 run `
 - 稳定性治理 before/after：默认治理开启时单热点流量 86.25% 被限流，关闭治理后几乎全部进入核心链路。
 - 热点票档分摊对比：`SKU_SPREAD=1` 时 87.56% 被限流，`SKU_SPREAD=20` 时本轮 0 次 `C0429`，受理数提升到 7,496。
 - Prometheus/Grafana 指标证据：单热点压测下 Prometheus RPS 峰值 828.63/s，HTTP p95 约 3.1ms，CPU 峰值约 2.15%。
+- Seata AT 示例：MySQL 库存预占和订单落库被 `@GlobalTransactional` 包裹，并有单元测试覆盖事务注解、幂等和失败回滚边界。
 - Redis Lua、Redis Lock、MySQL optimistic lock、RocketMQ Stream binder、MyBatis XML/schema 均有测试覆盖。
 
 未完成或待补强：
 
-- Seata 分布式事务示例。
 - Elasticsearch 活动/票档查询集成。
 
 ## 项目结构
@@ -327,6 +329,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 | [docs/hotspot-spread-benchmark-report.md](./docs/hotspot-spread-benchmark-report.md) | 单热点与多票档分摊压测报告 |
 | [docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md) | Prometheus/Grafana 压测指标证据 |
 | [docs/rush-benchmark-report.md](./docs/rush-benchmark-report.md) | k6 本地压测报告 |
+| [docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md) | Seata AT 分布式事务示例 |
 | [docs/stability-governance.md](./docs/stability-governance.md) | Sentinel、热点参数、Redis 准入令牌 |
 | [docs/stability-benchmark.md](./docs/stability-benchmark.md) | 稳定性压测记录 |
 | [docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md) | Sentinel Dashboard 动态规则演示 |

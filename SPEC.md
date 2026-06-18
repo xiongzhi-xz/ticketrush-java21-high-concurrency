@@ -218,7 +218,7 @@ src/main/java/com/ticketrush
 - [x] 订单超时关闭任务
 - [x] 库存回滚补偿
 - [x] 最终一致性说明
-- [ ] Seata 示例
+- [x] Seata 示例
 
 验收标准：
 
@@ -238,6 +238,7 @@ src/main/java/com/ticketrush
 - 订单当前创建为 `PENDING`，库存保持锁定；订单超时关闭任务会释放锁定库存。
 - 已提供 `OrderTimeoutCloseJob`，批量关闭过期 `PENDING` 订单并释放库存。
 - 已补充最终一致性说明文档：`docs/final-consistency.md`。
+- 已补充 Seata AT 示例：`SeataOrderTransactionDemoService` 使用 `@GlobalTransactional` 包裹 MySQL 库存预占和订单落库，用于说明强一致同步事务和主链路最终一致性的取舍。
 - MyBatis 订单仓储、schema、XML SQL 和真实 MySQL 订单 Mapper 集成测试已完成。
 - 已补充 Spring Cloud Stream 测试 Binder 集成测试，覆盖订单消息发布、消费落单和重复消息幂等。
 
@@ -335,7 +336,7 @@ src/main/java/com/ticketrush
 - [x] 超时关闭时释放锁定库存
 - [x] 补充 RocketMQ 集成测试
 - [x] 编写最终一致性和失败补偿说明
-- [ ] 补充 Seata 示例
+- [x] 补充 Seata 示例
 
 阶段 6 后续任务：
 
