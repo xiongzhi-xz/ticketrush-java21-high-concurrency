@@ -339,6 +339,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 | [SPEC.md](./SPEC.md) | 项目执行规格、阶段计划和当前进度 |
 | [HANDOFF.md](./HANDOFF.md) | 当前接管状态和最近验证记录 |
 | [PROJECT.md](./PROJECT.md) | 项目定位、质量标准和协作规则 |
+| [docs/interview-runbook.md](./docs/interview-runbook.md) | 面试演示 Runbook、追问答案和兜底方案 |
 | [docs/architecture.md](./docs/architecture.md) | 架构图、主链路、补偿链路和部署视图 |
 | [docs/database-schema.md](./docs/database-schema.md) | MySQL schema、表结构、索引和乐观锁 SQL |
 | [docs/executor-benchmark-report.md](./docs/executor-benchmark-report.md) | Virtual Threads 执行器基准报告 |

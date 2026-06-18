@@ -1,6 +1,36 @@
 # HANDOFF - TicketRush
 
-## Latest Snapshot - 2026-06-18 Demo Console
+## Latest Snapshot - 2026-06-18 Interview Prep Closeout
+
+Current goal:
+- Keep TicketRush stable as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
+- Prepare the user for tomorrow's interview/demo familiarization without adding new product features.
+
+Current stage:
+- Core development is closed unless the user explicitly opens a new scope.
+- Demo Console is complete at `http://localhost:8080/`.
+- Interview/demo materials are now prepared for tomorrow's familiarization.
+
+Recently completed:
+- Added `docs/interview-runbook.md` with TicketRush 30-second/2-minute pitches, Demo Console walkthrough, CLI fallback, high-frequency questions, and no-overclaim boundaries.
+- Added the runbook to README documentation navigation.
+- Added workspace-level `INTERVIEW_STUDY_PLAN.md` at `E:\project\work\job\INTERVIEW_STUDY_PLAN.md` to coordinate SmartKB and TicketRush study order.
+
+Workspace status:
+- Check with `git status --short --branch`.
+- Use JDK 21 for Maven if any Java verification is rerun.
+
+Verified latest:
+- Markdown links in `README.md` and `docs/interview-runbook.md`: passed.
+- `git diff --check`: passed.
+- With JDK 21: `mvn test`: 52 tests passed.
+- Docker runtime health: `http://localhost:8080/actuator/health` returned `UP` with MySQL, Redis, RocketMQ binder, Elasticsearch, Sentinel, and Nacos discovery available.
+- `GET http://localhost:8080/` served the Demo Console and expected controls (`preloadButton`, `rushButton`, Ticket Search, Executor Benchmark).
+
+Next step only:
+- Commit and push this documentation-only interview-prep slice, then stop. Do not expand features.
+
+## Previous Snapshot - 2026-06-18 Demo Console
 
 Current goal:
 - Keep TicketRush as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
