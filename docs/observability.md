@@ -20,10 +20,12 @@ docker/prometheus/prometheus.yml
 job_name: ticketrush-app
 metrics_path: /actuator/prometheus
 targets:
-  - host.docker.internal:8080
+  - app:8080
 ```
 
-`host.docker.internal` 用于让容器访问宿主机上的 Spring Boot 应用。Linux Docker 环境通过 `extra_hosts: host-gateway` 兼容。
+Docker Compose 全链路模式下，Spring Boot 应用同样运行在 Compose 网络中，所以 Prometheus 通过服务名 `app:8080` 抓取指标。
+
+如果只在宿主机启动 Spring Boot、Prometheus/Grafana 仍在容器内运行，可以临时把 target 改成 `host.docker.internal:8080`。
 
 ## Grafana
 
@@ -63,16 +65,22 @@ docker/grafana/dashboards/ticketrush-overview.json
 | JVM Heap Used | `sum(jvm_memory_used_bytes{application="ticketrush",area="heap"})` |
 | JVM Live Threads | `jvm_threads_live_threads{application="ticketrush"}` |
 
+压测期间的 Prometheus API 导出记录见 [observability-benchmark-report.md](./observability-benchmark-report.md)。
+
 ## 启动顺序
 
 ```bash
 docker compose up -d prometheus grafana
 ```
 
-再启动 Spring Boot 应用，访问一次业务接口后，Grafana 面板会逐步出现数据。
+再启动 Spring Boot 应用，访问一次业务接口后，Grafana 面板会逐步出现数据。Docker Compose 全链路模式下可以直接使用：
+
+```bash
+docker compose up -d
+```
 
 ## 注意事项
 
 - 当前配置适合本地开发和作品演示。
-- 如果应用也运行在 Docker Compose 网络内，应把 Prometheus target 改成应用容器名。
+- 如果应用不运行在 Docker Compose 网络内，应按实际网络位置调整 Prometheus target。
 - `application.yml` 已打开 `http.server.requests` 直方图，用于支持 p95 面板。

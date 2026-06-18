@@ -11,7 +11,7 @@
 
 ## 当前阶段
 
-Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照已完成。下一步是 Prometheus/Grafana 指标视角或 Seata 示例。
+Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标证据已完成。下一步是 Seata 示例或多票档热点分摊对比。
 
 ## 已完成
 
@@ -33,6 +33,7 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 - Dockerized k6 单热点票档默认治理观察记录。
 - Virtual Threads vs 传统线程池执行器 benchmark 报告。
 - Dockerized k6 稳定性治理 before/after 对照报告。
+- Prometheus/Grafana 压测指标证据报告。
 - Prometheus 配置、Grafana 说明、Arthas 诊断案例、Kubernetes/K3s 部署清单。
 - README、架构图、数据库 schema、踩坑记录等求职展示文档。
 - **Docker Compose 全链路一键启动**（app + 9 中间件）。
@@ -64,10 +65,9 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 
 ## 下一步
 
-1. 用 Prometheus/Grafana 补压测期间指标视角。
-2. 补 Seata 分布式事务示例。
-3. 做多票档 `SKU_SPREAD > 1` 的热点分摊对比。
-4. ES 集成（优先级最低）。
+1. 补 Seata 分布式事务示例。
+2. 做多票档 `SKU_SPREAD > 1` 的热点分摊对比。
+3. 补 Elasticsearch 活动/票档查询集成。
 
 ## 未验证
 
@@ -224,6 +224,52 @@ Not verified:
 
 Next step:
 - Add Prometheus/Grafana metric evidence or move to the Seata example.
+
+## 2026-06-18 Work Log - Observability Benchmark Evidence
+
+Current goal:
+- Add Prometheus/Grafana metric evidence for TicketRush benchmark runs.
+
+Completed:
+- Confirmed the working tree was clean before the task.
+- Confirmed Prometheus targets were healthy:
+  - `ticketrush-app`: `app:8080/actuator/prometheus`, health `up`.
+  - `prometheus`: `localhost:9090/metrics`, health `up`.
+- Confirmed Prometheus scrape interval is 15s.
+- Confirmed Grafana `TicketRush Overview` dashboard includes HTTP RPS, HTTP p95, Process CPU, JVM Heap Used, and JVM Live Threads panels.
+- Ran a 60s Dockerized k6 protected hot-sku run for Prometheus collection:
+  - `VUS=10`, `DURATION=60s`, `SKU_SPREAD=1`, `SLEEP=0.01`, `STRATEGY=REDIS_LUA`.
+- Exported Prometheus query-range metrics for HTTP RPS, accepted RPS, rate-limited RPS, p95, CPU, heap, live threads, Hikari active/pending, and Redis command completion rate.
+- Added `docs/observability-benchmark-report.md`.
+- Updated `docs/observability.md` to match the current Docker Compose Prometheus target `app:8080`.
+- Updated README and SPEC to reflect Prometheus/Grafana metric evidence.
+
+Key results:
+- k6: 52,173 requests, 838.88 req/s, 7,167 accepted, 45,005 rate-limited, p95 3.24ms, 0.00% unexpected responses.
+- Prometheus: total RPS max 828.63/s, accepted RPS max 114.71/s, rate-limited RPS max 713.92/s.
+- Prometheus HTTP p95 max about 0.0031s.
+- Process CPU max about 0.0215, heap max 466,801,296 bytes, live threads 480-481.
+- Hikari active and pending stayed at 0, which matches the Redis Lua + entry-guard scenario.
+
+Modified files:
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+- `docs/observability.md`
+- `docs/observability-benchmark-report.md`
+
+Verified:
+- Dockerized k6 run passed thresholds.
+- Prometheus API target status showed `ticketrush-app` as healthy.
+- Prometheus query-range exports returned non-empty samples for all report metrics.
+- Raw k6/Prometheus exports were generated under `target/prometheus-evidence/` and were not intended for git.
+
+Not verified:
+- Grafana screenshot export; this step uses Prometheus API data as reproducible evidence.
+- Container-level CPU/memory/network metrics for MySQL, Redis, and RocketMQ.
+
+Next step:
+- Move to Seata example, or run multi-SKU hotspot-spread comparison.
 
 ## 2026-06-17 Work Log - Executor Benchmark Report
 
