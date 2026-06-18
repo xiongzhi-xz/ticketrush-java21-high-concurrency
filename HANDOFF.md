@@ -1,6 +1,87 @@
 # HANDOFF - TicketRush
 
-## Latest Snapshot - 2026-06-18
+## Latest Snapshot - 2026-06-18 Demo Console
+
+Current goal:
+- Keep TicketRush as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
+- Add the missing page needed for interview/demo walkthroughs without expanding into a full frontend/admin system.
+
+Current stage:
+- Docker Compose full stack, k6 benchmark reports, Virtual Threads benchmark, Sentinel/Redis governance, Prometheus evidence, hotspot-spread comparison, Seata AT demo, Elasticsearch search, and the local Demo Console are complete.
+- Demo Console is available at `http://localhost:8080/`.
+- The page only calls existing APIs: health, inventory preload, rush ticket, Elasticsearch index/search, executor benchmark, and ops links.
+
+Recently completed:
+- Added `src/main/resources/static/index.html` as a lightweight TicketRush Demo Console.
+- Added `StaticDemoConsoleHtmlTest` to guard static entry points, API paths, responsive layout guards, and unique HTML IDs.
+- Updated README/SPEC to document the local demo page and keep the scope boundary explicit.
+
+Workspace status:
+- Check with `git status --short --branch`.
+- Use JDK 21 for Maven; the default shell may point to JDK 22 and fail the enforcer rule.
+- Known JDK 21 path on this machine: `C:\Users\xz\.antigravity\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64`.
+
+Verified latest:
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 4 tests passed.
+- Inline JS syntax check with Node: passed.
+- With JDK 21: `mvn test`: 52 tests passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker Compose app restart: `docker compose up -d --no-deps --force-recreate app`; app health became `UP`.
+- `GET http://localhost:8080/` served the Demo Console and expected controls/API paths.
+- Runtime API smoke:
+  - `GET /api/system/health`: `success=true`, `status=UP`, Java 21, virtual threads enabled.
+  - `POST /api/benchmark/executors`: `success=true`, `mode=VIRTUAL_THREAD`, `virtualThreadTaskCount=100`.
+  - `POST /api/rush/inventory/preload`: `success=true`.
+  - `POST /api/rush/tickets`: `success=true`, `accepted=true`, `remainingStock=999`, `processedByVirtualThread=true`.
+  - `POST /api/search/events/9101781814509/index`: `indexedSkuCount=2`.
+  - `GET /api/search/ticket-skus?...Codex%20Smoke...`: `total=2`.
+- Browser smoke:
+  - Chromium headless screenshots generated under `target/demo-console-desktop.png` and `target/demo-console-mobile.png`.
+  - Chrome DevTools Protocol layout check found no horizontal overflow on desktop/mobile viewports.
+
+Not verified latest:
+- Playwright package-level browser smoke was not used because the Chromium headless-shell cache was incomplete and `npx playwright install chromium` timed out. Browser verification used the cached Chromium executable directly instead.
+- Nacos may still log local gRPC reconnect noise in Docker, but app health remains `UP` and the demo flows work.
+
+Next step only:
+- Commit and push this demo-console slice, then stop. Do not start another feature unless explicitly requested.
+
+## 2026-06-18 Work Log - Demo Console
+
+Current goal:
+- Add the missing TicketRush page needed for interview/demo walkthroughs, without expanding the product scope.
+
+Completed:
+- Added a static Demo Console at `/`.
+- The page covers system health, rush inventory preload, ticket rush, Elasticsearch indexing/search, executor benchmark, and operational links.
+- The page intentionally reuses existing APIs only and does not add auth, admin CRUD, payment, or order-management UI.
+- Added a focused HTML regression test for static IDs, responsive guards, API path strings, and core JS function names.
+- Updated README, SPEC, and HANDOFF.
+
+Modified files:
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+- `src/main/resources/static/index.html`
+- `src/test/java/com/ticketrush/StaticDemoConsoleHtmlTest.java`
+
+Verified:
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 4 tests passed.
+- Inline JS syntax check with Node: passed.
+- With JDK 21: `mvn test`: 52 tests passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker app restarted and `/actuator/health` became `UP`.
+- `GET /` served the Demo Console.
+- `GET /api/system/health`, `POST /api/benchmark/executors`, `POST /api/rush/inventory/preload`, `POST /api/rush/tickets`, `POST /api/search/events/9101781814509/index`, and `GET /api/search/ticket-skus` smoke checks passed.
+- Chromium desktop/mobile screenshots were generated under `target/`, and a DevTools layout check found no horizontal overflow.
+
+Not verified:
+- Playwright package-level browser smoke, because browser install timed out. Direct cached-Chromium screenshot and CDP layout checks passed instead.
+
+Next step:
+- Commit and push this slice, then stop.
+
+## Previous Snapshot - 2026-06-18 Elasticsearch Runtime Smoke
 
 Current goal:
 - Keep TicketRush as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.

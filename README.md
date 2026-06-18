@@ -100,6 +100,11 @@ POST /api/rush/tickets
 - `GET /api/search/ticket-skus` 支持按关键字、活动 ID、活动状态和票档状态查询。
 - 详细说明见 [docs/elasticsearch-search.md](./docs/elasticsearch-search.md)。
 
+### 本地演示控制台
+
+- `http://localhost:8080/` 提供轻量 Demo Console，用于串联健康检查、库存预热、抢票、Elasticsearch 查询和执行器 benchmark。
+- 控制台只调用现有 API，不引入登录、后台管理、支付或订单管理页面。
+
 ### 稳定性治理
 
 - Sentinel 全局抢票资源：`ticketrush:rush:ticket`。
@@ -162,7 +167,7 @@ docker compose --profile sentinel up -d
 
 | 服务 | 地址 |
 | --- | --- |
-| TicketRush | http://localhost:8080 |
+| TicketRush Demo Console | http://localhost:8080/ |
 | Health | http://localhost:8080/api/system/health |
 | Actuator Health | http://localhost:8080/actuator/health |
 | Prometheus | http://localhost:9090 |
@@ -261,6 +266,7 @@ k6 run `
 | `POST` | `/api/search/events/{eventId}/index` | 按活动重建 Elasticsearch 票档搜索文档 |
 | `GET` | `/api/search/ticket-skus` | 查询 Elasticsearch 活动/票档读模型 |
 | `GET` | `/actuator/prometheus` | Prometheus 指标抓取入口 |
+| `GET` | `/` | 本地演示控制台静态页 |
 
 常见业务错误码：
 
@@ -276,9 +282,10 @@ k6 run `
 
 当前已验证：
 
-- `mvn clean verify`：35 tests，0 failures，0 errors。
+- `mvn test`：52 tests，0 failures，0 errors。
 - Docker Compose 全链路启动：应用 + 9 个核心中间件容器。
 - `/api/system/health`：`UP`，Java 21，虚拟线程开关开启。
+- `/`：本地 Demo Console 可访问，页面串联健康检查、库存预热、抢票、检索和执行器 benchmark。
 - `/api/rush/inventory/preload`：库存预热成功。
 - `/api/rush/tickets`：抢票成功，返回 `processedByVirtualThread=true`。
 - `/actuator/prometheus`：指标正常输出。

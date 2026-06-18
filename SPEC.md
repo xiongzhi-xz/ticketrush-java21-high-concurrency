@@ -292,6 +292,7 @@ src/main/java/com/ticketrush
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
 - [x] GitHub 展示首页 README 收口（抢票主链路、启动、压测、API、验证状态）
+- [x] 本地轻量演示控制台（只串联现有 API，不扩完整后台）
 - [x] 架构图
 - [x] 踩坑记录
 
@@ -300,6 +301,7 @@ src/main/java/com/ticketrush
 - 有真实压测数据
 - 有可复现部署步骤
 - 有清晰架构说明
+- 有可直接走流程演示的本地页面入口
 - 面试时能围绕项目讲清楚技术选择、性能收益和风险取舍
 
 ## 7. 下一步任务
@@ -359,6 +361,7 @@ src/main/java/com/ticketrush
 - [x] Elasticsearch 活动/票档查询集成
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
+- [x] 本地轻量演示控制台
 - [x] Virtual Threads vs 传统线程池压测报告
 - [x] 架构图
 - [x] 踩坑记录
