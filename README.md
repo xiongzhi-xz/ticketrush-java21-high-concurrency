@@ -27,7 +27,7 @@ TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链
 | Delivery | Docker Compose, Dockerfile, Kubernetes/K3s manifests |
 | Test & Benchmark | JUnit 5, Spring Cloud Stream test binder, k6 |
 
-说明：Seata 依赖、配置与 MySQL AT 示例已落地，当前高并发主链路仍优先采用 Redis/RocketMQ 最终一致性补偿；Elasticsearch 查询集成仍在后续任务中。
+说明：Seata 依赖、配置与 MySQL AT 示例已落地，当前高并发主链路仍优先采用 Redis/RocketMQ 最终一致性补偿；Elasticsearch 已作为活动/票档查询读模型接入，不参与抢票写链路。
 
 ## 架构图
 
@@ -93,6 +93,13 @@ POST /api/rush/tickets
 - 最终一致性设计见 [docs/final-consistency.md](./docs/final-consistency.md)。
 - Seata AT 示例见 [docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md)，用于演示 MySQL 库存预占和订单落库的同步全局事务。
 
+### Elasticsearch 查询
+
+- MySQL 仍是活动和票档写模型，Elasticsearch 保存 `(eventId, skuId)` 聚合读模型。
+- `POST /api/search/events/{eventId}/index` 按活动重建票档搜索文档。
+- `GET /api/search/ticket-skus` 支持按关键字、活动 ID、活动状态和票档状态查询。
+- 详细说明见 [docs/elasticsearch-search.md](./docs/elasticsearch-search.md)。
+
 ### 稳定性治理
 
 - Sentinel 全局抢票资源：`ticketrush:rush:ticket`。
@@ -110,6 +117,7 @@ POST /api/rush/tickets
 - 热点票档分摊压测报告：[docs/hotspot-spread-benchmark-report.md](./docs/hotspot-spread-benchmark-report.md)。
 - Prometheus/Grafana 指标证据报告：[docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md)。
 - Seata 分布式事务示例：[docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md)。
+- Elasticsearch 活动/票档查询：[docs/elasticsearch-search.md](./docs/elasticsearch-search.md)。
 - 稳定性治理压测脚本：[scripts/k6/stability-governance.js](./scripts/k6/stability-governance.js)。
 - Sentinel Dashboard 动态规则样例：[docs/sentinel-dashboard-demo.md](./docs/sentinel-dashboard-demo.md)。
 - Arthas 抢票链路诊断案例：[docs/arthas-diagnostics.md](./docs/arthas-diagnostics.md)。
@@ -250,6 +258,8 @@ k6 run `
 | `POST` | `/api/rush/inventory/preload` | 本地压测前预热票档库存 |
 | `POST` | `/api/rush/tickets` | 抢票入口，支持三种库存扣减策略 |
 | `POST` | `/api/benchmark/executors` | Virtual Threads 与传统线程池执行器对比 |
+| `POST` | `/api/search/events/{eventId}/index` | 按活动重建 Elasticsearch 票档搜索文档 |
+| `GET` | `/api/search/ticket-skus` | 查询 Elasticsearch 活动/票档读模型 |
 | `GET` | `/actuator/prometheus` | Prometheus 指标抓取入口 |
 
 常见业务错误码：
@@ -278,11 +288,12 @@ k6 run `
 - 热点票档分摊对比：`SKU_SPREAD=1` 时 87.56% 被限流，`SKU_SPREAD=20` 时本轮 0 次 `C0429`，受理数提升到 7,496。
 - Prometheus/Grafana 指标证据：单热点压测下 Prometheus RPS 峰值 828.63/s，HTTP p95 约 3.1ms，CPU 峰值约 2.15%。
 - Seata AT 示例：MySQL 库存预占和订单落库被 `@GlobalTransactional` 包裹，并有单元测试覆盖事务注解、幂等和失败回滚边界。
+- Elasticsearch 查询：活动/票档读模型、索引重建 API、查询 API 和查询 JSON 构建均有单元测试覆盖。
 - Redis Lua、Redis Lock、MySQL optimistic lock、RocketMQ Stream binder、MyBatis XML/schema 均有测试覆盖。
 
 未完成或待补强：
 
-- Elasticsearch 活动/票档查询集成。
+- Elasticsearch 运行态 smoke 需要 Docker Compose 中已有 MySQL 活动/票档数据后再执行。
 
 ## 项目结构
 
@@ -325,6 +336,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 | [docs/database-schema.md](./docs/database-schema.md) | MySQL schema、表结构、索引和乐观锁 SQL |
 | [docs/executor-benchmark-report.md](./docs/executor-benchmark-report.md) | Virtual Threads 执行器基准报告 |
 | [docs/final-consistency.md](./docs/final-consistency.md) | 异步下单、消费幂等和补偿策略 |
+| [docs/elasticsearch-search.md](./docs/elasticsearch-search.md) | Elasticsearch 活动/票档查询读模型 |
 | [docs/governance-comparison-report.md](./docs/governance-comparison-report.md) | 稳定性治理 before/after 对照报告 |
 | [docs/hotspot-spread-benchmark-report.md](./docs/hotspot-spread-benchmark-report.md) | 单热点与多票档分摊压测报告 |
 | [docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md) | Prometheus/Grafana 压测指标证据 |

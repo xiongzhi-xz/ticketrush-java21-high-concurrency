@@ -288,6 +288,7 @@ src/main/java/com/ticketrush
 - [x] Grafana 面板说明
 - [x] Prometheus/Grafana 压测指标证据
 - [x] Arthas 诊断案例
+- [x] Elasticsearch 活动/票档查询集成
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
 - [x] GitHub 展示首页 README 收口（抢票主链路、启动、压测、API、验证状态）
@@ -355,6 +356,7 @@ src/main/java/com/ticketrush
 - [x] Grafana 面板说明
 - [x] Prometheus/Grafana 压测指标证据
 - [x] Arthas 诊断案例
+- [x] Elasticsearch 活动/票档查询集成
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
 - [x] Virtual Threads vs 传统线程池压测报告

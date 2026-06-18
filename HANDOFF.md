@@ -1,5 +1,84 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-18
+
+Current goal:
+- Keep TicketRush as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
+
+Current stage:
+- Docker Compose full stack, k6 benchmark reports, Virtual Threads benchmark, Sentinel/Redis governance, Prometheus evidence, hotspot-spread comparison, Seata AT demo, and Elasticsearch activity/SKU search code are complete.
+- Elasticsearch is a read-side model only; the rush write path remains Sentinel -> Redis admission -> inventory deduction -> RocketMQ async order -> timeout compensation.
+
+Recently completed:
+- Added `TicketSearchApplicationService`, `TicketSearchRepository`, and an Elasticsearch adapter backed by `ElasticsearchOperations`.
+- Added `POST /api/search/events/{eventId}/index` to rebuild search documents from existing MySQL event/SKU data.
+- Added `GET /api/search/ticket-skus` with keyword, event ID, event status, SKU status, and pagination filters.
+- Added `docs/elasticsearch-search.md` plus README/SPEC updates.
+
+Workspace status:
+- Check with `git status --short --branch`.
+- Use JDK 21 for Maven; the default shell may point to JDK 22 and fail the enforcer rule.
+- Known JDK 21 path on this machine: `C:\Users\xz\.antigravity\extensions\redhat.java-1.54.0-win32-x64\jre\21.0.10-win32-x86_64`.
+
+Verified latest:
+- With JDK 21: `mvn "-Dtest=TicketSearchApplicationServiceTest,ElasticsearchTicketSearchRepositoryTest" test`: 7 tests passed.
+- With JDK 21: `mvn test`: 47 tests passed.
+- `git diff --check`: passed.
+
+Not verified latest:
+- Runtime Elasticsearch smoke against Docker Compose. It requires a running stack plus MySQL activity/SKU seed data before calling the index/search APIs.
+
+Next step only:
+- Run final verification, then commit and push this Elasticsearch search slice. Do not start another feature unless explicitly requested.
+
+## 2026-06-18 Work Log - Elasticsearch Activity/SKU Search
+
+Current goal:
+- Add the next TicketRush slice: Elasticsearch activity/SKU query integration, without changing the proven rush write path.
+
+Completed:
+- Added a domain search port with `TicketSearchRecord`, `TicketSearchQuery`, `TicketSearchPage`, and `TicketSearchRepository`.
+- Added `TicketSearchApplicationService` to rebuild search records from existing MySQL `TicketEvent` and `TicketSku` data.
+- Added Elasticsearch infrastructure with `TicketSearchDocument` and `ElasticsearchTicketSearchRepository`.
+- Added `POST /api/search/events/{eventId}/index`.
+- Added `GET /api/search/ticket-skus`.
+- Added unit coverage for application mapping, query normalization, Elasticsearch query JSON, index creation, and document mapping.
+- Added `docs/elasticsearch-search.md` and updated README/SPEC/HANDOFF.
+
+Modified files:
+- `src/main/java/com/ticketrush/application/command/IndexTicketEventCommand.java`
+- `src/main/java/com/ticketrush/application/command/TicketSearchCommand.java`
+- `src/main/java/com/ticketrush/application/dto/TicketEventIndexResult.java`
+- `src/main/java/com/ticketrush/application/dto/TicketSearchResult.java`
+- `src/main/java/com/ticketrush/application/service/TicketSearchApplicationService.java`
+- `src/main/java/com/ticketrush/domain/model/TicketSearchPage.java`
+- `src/main/java/com/ticketrush/domain/model/TicketSearchQuery.java`
+- `src/main/java/com/ticketrush/domain/model/TicketSearchRecord.java`
+- `src/main/java/com/ticketrush/domain/repository/TicketSearchRepository.java`
+- `src/main/java/com/ticketrush/infrastructure/elasticsearch/ElasticsearchTicketSearchRepository.java`
+- `src/main/java/com/ticketrush/infrastructure/elasticsearch/TicketSearchDocument.java`
+- `src/main/java/com/ticketrush/interfaces/controller/TicketSearchController.java`
+- `src/main/java/com/ticketrush/interfaces/response/TicketEventIndexResponse.java`
+- `src/main/java/com/ticketrush/interfaces/response/TicketSearchItemResponse.java`
+- `src/main/java/com/ticketrush/interfaces/response/TicketSearchResponse.java`
+- `src/test/java/com/ticketrush/application/service/TicketSearchApplicationServiceTest.java`
+- `src/test/java/com/ticketrush/infrastructure/elasticsearch/ElasticsearchTicketSearchRepositoryTest.java`
+- `docs/elasticsearch-search.md`
+- `README.md`
+- `SPEC.md`
+- `HANDOFF.md`
+
+Verified:
+- With JDK 21: `mvn "-Dtest=TicketSearchApplicationServiceTest,ElasticsearchTicketSearchRepositoryTest" test`: 7 tests passed.
+- With JDK 21: `mvn test`: 47 tests passed.
+- `git diff --check`: passed.
+
+Not verified:
+- Runtime Elasticsearch smoke against Docker Compose. It needs a running stack and MySQL event/SKU seed data.
+
+Next step:
+- Commit and push this slice. Do not start another feature unless explicitly requested.
+
 ## 当前目标
 
 把 TicketRush 收口为可本地运行、可压测、可面试讲解的 Java 21 高并发票务秒杀系统。
