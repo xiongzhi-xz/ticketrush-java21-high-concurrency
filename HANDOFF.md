@@ -1,5 +1,27 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-21 Public Wording Cleanup
+
+Current goal:
+- Keep TicketRush public GitHub materials focused on technical demo, architecture, benchmarks, verification, and project boundaries.
+
+Current stage:
+- No feature work.
+- Public-facing wording has been sanitized so the repository no longer reads like private notes.
+
+Recently completed:
+- Renamed the public demo guide to `docs/demo-runbook.md`.
+- Replaced public wording such as private prep phrasing, scripted wording, and private-note wording with neutral technical demo language.
+- Updated README, SPEC, HANDOFF, showcase docs, and related benchmark notes to point to the neutral document name.
+
+Verified latest:
+- Sensitive public-prep keyword scan across `README.md`, `SPEC.md`, `HANDOFF.md`, and `docs`: no matches.
+- All Markdown links across the repository: passed.
+- `git diff --check`: passed with line-ending warning only.
+
+Next step only:
+- Commit and push this public wording cleanup, then stop. Do not expand features.
+
 ## Latest Snapshot - 2026-06-21 GitHub Showcase Closeout
 
 Current goal:
@@ -10,7 +32,7 @@ Current stage:
 - GitHub presentation has been tightened with a top README showcase entry and a dedicated showcase note.
 
 Recently completed:
-- Added `docs/github-showcase.md` with 30-second highlights, recommended browsing order, local demo flow, verification evidence, resume wording, and no-overclaim boundaries.
+- Added `docs/github-showcase.md` with 30-second highlights, recommended browsing order, local demo flow, verification evidence, project summary wording, and no-overclaim boundaries.
 - Added a `GitHub 展示入口` section near the top of `README.md`.
 - Linked the showcase note from README documentation navigation.
 - Marked the showcase note complete in `SPEC.md`.
@@ -27,19 +49,19 @@ Verified latest:
 Next step only:
 - Run docs checks, commit this GitHub showcase closeout, then stop. Do not expand features.
 
-## Latest Snapshot - 2026-06-18 Interview Prep Closeout
+## Latest Snapshot - 2026-06-18 Demo Prep Closeout
 
 Current goal:
-- Keep TicketRush stable as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
-- Prepare the user for tomorrow's interview/demo familiarization without adding new product features.
+- Keep TicketRush stable as a local runnable, benchmarkable, demo-ready Java 21 high-concurrency ticket-rush system.
+- Prepare the user for tomorrow's demo familiarization without adding new product features.
 
 Current stage:
 - Core development is closed unless the user explicitly opens a new scope.
 - Demo Console is complete at `http://localhost:8080/`.
-- Interview/demo materials are now prepared for tomorrow's familiarization.
+- Demo materials are now prepared for tomorrow's familiarization.
 
 Recently completed:
-- Added `docs/interview-runbook.md` with TicketRush 30-second/2-minute pitches, Demo Console walkthrough, CLI fallback, high-frequency questions, and no-overclaim boundaries.
+- Added `docs/demo-runbook.md` with TicketRush 30-second/2-minute pitches, Demo Console walkthrough, CLI fallback, high-frequency questions, and no-overclaim boundaries.
 - Added the runbook to README documentation navigation.
 - Added workspace-level `INTERVIEW_STUDY_PLAN.md` at `E:\project\work\job\INTERVIEW_STUDY_PLAN.md` to coordinate SmartKB and TicketRush study order.
 
@@ -48,20 +70,20 @@ Workspace status:
 - Use JDK 21 for Maven if any Java verification is rerun.
 
 Verified latest:
-- Markdown links in `README.md` and `docs/interview-runbook.md`: passed.
+- Markdown links in `README.md` and `docs/demo-runbook.md`: passed.
 - `git diff --check`: passed.
 - With JDK 21: `mvn test`: 52 tests passed.
 - Docker runtime health: `http://localhost:8080/actuator/health` returned `UP` with MySQL, Redis, RocketMQ binder, Elasticsearch, Sentinel, and Nacos discovery available.
 - `GET http://localhost:8080/` served the Demo Console and expected controls (`preloadButton`, `rushButton`, Ticket Search, Executor Benchmark).
 
 Next step only:
-- Commit and push this documentation-only interview-prep slice, then stop. Do not expand features.
+- Commit and push this documentation-only demo-prep slice, then stop. Do not expand features.
 
 ## Previous Snapshot - 2026-06-18 Demo Console
 
 Current goal:
-- Keep TicketRush as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
-- Add the missing page needed for interview/demo walkthroughs without expanding into a full frontend/admin system.
+- Keep TicketRush as a local runnable, benchmarkable, demo-ready Java 21 high-concurrency ticket-rush system.
+- Add the missing page needed for demo walkthroughs without expanding into a full frontend/admin system.
 
 Current stage:
 - Docker Compose full stack, k6 benchmark reports, Virtual Threads benchmark, Sentinel/Redis governance, Prometheus evidence, hotspot-spread comparison, Seata AT demo, Elasticsearch search, and the local Demo Console are complete.
@@ -106,7 +128,7 @@ Next step only:
 ## 2026-06-18 Work Log - Demo Console
 
 Current goal:
-- Add the missing TicketRush page needed for interview/demo walkthroughs, without expanding the product scope.
+- Add the missing TicketRush page needed for demo walkthroughs, without expanding the product scope.
 
 Completed:
 - Added a static Demo Console at `/`.
@@ -141,7 +163,7 @@ Next step:
 ## Previous Snapshot - 2026-06-18 Elasticsearch Runtime Smoke
 
 Current goal:
-- Keep TicketRush as a local runnable, benchmarkable, interview-ready Java 21 high-concurrency ticket-rush system.
+- Keep TicketRush as a local runnable, benchmarkable, demo-ready Java 21 high-concurrency ticket-rush system.
 
 Current stage:
 - Docker Compose full stack, k6 benchmark reports, Virtual Threads benchmark, Sentinel/Redis governance, Prometheus evidence, hotspot-spread comparison, Seata AT demo, and Elasticsearch activity/SKU search code are complete.
@@ -260,7 +282,7 @@ Next step:
 
 ## 当前目标
 
-把 TicketRush 收口为可本地运行、可压测、可面试讲解的 Java 21 高并发票务秒杀系统。
+把 TicketRush 收口为可本地运行、可压测、可技术讲解的 Java 21 高并发票务秒杀系统。
 
 它在求职叙事中的定位：
 
@@ -380,7 +402,7 @@ Current goal:
 Completed:
 - Rewrote the README around the high-concurrency ticket-rush main path:
   - Sentinel guard -> Redis admission token -> Java 21 Virtual Threads -> inventory strategy -> RocketMQ async order -> timeout compensation.
-- Added a Mermaid architecture diagram, project highlights, technology table, feature checklist, Docker Compose startup path, manual smoke commands, k6 entry points, API overview, verification status, project structure, interview talking points, documentation navigation, and safety notes.
+- Added a Mermaid architecture diagram, project highlights, technology table, feature checklist, Docker Compose startup path, manual smoke commands, k6 entry points, API overview, verification status, project structure, technical explanation notes, documentation navigation, and safety notes.
 - Kept Seata and Elasticsearch described as reserved/pending integration rather than completed business features.
 - Marked README showcase polish complete in `SPEC.md`.
 

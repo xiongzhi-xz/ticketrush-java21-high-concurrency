@@ -125,7 +125,7 @@ trace com.ticketrush.application.service.OrderApplicationService createOrder '#c
 | --- | --- | --- | --- | --- | --- | --- |
 | 待补充 | 待补充 | 待补充 | 待补充 | 待补充 | 待补充 | 待补充 |
 
-## 面试讲解点
+## 技术讲解点
 
 - 先用 Prometheus/Grafana 判断系统是否有异常趋势，再用 Arthas 对单点链路做现场诊断。
 - `trace` 用于看链路耗时分布，`watch` 用于看参数、返回值和异常。

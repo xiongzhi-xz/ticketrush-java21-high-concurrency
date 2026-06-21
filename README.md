@@ -9,8 +9,8 @@ TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链
 如果你是第一次打开这个仓库，建议先按这个顺序看：
 
 1. 本页的“项目亮点”“架构图”“核心链路”“快速启动”“验证状态”。
-2. [docs/github-showcase.md](docs/github-showcase.md)：30 秒展示摘要、推荐浏览顺序、简历表达和边界说明。
-3. [docs/interview-runbook.md](docs/interview-runbook.md)：5 分钟演示路径、CLI 兜底和追问答案。
+2. [docs/github-showcase.md](docs/github-showcase.md)：30 秒展示摘要、推荐浏览顺序、项目摘要表达和边界说明。
+3. [docs/demo-runbook.md](docs/demo-runbook.md)：5 分钟演示路径、CLI 替代演示和常见技术问题。
 4. [docs/rush-benchmark-report.md](docs/rush-benchmark-report.md) 与 [docs/executor-benchmark-report.md](docs/executor-benchmark-report.md)：压测和 Virtual Threads 证据。
 
 展示边界：TicketRush 是本地可运行、可压测、可解释的 Java 21 高并发票务作品项目；Demo Console 不是完整后台管理系统，真实支付、短信、实名制、多租户 SaaS 和生产订单系统不在当前范围。
@@ -22,7 +22,7 @@ TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链
 - **RocketMQ 异步削峰**：抢票成功后发布订单创建消息，消费者幂等创建 `PENDING` 订单，入口失败时回滚预占库存。
 - **最终一致性补偿**：订单超时关闭任务批量关闭过期订单，并释放锁定库存。
 - **可观测和部署闭环**：Actuator + Prometheus + Grafana，Docker Compose 一键启动，Kubernetes/K3s 清单可演示。
-- **面试友好文档**：架构图、数据库 schema、稳定性治理、Arthas 诊断、踩坑记录和压测脚本都已落地。
+- **技术说明文档**：架构图、数据库 schema、稳定性治理、Arthas 诊断、踩坑记录和压测脚本都已落地。
 
 ## 技术栈
 
@@ -325,7 +325,7 @@ src/main/java/com/ticketrush
 └── job             # 热点库存预热、订单超时关闭、补偿任务
 ```
 
-## 面试讲法
+## 技术讲解
 
 30 秒版：
 
@@ -333,7 +333,7 @@ src/main/java/com/ticketrush
 TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区和演出票务抢票。它的主链路覆盖 Sentinel 限流、Redis 准入令牌、Virtual Threads 库存预占、Redis Lua/Redis Lock/MySQL 乐观锁三种防超卖策略、RocketMQ 异步下单、消费幂等、订单超时关闭补偿，以及 Prometheus/Grafana 监控和 Docker/K3s 部署。这个项目用来证明我能把高并发票务里的防超卖、削峰、幂等、一致性和可观测做成可运行、可压测、可解释的工程闭环。
 ```
 
-核心追问点：
+常见技术问题：
 
 - 为什么 Redis Lua 是热点票档库存扣减的主推荐方案？
 - Redis 分布式锁和 MySQL 乐观锁在高并发下分别会暴露什么瓶颈？
@@ -349,8 +349,8 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 | [SPEC.md](./SPEC.md) | 项目执行规格、阶段计划和当前进度 |
 | [HANDOFF.md](./HANDOFF.md) | 当前接管状态和最近验证记录 |
 | [PROJECT.md](./PROJECT.md) | 项目定位、质量标准和协作规则 |
-| [docs/interview-runbook.md](./docs/interview-runbook.md) | 面试演示 Runbook、追问答案和兜底方案 |
-| [docs/github-showcase.md](./docs/github-showcase.md) | GitHub 展示摘要、浏览顺序和简历表达 |
+| [docs/demo-runbook.md](./docs/demo-runbook.md) | 演示 Runbook、常见技术问题和替代路径 |
+| [docs/github-showcase.md](./docs/github-showcase.md) | GitHub 展示摘要、浏览顺序和项目摘要表达 |
 | [docs/architecture.md](./docs/architecture.md) | 架构图、主链路、补偿链路和部署视图 |
 | [docs/database-schema.md](./docs/database-schema.md) | MySQL schema、表结构、索引和乐观锁 SQL |
 | [docs/executor-benchmark-report.md](./docs/executor-benchmark-report.md) | Virtual Threads 执行器基准报告 |

@@ -1,6 +1,6 @@
 # TicketRush GitHub 展示说明
 
-这份说明用于招聘方或面试官快速判断 TicketRush 的展示重点。它不是新功能清单，也不替代 README。
+这份说明用于技术读者或技术评审者快速判断 TicketRush 的展示重点。它不是新功能清单，也不替代 README。
 
 ## 30 秒看点
 
@@ -14,7 +14,7 @@
 ## 推荐浏览顺序
 
 1. [README.md](../README.md)：先看项目定位、架构图、核心链路、快速启动和验证状态。
-2. [docs/interview-runbook.md](interview-runbook.md)：看 5 分钟演示路径、CLI 兜底和追问答案。
+2. [docs/demo-runbook.md](demo-runbook.md)：看 5 分钟演示路径、CLI 替代演示和常见技术问题。
 3. [docs/architecture.md](architecture.md)：看抢票主链路、补偿链路和部署视图。
 4. [docs/rush-benchmark-report.md](rush-benchmark-report.md)：看三种库存策略 baseline。
 5. [docs/executor-benchmark-report.md](executor-benchmark-report.md)：看 Virtual Threads vs 固定线程池对比。
@@ -45,7 +45,7 @@ http://localhost:8080/
 - Prometheus API 导出过压测指标证据。
 - Seata AT 示例、Elasticsearch 查询、Redis Lua/Lock、MySQL 乐观锁、RocketMQ Stream binder、MyBatis XML/schema 均有测试或报告覆盖。
 
-## 适合放进简历的表达
+## 项目摘要表达
 
 ```text
 TicketRush：基于 Java 21 + Spring Boot 3 的高并发票务秒杀系统，围绕抢票主链路实现 Sentinel 限流、Redis 准入令牌、Virtual Threads 库存预占、Redis Lua/分布式锁/MySQL 乐观锁防超卖、RocketMQ 异步下单、消费幂等、订单超时补偿，并补充 k6 压测、Prometheus/Grafana 指标证据和 Docker/K3s 部署材料。
