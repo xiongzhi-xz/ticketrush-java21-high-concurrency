@@ -1,5 +1,32 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-21 GitHub Showcase Closeout
+
+Current goal:
+- Keep TicketRush as a stable GitHub-facing Java 21 high-concurrency ticket-rush showcase without adding new features.
+
+Current stage:
+- Core development is closed unless the user explicitly opens a new scope.
+- GitHub presentation has been tightened with a top README showcase entry and a dedicated showcase note.
+
+Recently completed:
+- Added `docs/github-showcase.md` with 30-second highlights, recommended browsing order, local demo flow, verification evidence, resume wording, and no-overclaim boundaries.
+- Added a `GitHub 展示入口` section near the top of `README.md`.
+- Linked the showcase note from README documentation navigation.
+- Marked the showcase note complete in `SPEC.md`.
+
+Workspace status:
+- Check with `git status --short --branch`.
+- Use JDK 21 for Maven if Java verification is rerun.
+
+Verified latest:
+- Markdown links in `README.md` and `docs/github-showcase.md`: passed.
+- Sensitive pattern scan for private keys and common token formats in changed docs: no matches.
+- `git diff --check`: passed.
+
+Next step only:
+- Run docs checks, commit this GitHub showcase closeout, then stop. Do not expand features.
+
 ## Latest Snapshot - 2026-06-18 Interview Prep Closeout
 
 Current goal:

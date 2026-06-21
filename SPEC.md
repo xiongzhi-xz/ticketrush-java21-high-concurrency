@@ -292,6 +292,7 @@ src/main/java/com/ticketrush
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
 - [x] GitHub 展示首页 README 收口（抢票主链路、启动、压测、API、验证状态）
+- [x] GitHub 展示补充页（30 秒看点、浏览顺序、简历表达和边界说明）
 - [x] 本地轻量演示控制台（只串联现有 API，不扩完整后台）
 - [x] 架构图
 - [x] 踩坑记录
