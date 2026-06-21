@@ -1,5 +1,28 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-21 Screenshot Showcase
+
+Current goal:
+- Add lightweight GitHub screenshot assets for TicketRush without changing product behavior.
+
+Current stage:
+- No feature work.
+- README now includes screenshots for the Demo Console desktop and mobile views.
+
+Recently completed:
+- Added `docs/screenshots/ticketrush-demo-console-desktop.png`.
+- Added `docs/screenshots/ticketrush-demo-console-mobile.png`.
+- Added a README `界面截图` section and marked the screenshot slice in `SPEC.md`.
+
+Verified latest:
+- Image dimension check for `docs/screenshots/*.png`: passed.
+- Public wording scan across `README.md`, `SPEC.md`, `HANDOFF.md`, and `docs`: no matches for private-prep phrasing.
+- All Markdown links across the repository: passed.
+- `git diff --check`: passed.
+
+Next step only:
+- Run docs checks, commit, push, then stop. Do not expand features.
+
 ## Latest Snapshot - 2026-06-21 Public Wording Cleanup
 
 Current goal:

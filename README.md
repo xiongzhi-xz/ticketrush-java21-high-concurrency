@@ -66,6 +66,14 @@ flowchart LR
 
 更完整的总体架构、抢票主链路、补偿链路和部署视图见 [docs/architecture.md](./docs/architecture.md)。
 
+## 界面截图
+
+| Demo Console 桌面视图 | Demo Console 移动视图 |
+| --- | --- |
+| ![TicketRush Demo Console 桌面视图](docs/screenshots/ticketrush-demo-console-desktop.png) | ![TicketRush Demo Console 移动视图](docs/screenshots/ticketrush-demo-console-mobile.png) |
+
+截图来自本地浏览器验证过程，展示健康检查、库存预热、抢票、Elasticsearch 查询和执行器 benchmark 的统一演示入口。
+
 ## 核心链路
 
 ```text

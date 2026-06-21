@@ -13,7 +13,7 @@
 
 ## 推荐浏览顺序
 
-1. [README.md](../README.md)：先看项目定位、架构图、核心链路、快速启动和验证状态。
+1. [README.md](../README.md)：先看项目定位、架构图、界面截图、核心链路、快速启动和验证状态。
 2. [docs/demo-runbook.md](demo-runbook.md)：看 5 分钟演示路径、CLI 替代演示和设计取舍。
 3. [docs/architecture.md](architecture.md)：看抢票主链路、补偿链路和部署视图。
 4. [docs/rush-benchmark-report.md](rush-benchmark-report.md)：看三种库存策略 baseline。
