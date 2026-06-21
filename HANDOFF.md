@@ -32,7 +32,7 @@ Current stage:
 - GitHub presentation has been tightened with a top README showcase entry and a dedicated showcase note.
 
 Recently completed:
-- Added `docs/github-showcase.md` with 30-second highlights, recommended browsing order, local demo flow, verification evidence, project summary wording, and no-overclaim boundaries.
+- Added `docs/github-showcase.md` with quick highlights, recommended browsing order, local demo flow, verification evidence, project summary wording, and no-overclaim boundaries.
 - Added a `GitHub 展示入口` section near the top of `README.md`.
 - Linked the showcase note from README documentation navigation.
 - Marked the showcase note complete in `SPEC.md`.
@@ -61,7 +61,7 @@ Current stage:
 - Demo materials are now prepared for tomorrow's familiarization.
 
 Recently completed:
-- Added `docs/demo-runbook.md` with TicketRush 30-second/2-minute pitches, Demo Console walkthrough, CLI fallback, high-frequency questions, and no-overclaim boundaries.
+- Added `docs/demo-runbook.md` with TicketRush project overview notes, Demo Console walkthrough, CLI fallback, high-frequency questions, and no-overclaim boundaries.
 - Added the runbook to README documentation navigation.
 - Added workspace-level `INTERVIEW_STUDY_PLAN.md` at `E:\project\work\job\INTERVIEW_STUDY_PLAN.md` to coordinate SmartKB and TicketRush study order.
 
@@ -282,7 +282,7 @@ Next step:
 
 ## 当前目标
 
-把 TicketRush 收口为可本地运行、可压测、可技术讲解的 Java 21 高并发票务秒杀系统。
+把 TicketRush 收口为可本地运行、可压测、可设计说明的 Java 21 高并发票务秒杀系统。
 
 它在求职叙事中的定位：
 
