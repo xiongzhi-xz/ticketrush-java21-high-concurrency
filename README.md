@@ -68,11 +68,16 @@ flowchart LR
 
 ## 界面截图
 
-| Demo Console 桌面视图 | Demo Console 移动视图 |
+| 步骤 | 桌面横屏截图 |
 | --- | --- |
-| ![TicketRush Demo Console 桌面视图](docs/screenshots/ticketrush-demo-console-desktop.png) | ![TicketRush Demo Console 移动视图](docs/screenshots/ticketrush-demo-console-mobile.png) |
+| 1. Demo Console 总览 | ![TicketRush Demo Console 总览](docs/screenshots/desktop/ticketrush-01-demo-console-overview.png) |
+| 2. 系统健康检查 | ![TicketRush 系统健康检查](docs/screenshots/desktop/ticketrush-02-system-health.png) |
+| 3. 库存预热 | ![TicketRush 库存预热](docs/screenshots/desktop/ticketrush-03-inventory-preload.png) |
+| 4. 抢票成功 | ![TicketRush 抢票成功](docs/screenshots/desktop/ticketrush-04-rush-ticket.png) |
+| 5. Ticket Search 查询 | ![TicketRush Ticket Search 查询](docs/screenshots/desktop/ticketrush-05-ticket-search.png) |
+| 6. Executor Benchmark | ![TicketRush Executor Benchmark](docs/screenshots/desktop/ticketrush-06-executor-benchmark.png) |
 
-截图来自本地浏览器验证过程，展示健康检查、库存预热、抢票、Elasticsearch 查询和执行器 benchmark 的统一演示入口。
+截图为 `1440x900` 桌面横屏视口，覆盖本地演示路径中的健康检查、库存预热、抢票、Elasticsearch 查询和执行器 benchmark 步骤。
 
 ## 核心链路
 

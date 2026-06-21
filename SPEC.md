@@ -293,7 +293,7 @@ src/main/java/com/ticketrush
 - [x] 专业 README
 - [x] GitHub 展示首页 README 收口（抢票主链路、启动、压测、API、验证状态）
 - [x] GitHub 展示补充页（快速看点、浏览顺序、项目摘要和边界说明）
-- [x] GitHub README 界面截图（Demo Console 桌面和移动视图）
+- [x] GitHub README 桌面横屏步骤截图（总览、健康检查、库存预热、抢票、检索、执行器 benchmark）
 - [x] 本地轻量演示控制台（只串联现有 API，不扩完整后台）
 - [x] 架构图
 - [x] 踩坑记录

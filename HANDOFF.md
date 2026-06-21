@@ -1,24 +1,29 @@
 # HANDOFF - TicketRush
 
-## Latest Snapshot - 2026-06-21 Screenshot Showcase
+## Latest Snapshot - 2026-06-21 Desktop Screenshot Showcase
 
 Current goal:
-- Add lightweight GitHub screenshot assets for TicketRush without changing product behavior.
+- Replace the GitHub README screenshots with desktop landscape screenshots that cover each local Demo Console step.
 
 Current stage:
 - No feature work.
-- README now includes screenshots for the Demo Console desktop and mobile views.
+- README now references a 6-step `1440x900` desktop screenshot sequence.
 
 Recently completed:
-- Added `docs/screenshots/ticketrush-demo-console-desktop.png`.
-- Added `docs/screenshots/ticketrush-demo-console-mobile.png`.
-- Added a README `界面截图` section and marked the screenshot slice in `SPEC.md`.
+- Added `docs/screenshots/desktop/ticketrush-01-demo-console-overview.png`.
+- Added `docs/screenshots/desktop/ticketrush-02-system-health.png`.
+- Added `docs/screenshots/desktop/ticketrush-03-inventory-preload.png`.
+- Added `docs/screenshots/desktop/ticketrush-04-rush-ticket.png`.
+- Added `docs/screenshots/desktop/ticketrush-05-ticket-search.png`.
+- Added `docs/screenshots/desktop/ticketrush-06-executor-benchmark.png`.
+- Updated README `界面截图` to show the desktop step sequence.
+- Updated `SPEC.md` screenshot progress wording.
 
 Verified latest:
-- Image dimension check for `docs/screenshots/*.png`: passed.
+- Image dimension check for `docs/screenshots/desktop/*.png`: all screenshots are `1440x900`.
 - Public wording scan across `README.md`, `SPEC.md`, `HANDOFF.md`, and `docs`: no matches for private-prep phrasing.
 - All Markdown links across the repository: passed.
-- `git diff --check`: passed.
+- `git diff --check`: passed with line-ending warnings only.
 
 Next step only:
 - Run docs checks, commit, push, then stop. Do not expand features.
