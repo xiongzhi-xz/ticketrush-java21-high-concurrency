@@ -30,9 +30,9 @@ http://localhost:8080/
 
 推荐演示顺序：
 
-1. 刷新健康状态：确认 Java 21、虚拟线程和运行状态。
-2. 预热库存：把热门票档库存写入 Redis。
-3. 发起抢票：观察 `processedByVirtualThread=true` 和剩余库存变化。
+1. 初始化库存：把热门票档库存写入 Redis。
+2. 发起抢票：观察右侧结论卡片中的抢票结果、库存变化和处理线程。
+3. 重复提交验证幂等：复用同一个幂等 Key，确认不会重复扣库存。
 4. 运行压测：对比虚拟线程和传统固定线程池。
 5. 重建活动索引 / 查询票档：演示 Elasticsearch 是读模型，不参与抢票写链路。
 
@@ -40,7 +40,7 @@ http://localhost:8080/
 
 - `mvn test`：52 tests，0 failures，0 errors。
 - Docker Compose 全链路启动：应用和核心中间件容器已验证。
-- Demo Console 已在运行态访问并串联健康检查、库存预热、抢票、检索和 benchmark。
+- 本地演示页已在运行态访问并串联初始化库存、抢票、重复提交幂等、检索和 benchmark。
 - k6 压测报告覆盖库存策略 baseline、稳定性治理 before/after 和热点分摊对比。
 - Prometheus API 导出过压测指标证据。
 - Seata AT 示例、Elasticsearch 查询、Redis Lua/Lock、MySQL 乐观锁、RocketMQ Stream binder、MyBatis XML/schema 均有测试或报告覆盖。
@@ -53,7 +53,7 @@ TicketRush：基于 Java 21 + Spring Boot 3 的高并发票务秒杀系统，围
 
 ## 边界说明
 
-- Demo Console 是本地演示控制台，不是完整后台管理系统。
+- 本地演示页用于证明核心链路，不是完整后台管理系统。
 - 项目不接入真实支付、短信、实名制、多租户 SaaS 或生产订单系统。
 - Seata 是 MySQL 库存预占 + 订单落库示例，主抢票链路仍采用 Redis/RocketMQ 最终一致性方案。
 - Docker Compose 中的账号密码仅用于本地演示；不要提交 `.env`、真实账号、token、cookie、私钥或本地运行数据。

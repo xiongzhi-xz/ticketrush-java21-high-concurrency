@@ -13,7 +13,7 @@ TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链
 3. [docs/demo-runbook.md](docs/demo-runbook.md)：5 分钟演示路径、CLI 替代演示和设计取舍。
 4. [docs/rush-benchmark-report.md](docs/rush-benchmark-report.md) 与 [docs/executor-benchmark-report.md](docs/executor-benchmark-report.md)：压测和 Virtual Threads 证据。
 
-展示边界：TicketRush 是本地可运行、可压测、可解释的 Java 21 高并发票务作品项目；Demo Console 不是完整后台管理系统，真实支付、短信、实名制、多租户 SaaS 和生产订单系统不在当前范围。
+展示边界：TicketRush 是本地可运行、可压测、可解释的 Java 21 高并发票务作品项目；本地演示页用于证明核心链路，不是完整后台管理系统，真实支付、短信、实名制、多租户 SaaS 和生产订单系统不在当前范围。
 ## 项目亮点
 
 - **Java 21 Virtual Threads 实战**：抢票库存预占和执行器基准接口都走虚拟线程，响应中可看到 `processedByVirtualThread=true`。
@@ -70,14 +70,14 @@ flowchart LR
 
 | 步骤 | 桌面横屏截图 |
 | --- | --- |
-| 1. 演示台总览 | ![TicketRush 高并发抢票演示台总览](docs/screenshots/desktop/ticketrush-01-demo-console-overview.png) |
+| 1. 核心链路总览 | ![TicketRush 高并发抢票演示总览](docs/screenshots/desktop/ticketrush-01-demo-console-overview.png) |
 | 2. 系统健康检查 | ![TicketRush 系统健康检查](docs/screenshots/desktop/ticketrush-02-system-health.png) |
-| 3. 库存预热 | ![TicketRush 库存预热](docs/screenshots/desktop/ticketrush-03-inventory-preload.png) |
-| 4. 抢票成功 | ![TicketRush 抢票成功](docs/screenshots/desktop/ticketrush-04-rush-ticket.png) |
+| 3. 初始化库存 | ![TicketRush 初始化库存](docs/screenshots/desktop/ticketrush-03-inventory-preload.png) |
+| 4. 抢票与幂等验证 | ![TicketRush 抢票与幂等验证](docs/screenshots/desktop/ticketrush-04-rush-ticket.png) |
 | 5. 票档检索查询 | ![TicketRush 票档检索查询](docs/screenshots/desktop/ticketrush-05-ticket-search.png) |
 | 6. 虚拟线程压测对比 | ![TicketRush 虚拟线程压测对比](docs/screenshots/desktop/ticketrush-06-executor-benchmark.png) |
 
-截图为 `1440x900` 桌面横屏视口，覆盖本地演示路径中的健康检查、库存预热、抢票、Elasticsearch 查询和执行器 benchmark 步骤。
+截图为 `1440x900` 桌面横屏视口，覆盖本地演示路径中的初始化库存、抢票、重复提交幂等、Elasticsearch 查询和执行器 benchmark 步骤。
 
 ## 核心链路
 
@@ -125,7 +125,7 @@ POST /api/rush/tickets
 
 ### 本地演示控制台
 
-- `http://localhost:8080/` 提供轻量 Demo Console，用于串联健康检查、库存预热、抢票、Elasticsearch 查询和执行器 benchmark。
+- `http://localhost:8080/` 提供本地演示页，用于串联初始化库存、抢票、重复提交幂等、Elasticsearch 查询和执行器 benchmark。
 - 控制台只调用现有 API，不引入登录、后台管理、支付或订单管理页面。
 
 ### 稳定性治理
@@ -190,7 +190,7 @@ docker compose --profile sentinel up -d
 
 | 服务 | 地址 |
 | --- | --- |
-| TicketRush 高并发抢票演示台 | http://localhost:8080/ |
+| TicketRush 高并发抢票演示 | http://localhost:8080/ |
 | Health | http://localhost:8080/api/system/health |
 | Actuator Health | http://localhost:8080/actuator/health |
 | Prometheus | http://localhost:9090 |
@@ -308,7 +308,7 @@ k6 run `
 - `mvn test`：52 tests，0 failures，0 errors。
 - Docker Compose 全链路启动：应用 + 9 个核心中间件容器。
 - `/api/system/health`：`UP`，Java 21，虚拟线程开关开启。
-- `/`：本地 Demo Console 可访问，页面串联健康检查、库存预热、抢票、检索和执行器 benchmark。
+- `/`：本地演示页可访问，页面串联初始化库存、抢票、重复提交幂等、检索和执行器 benchmark。
 - `/api/rush/inventory/preload`：库存预热成功。
 - `/api/rush/tickets`：抢票成功，返回 `processedByVirtualThread=true`。
 - `/actuator/prometheus`：指标正常输出。

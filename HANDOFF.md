@@ -5,6 +5,7 @@
 Current goal:
 - Make the TicketRush local demo page Chinese, business-oriented, and easier to understand from screenshots.
 - Clarify why different inventory deduction strategies can show different remaining stock.
+- Redesign the page so the first screen clearly shows the high-concurrency ticket-rush proof points instead of a loose API console.
 
 Current stage:
 - No backend feature expansion.
@@ -23,6 +24,13 @@ Recently completed:
   - Redis Lua and Redis Lock share the same Redis preloaded inventory.
   - MySQL optimistic lock reads the MySQL inventory table and is a comparison path.
 - Moved rush result badges upward so `是否接单`、`Redis/MySQL 剩余库存`、`库存来源`、`虚拟线程` are visible in the main rush panel.
+- Reworked the page from a broad console into a focused 5-minute demo:
+  - first screen highlights 防超卖、幂等、限流、虚拟线程、异步削峰;
+  - left side shows the step-by-step operation path;
+  - right side shows human-readable conclusion cards;
+  - raw JSON is collapsed under `查看原始接口响应`;
+  - Elasticsearch, observability, and health checks are secondary sections.
+- Added `3 重复提交验证幂等` to show duplicate requests do not deduct inventory again.
 
 Verified latest:
 - Inline JavaScript syntax check: passed.
@@ -30,8 +38,8 @@ Verified latest:
 - With JDK 21: `mvn package -DskipTests`: passed.
 - Docker app redeploy: `docker compose up -d --no-deps --force-recreate app`.
 - `http://localhost:8080/actuator/health`: `UP`.
-- `http://localhost:8080/`: contains the strategy source explanation and `rushSourceBadge`.
-- Browser walkthrough against local backend: health, preload, rush, index/search, and executor benchmark all produced visible results.
+- `http://localhost:8080/`: contains `5 分钟证明一个高并发抢票链路`, `本次演示结论`, and `重复提交验证幂等`.
+- Browser walkthrough against local backend: health, initialize inventory, rush, duplicate-submit idempotency, index/search, and executor benchmark all produced visible results.
 - Screenshot dimension check: all `docs/screenshots/desktop/*.png` are `1440x900`.
 - Browser layout check: no horizontal overflow at the desktop screenshot viewport.
 - `git diff --check`: passed.

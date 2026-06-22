@@ -23,13 +23,16 @@ class StaticDemoConsoleHtmlTest {
 
         assertThat(html).contains(
                 "TicketRush 高并发抢票演示台",
+                "5 分钟证明一个高并发抢票链路",
                 "系统健康检查",
                 "抢票主链路",
                 "票档检索读模型",
                 "虚拟线程压测对比",
+                "本次演示结论",
                 "id=\"refreshHealthButton\"",
                 "id=\"preloadButton\"",
                 "id=\"rushButton\"",
+                "id=\"repeatRushButton\"",
                 "id=\"indexEventButton\"",
                 "id=\"searchButton\"",
                 "id=\"benchmarkButton\"",
@@ -43,19 +46,21 @@ class StaticDemoConsoleHtmlTest {
         String html = readIndexHtml();
 
         assertThat(html).contains(
-                "刷新健康状态",
-                "预热库存",
+                "刷新系统状态",
+                "初始化库存",
                 "发起抢票",
+                "重复提交验证幂等",
                 "重建活动索引",
                 "查询票档",
                 "运行压测",
                 "清空结果",
                 "防超卖",
-                "幂等请求",
-                "最终一致性",
+                "幂等",
+                "异步削峰",
+                "查看原始接口响应",
                 "库存来源：Redis Hash",
                 "库存来源：MySQL 库存表",
-                "共享同一份 Redis 预热库存",
+                "共享 Redis 预热库存",
                 "独立数据库库存"
         );
     }
@@ -86,8 +91,8 @@ class StaticDemoConsoleHtmlTest {
 
         assertThat(html).contains(
                 "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">",
-                "@media (max-width: 1100px)",
-                "@media (max-width: 760px)",
+                "@media (max-width: 1120px)",
+                "@media (max-width: 780px)",
                 "grid-template-columns: 1fr",
                 "overflow-wrap: anywhere",
                 "min-width: 320px"
@@ -114,6 +119,8 @@ class StaticDemoConsoleHtmlTest {
                 "metricApp",
                 "preloadSkuId",
                 "rushRequestId",
+                "repeatRushButton",
+                "summaryOutcome",
                 "strategyHint",
                 "rushSourceBadge",
                 "searchSummary",

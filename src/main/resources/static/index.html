@@ -7,22 +7,22 @@
     <style>
         :root {
             color-scheme: light;
-            --bg: #f6f7f9;
+            --bg: #f5f7fb;
             --panel: #ffffff;
-            --text: #17202a;
-            --muted: #687383;
-            --line: #d9dee7;
-            --soft: #eef2f6;
+            --text: #162033;
+            --muted: #637083;
+            --line: #d8dee9;
+            --soft: #eef3f8;
+            --ink: #101828;
             --green: #0f7a5f;
-            --green-soft: #e7f6f1;
-            --red: #b42318;
-            --red-soft: #fdeceb;
-            --amber: #916400;
-            --amber-soft: #fff5d6;
+            --green-soft: #e6f6f1;
             --blue: #2457a6;
             --blue-soft: #eaf1ff;
-            --ink: #101828;
-            --code: #111827;
+            --amber: #946200;
+            --amber-soft: #fff4cf;
+            --red: #b42318;
+            --red-soft: #fdeceb;
+            --code: #101828;
         }
 
         * {
@@ -40,27 +40,26 @@
 
         button,
         input,
-        select,
-        textarea {
+        select {
             font: inherit;
             letter-spacing: 0;
         }
 
         button {
-            min-height: 36px;
+            min-height: 38px;
             border: 1px solid transparent;
             border-radius: 6px;
             padding: 8px 12px;
             background: var(--ink);
-            color: white;
+            color: #ffffff;
             cursor: pointer;
-            font-weight: 650;
+            font-weight: 750;
             white-space: nowrap;
         }
 
         button.secondary {
             border-color: var(--line);
-            background: white;
+            background: #ffffff;
             color: var(--ink);
         }
 
@@ -78,11 +77,31 @@
         a {
             color: var(--blue);
             text-decoration: none;
-            font-weight: 650;
+            font-weight: 700;
         }
 
-        a:hover {
-            text-decoration: underline;
+        h1,
+        h2,
+        h3,
+        p {
+            margin: 0;
+        }
+
+        input,
+        select {
+            width: 100%;
+            min-height: 38px;
+            border: 1px solid var(--line);
+            border-radius: 6px;
+            padding: 8px 10px;
+            background: #ffffff;
+            color: var(--text);
+        }
+
+        input:focus,
+        select:focus {
+            border-color: var(--blue);
+            outline: 3px solid rgba(36, 87, 166, .14);
         }
 
         label {
@@ -95,32 +114,11 @@
             margin-bottom: 5px;
             color: var(--muted);
             font-size: 12px;
-            font-weight: 700;
-        }
-
-        input,
-        select,
-        textarea {
-            width: 100%;
-            min-height: 38px;
-            border: 1px solid var(--line);
-            border-radius: 6px;
-            padding: 8px 10px;
-            background: white;
-            color: var(--text);
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
-            border-color: var(--blue);
-            outline: 3px solid rgba(36, 87, 166, .14);
+            font-weight: 750;
         }
 
         .shell {
             min-height: 100vh;
-            display: grid;
-            grid-template-rows: auto 1fr;
         }
 
         .topbar {
@@ -152,38 +150,38 @@
         .mark {
             width: 34px;
             height: 34px;
-            border-radius: 8px;
             display: grid;
             place-items: center;
             border: 1px solid #b7c3d7;
-            background: linear-gradient(135deg, #ffffff, #dff7ee);
+            border-radius: 8px;
+            background: #ffffff;
             color: var(--green);
-            font-weight: 850;
-        }
-
-        h1,
-        h2,
-        h3,
-        p {
-            margin: 0;
+            font-weight: 900;
         }
 
         h1 {
-            font-size: 18px;
+            font-size: 19px;
             line-height: 1.2;
         }
 
         .subtitle {
-            margin-top: 2px;
+            margin-top: 3px;
             color: var(--muted);
             font-size: 13px;
         }
 
-        .top-actions {
+        .top-actions,
+        .status-row,
+        .proof-row,
+        .action-row,
+        .link-row {
             display: flex;
             align-items: center;
             gap: 8px;
             flex-wrap: wrap;
+        }
+
+        .top-actions {
             justify-content: flex-end;
         }
 
@@ -192,13 +190,13 @@
             display: inline-flex;
             align-items: center;
             gap: 6px;
-            border-radius: 999px;
             border: 1px solid var(--line);
+            border-radius: 999px;
             padding: 5px 9px;
-            background: white;
+            background: #ffffff;
             color: var(--muted);
             font-size: 12px;
-            font-weight: 750;
+            font-weight: 800;
         }
 
         .badge.green {
@@ -207,39 +205,38 @@
             color: var(--green);
         }
 
-        .badge.red {
-            border-color: #fac5c0;
-            background: var(--red-soft);
-            color: var(--red);
-        }
-
         .badge.amber {
             border-color: #f4d37b;
             background: var(--amber-soft);
             color: var(--amber);
         }
 
-        .main {
-            max-width: 1440px;
-            width: 100%;
-            margin: 0 auto;
-            padding: 18px 20px 28px;
-            display: grid;
-            grid-template-columns: minmax(0, 1.25fr) minmax(360px, .75fr);
-            gap: 16px;
-            align-items: start;
+        .badge.red {
+            border-color: #fac5c0;
+            background: var(--red-soft);
+            color: var(--red);
         }
 
-        .workspace {
+        .main {
+            max-width: 1440px;
+            margin: 0 auto;
+            padding: 18px 20px 30px;
             display: grid;
             gap: 16px;
+        }
+
+        .hero {
+            display: grid;
+            grid-template-columns: minmax(0, 1.05fr) minmax(420px, .95fr);
+            gap: 16px;
+            align-items: stretch;
         }
 
         .panel {
+            min-width: 0;
             border: 1px solid var(--line);
             border-radius: 8px;
             background: var(--panel);
-            min-width: 0;
         }
 
         .panel-header {
@@ -251,17 +248,13 @@
             padding: 14px 16px;
         }
 
-        .panel-title {
-            min-width: 0;
-        }
-
         .panel-title h2 {
             font-size: 15px;
             line-height: 1.25;
         }
 
         .panel-title p {
-            margin-top: 3px;
+            margin-top: 4px;
             color: var(--muted);
             font-size: 12px;
         }
@@ -270,110 +263,57 @@
             padding: 16px;
         }
 
-        .grid {
+        .hero-copy {
             display: grid;
-            gap: 12px;
+            gap: 14px;
         }
 
-        .grid.two {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
+        .hero-copy h2 {
+            max-width: 760px;
+            font-size: 28px;
+            line-height: 1.18;
         }
 
-        .grid.three {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .grid.four {
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-        }
-
-        .metric {
-            min-width: 0;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 12px;
-            background: #fbfcfd;
-        }
-
-        .metric span {
-            display: block;
+        .hero-copy p {
             color: var(--muted);
-            font-size: 12px;
-            font-weight: 750;
+            font-size: 14px;
+            line-height: 1.55;
         }
 
-        .metric strong {
-            display: block;
-            margin-top: 6px;
-            overflow-wrap: anywhere;
-            color: var(--text);
-            font-size: 18px;
-            line-height: 1.15;
-        }
-
-        .metric.green {
-            border-color: #bce5d8;
-            background: var(--green-soft);
-        }
-
-        .metric.amber {
-            border-color: #f4d37b;
-            background: var(--amber-soft);
-        }
-
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
-            gap: 12px;
-            align-items: end;
-        }
-
-        .form-row.compact {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-        }
-
-        .button-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 12px;
-        }
-
-        .flow {
+        .flow-line {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
-            gap: 10px;
+            gap: 8px;
         }
 
-        .step {
+        .flow-step {
+            min-width: 0;
             border: 1px solid var(--line);
             border-radius: 8px;
             padding: 10px;
             background: #fbfcfd;
-            min-width: 0;
         }
 
-        .step span {
+        .flow-step span {
             display: inline-flex;
-            width: 24px;
-            height: 24px;
+            width: 23px;
+            height: 23px;
             align-items: center;
             justify-content: center;
             border-radius: 999px;
             background: var(--blue-soft);
             color: var(--blue);
             font-size: 12px;
-            font-weight: 800;
+            font-weight: 900;
         }
 
-        .step strong {
+        .flow-step strong {
             display: block;
             margin-top: 8px;
             font-size: 13px;
         }
 
-        .step small {
+        .flow-step small {
             display: block;
             margin-top: 4px;
             color: var(--muted);
@@ -381,10 +321,86 @@
             line-height: 1.35;
         }
 
-        .tech-tags {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
+        .operation-grid {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .operation {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fbfcfd;
+        }
+
+        .operation strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .operation span {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .result-card {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 12px;
+            background: #fbfcfd;
+        }
+
+        .result-card.primary {
+            grid-column: 1 / -1;
+            border-color: #bce5d8;
+            background: var(--green-soft);
+        }
+
+        .result-card span {
+            display: block;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .result-card strong {
+            display: block;
+            margin-top: 7px;
+            overflow-wrap: anywhere;
+            color: var(--text);
+            font-size: 20px;
+            line-height: 1.15;
+        }
+
+        .result-card small {
+            display: block;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 12px;
+            align-items: end;
+        }
+
+        .form-grid.three {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
         }
 
         .field-help {
@@ -404,71 +420,60 @@
             line-height: 1.5;
         }
 
-        .strategy-guide {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 10px;
-        }
-
-        .strategy-card {
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 10px;
-            background: #fbfcfd;
-            min-width: 0;
-        }
-
-        .strategy-card strong {
-            display: block;
-            font-size: 13px;
-        }
-
-        .strategy-card span {
-            display: block;
-            margin-top: 5px;
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.4;
-        }
-
-        .links {
+        .section-grid {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            align-items: start;
+        }
+
+        .metric-grid {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
             gap: 10px;
         }
 
-        .link-item {
+        .metric {
             min-width: 0;
             border: 1px solid var(--line);
             border-radius: 8px;
-            padding: 11px;
+            padding: 12px;
             background: #fbfcfd;
         }
 
-        .link-item span {
+        .metric span {
             display: block;
-            margin-top: 4px;
             color: var(--muted);
             font-size: 12px;
+            font-weight: 800;
+        }
+
+        .metric strong {
+            display: block;
+            margin-top: 6px;
             overflow-wrap: anywhere;
+            color: var(--text);
+            font-size: 18px;
+            line-height: 1.15;
         }
 
-        .result-panel {
-            position: sticky;
-            top: 78px;
+        details {
+            border-top: 1px solid var(--line);
+            margin-top: 14px;
+            padding-top: 12px;
         }
 
-        .result-toolbar {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            flex-wrap: wrap;
+        summary {
+            cursor: pointer;
+            color: var(--blue);
+            font-size: 13px;
+            font-weight: 800;
         }
 
         pre {
-            margin: 0;
-            max-height: calc(100vh - 240px);
-            min-height: 360px;
+            margin: 10px 0 0;
+            max-height: 320px;
+            min-height: 180px;
             overflow: auto;
             border-radius: 8px;
             background: var(--code);
@@ -480,39 +485,26 @@
             overflow-wrap: anywhere;
         }
 
-        .status-strip {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-            margin-top: 10px;
-        }
-
         .muted {
             color: var(--muted);
         }
 
-        @media (max-width: 1100px) {
-            .main {
+        @media (max-width: 1120px) {
+            .hero,
+            .section-grid {
                 grid-template-columns: 1fr;
-            }
-
-            .result-panel {
-                position: static;
-            }
-
-            pre {
-                max-height: 520px;
             }
         }
 
-        @media (max-width: 760px) {
+        @media (max-width: 780px) {
             .topbar-inner,
             .main {
                 padding-left: 12px;
                 padding-right: 12px;
             }
 
-            .topbar-inner {
+            .topbar-inner,
+            .panel-header {
                 align-items: flex-start;
                 flex-direction: column;
             }
@@ -521,20 +513,17 @@
                 justify-content: flex-start;
             }
 
-            .grid.two,
-            .grid.three,
-            .grid.four,
-            .flow,
-            .strategy-guide,
-            .links,
-            .form-row,
-            .form-row.compact {
-                grid-template-columns: 1fr;
+            .hero-copy h2 {
+                font-size: 22px;
             }
 
-            .panel-header {
-                align-items: flex-start;
-                flex-direction: column;
+            .flow-line,
+            .operation-grid,
+            .result-grid,
+            .form-grid,
+            .form-grid.three,
+            .metric-grid {
+                grid-template-columns: 1fr;
             }
 
             button {
@@ -550,13 +539,13 @@
             <div class="brand">
                 <div class="mark">TR</div>
                 <div>
-                    <h1>TicketRush 高并发抢票演示台</h1>
-                    <p class="subtitle">从健康检查、库存预热到抢票、检索和虚拟线程压测</p>
+                    <h1>TicketRush 高并发抢票演示</h1>
+                    <p class="subtitle">防超卖、幂等、限流、虚拟线程、异步削峰</p>
                 </div>
             </div>
             <div class="top-actions">
                 <span id="overallStatus" class="badge amber">检查中</span>
-                <button id="refreshHealthButton" class="secondary" type="button">刷新健康状态</button>
+                <button id="refreshHealthButton" class="secondary" type="button">刷新系统状态</button>
                 <a class="badge" href="/actuator/health" target="_blank" rel="noreferrer">Actuator</a>
                 <a class="badge" href="/actuator/prometheus" target="_blank" rel="noreferrer">Prometheus 指标</a>
             </div>
@@ -564,18 +553,167 @@
     </header>
 
     <main class="main">
-        <section class="workspace">
+        <section class="hero">
+            <section class="panel" aria-labelledby="mainHeading">
+                <div class="panel-body hero-copy">
+                    <div>
+                        <h2 id="mainHeading">5 分钟证明一个高并发抢票链路</h2>
+                        <p>按顺序初始化库存、发起抢票、重复提交验证幂等，再用不同库存扣减方案和虚拟线程压测解释工程取舍。</p>
+                    </div>
+
+                    <div class="proof-row" aria-label="核心证明点">
+                        <span id="proofOversell" class="badge">防超卖待验证</span>
+                        <span id="proofIdempotent" class="badge">幂等待验证</span>
+                        <span id="proofRateLimit" class="badge">限流准入</span>
+                        <span id="proofVirtualThread" class="badge">虚拟线程待验证</span>
+                        <span id="proofAsyncOrder" class="badge">RocketMQ 异步下单</span>
+                    </div>
+
+                    <div class="flow-line" aria-label="抢票主链路">
+                        <div class="flow-step"><span>1</span><strong>请求进入</strong><small>用户提交抢票</small></div>
+                        <div class="flow-step"><span>2</span><strong>限流准入</strong><small>Sentinel + Redis 令牌</small></div>
+                        <div class="flow-step"><span>3</span><strong>库存预扣</strong><small>Redis Lua 主链路</small></div>
+                        <div class="flow-step"><span>4</span><strong>异步下单</strong><small>RocketMQ 削峰</small></div>
+                        <div class="flow-step"><span>5</span><strong>超时补偿</strong><small>释放锁定库存</small></div>
+                    </div>
+
+                    <div class="operation-grid" aria-label="演示操作顺序">
+                        <div class="operation">
+                            <strong>1. 初始化库存</strong>
+                            <span>重置 Redis 热点票档库存，让库存变化从明确数值开始。</span>
+                        </div>
+                        <div class="operation">
+                            <strong>2. 发起抢票</strong>
+                            <span>观察抢票是否受理、库存是否扣减、是否由虚拟线程处理。</span>
+                        </div>
+                        <div class="operation">
+                            <strong>3. 重复提交</strong>
+                            <span>复用同一个幂等 Key，验证不会重复扣库存。</span>
+                        </div>
+                    </div>
+
+                    <div class="form-grid three">
+                        <label>
+                            <span>预热票档 ID</span>
+                            <input id="preloadSkuId" inputmode="numeric" value="1001">
+                        </label>
+                        <label>
+                            <span>预热库存数</span>
+                            <input id="preloadStock" inputmode="numeric" value="1000">
+                        </label>
+                        <button id="preloadButton" type="button">1 初始化库存</button>
+                    </div>
+
+                    <div class="form-grid">
+                        <label>
+                            <span>活动 ID</span>
+                            <input id="rushEventId" inputmode="numeric" value="3001">
+                        </label>
+                        <label>
+                            <span>票档 ID</span>
+                            <input id="rushSkuId" inputmode="numeric" value="1001">
+                        </label>
+                        <label>
+                            <span>用户 ID</span>
+                            <input id="rushUserId" inputmode="numeric" value="2001">
+                        </label>
+                        <label>
+                            <span>购买数量</span>
+                            <input id="rushQuantity" inputmode="numeric" value="1">
+                        </label>
+                    </div>
+
+                    <div class="form-grid">
+                        <label>
+                            <span>库存扣减方案</span>
+                            <select id="rushStrategy">
+                                <option value="REDIS_LUA">Redis Lua 原子扣减（主推荐链路）</option>
+                                <option value="REDIS_LOCK">Redis 分布式锁扣减（共享 Redis 库存）</option>
+                                <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减（独立数据库库存）</option>
+                            </select>
+                            <div id="strategyHint" class="field-help">库存来源：Redis Hash。推荐主演示链路，预热库存后从这里开始扣减。</div>
+                        </label>
+                        <label>
+                            <span>请求 ID</span>
+                            <input id="rushRequestId">
+                            <div class="field-help">点击“生成新请求”会刷新</div>
+                        </label>
+                        <label>
+                            <span>幂等 Key</span>
+                            <input id="rushIdempotentKey">
+                            <div class="field-help">重复提交会复用这个 Key</div>
+                        </label>
+                        <button id="rushButton" type="button">2 发起抢票</button>
+                    </div>
+
+                    <div class="action-row">
+                        <button id="repeatRushButton" class="secondary" type="button">3 重复提交验证幂等</button>
+                        <button id="generateRequestButton" class="subtle" type="button">生成新请求</button>
+                    </div>
+
+                    <div class="notice">
+                        先用 Redis Lua 演示主链路。Redis Lua 和 Redis 分布式锁共享 Redis 预热库存；MySQL 乐观锁读取 MySQL 库存表，因此剩余库存可能和 Redis 路径不同。
+                    </div>
+                </div>
+            </section>
+
+            <aside class="panel" aria-labelledby="resultHeading">
+                <div class="panel-header">
+                    <div class="panel-title">
+                        <h2 id="resultHeading">本次演示结论</h2>
+                        <p id="resultSubtitle">等待初始化库存</p>
+                    </div>
+                    <button id="clearResultButton" class="secondary" type="button">清空结果</button>
+                </div>
+                <div class="panel-body">
+                    <div class="result-grid">
+                        <div class="result-card primary">
+                            <span>抢票结果</span>
+                            <strong id="summaryOutcome">等待演示</strong>
+                            <small id="summaryMessage">先初始化库存，再发起抢票。</small>
+                        </div>
+                        <div class="result-card">
+                            <span>库存变化</span>
+                            <strong id="summaryStock">-</strong>
+                            <small id="rushStockBadge">剩余库存 -</small>
+                        </div>
+                        <div class="result-card">
+                            <span>扣减方案</span>
+                            <strong id="summaryStrategy">Redis Lua</strong>
+                            <small id="rushSourceBadge">库存来源 Redis Hash</small>
+                        </div>
+                        <div class="result-card">
+                            <span>虚拟线程</span>
+                            <strong id="summaryThread">-</strong>
+                            <small id="rushThreadBadge">虚拟线程 -</small>
+                        </div>
+                        <div class="result-card">
+                            <span>幂等验证</span>
+                            <strong id="summaryIdempotent">待验证</strong>
+                            <small id="rushAcceptedBadge">是否接单 -</small>
+                        </div>
+                    </div>
+
+                    <details>
+                        <summary>查看原始接口响应</summary>
+                        <pre id="resultBody">准备就绪。</pre>
+                    </details>
+                </div>
+            </aside>
+        </section>
+
+        <section class="section-grid">
             <section class="panel" aria-labelledby="systemHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="systemHeading">1. 系统健康检查</h2>
-                        <p>确认应用、Java 21、虚拟线程和 Actuator 都可用</p>
+                        <h2 id="systemHeading">系统健康检查</h2>
+                        <p>只作为运行前确认，不占用主演示视线</p>
                     </div>
                     <button id="systemHealthButton" class="secondary" type="button">检查系统</button>
                 </div>
                 <div class="panel-body">
-                    <div class="grid four">
-                        <div class="metric green">
+                    <div class="metric-grid">
+                        <div class="metric">
                             <span>应用状态</span>
                             <strong id="metricApp">-</strong>
                         </div>
@@ -595,123 +733,56 @@
                 </div>
             </section>
 
-            <section class="panel" aria-labelledby="flowHeading">
+            <section class="panel" aria-labelledby="benchmarkHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="flowHeading">2. 抢票主链路</h2>
-                        <p>演示限流、准入、库存原子扣减、异步下单和最终一致性补偿</p>
+                        <h2 id="benchmarkHeading">虚拟线程压测对比</h2>
+                        <p>对比 Virtual Threads 和传统固定线程池的吞吐差异</p>
                     </div>
-                    <button id="generateRequestButton" class="subtle" type="button">生成新请求</button>
+                    <button id="benchmarkButton" class="secondary" type="button">运行压测</button>
                 </div>
-                <div class="panel-body grid">
-                    <div class="flow">
-                        <div class="step"><span>1</span><strong>库存预热</strong><small>把热门票档写入 Redis</small></div>
-                        <div class="step"><span>2</span><strong>限流准入</strong><small>Sentinel + Redis 令牌</small></div>
-                        <div class="step"><span>3</span><strong>库存预扣</strong><small>Lua / 分布式锁 / 乐观锁</small></div>
-                        <div class="step"><span>4</span><strong>异步下单</strong><small>RocketMQ 削峰</small></div>
-                        <div class="step"><span>5</span><strong>超时补偿</strong><small>释放锁定库存</small></div>
-                    </div>
-
-                    <div class="tech-tags" aria-label="核心能力标签">
-                        <span class="badge green">防超卖</span>
-                        <span class="badge green">幂等请求</span>
-                        <span class="badge">热点限流</span>
-                        <span class="badge">Java 21 Virtual Threads</span>
-                        <span class="badge">最终一致性</span>
-                    </div>
-
-                    <div class="status-strip">
-                        <span id="rushAcceptedBadge" class="badge">是否接单 -</span>
-                        <span id="rushStockBadge" class="badge">剩余库存 -</span>
-                        <span id="rushSourceBadge" class="badge">库存来源 Redis Hash</span>
-                        <span id="rushThreadBadge" class="badge">虚拟线程 -</span>
-                    </div>
-
-                    <div class="notice">
-                        推荐演示先使用 Redis Lua。下方三个扣减方案用于对比不同技术路径：Redis Lua 和 Redis 分布式锁共享同一份 Redis 预热库存；MySQL 乐观锁读取数据库库存表，因此剩余库存可能和 Redis 路径不同。
-                    </div>
-
-                    <div class="form-row compact">
+                <div class="panel-body">
+                    <div class="form-grid">
                         <label>
-                            <span>预热票档 ID</span>
-                            <input id="preloadSkuId" inputmode="numeric" value="1001">
-                        </label>
-                        <label>
-                            <span>预热库存数</span>
-                            <input id="preloadStock" inputmode="numeric" value="1000">
-                        </label>
-                        <button id="preloadButton" type="button">预热库存</button>
-                    </div>
-
-                    <div class="strategy-guide" aria-label="库存扣减方案说明">
-                        <div class="strategy-card">
-                            <strong>Redis Lua：主推荐链路</strong>
-                            <span>库存来源：Redis Hash。预热按钮会重置这份库存，用来演示原子扣减、防超卖和幂等。</span>
-                        </div>
-                        <div class="strategy-card">
-                            <strong>Redis 分布式锁：对比链路</strong>
-                            <span>库存来源：同一份 Redis Hash。它和 Redis Lua 会连续扣同一份 Redis 剩余库存。</span>
-                        </div>
-                        <div class="strategy-card">
-                            <strong>MySQL 乐观锁：数据库对比</strong>
-                            <span>库存来源：MySQL 库存表。它不是 Redis 预热库存，用来观察热点行版本冲突和长尾延迟。</span>
-                        </div>
-                    </div>
-
-                    <div class="form-row">
-                        <label>
-                            <span>活动 ID</span>
-                            <input id="rushEventId" inputmode="numeric" value="3001">
-                        </label>
-                        <label>
-                            <span>票档 ID</span>
-                            <input id="rushSkuId" inputmode="numeric" value="1001">
-                        </label>
-                        <label>
-                            <span>用户 ID</span>
-                            <input id="rushUserId" inputmode="numeric" value="2001">
-                        </label>
-                        <label>
-                            <span>购买数量</span>
-                            <input id="rushQuantity" inputmode="numeric" value="1">
-                        </label>
-                    </div>
-
-                    <div class="form-row">
-                        <label>
-                            <span>库存扣减方案</span>
-                            <select id="rushStrategy">
-                                <option value="REDIS_LUA">Redis Lua 原子扣减（推荐主链路）</option>
-                                <option value="REDIS_LOCK">Redis 分布式锁扣减（共享 Redis 库存）</option>
-                                <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减（独立数据库库存）</option>
+                            <span>执行模式</span>
+                            <select id="benchmarkMode">
+                                <option value="VIRTUAL_THREAD">Java 21 虚拟线程</option>
+                                <option value="TRADITIONAL_THREAD_POOL">传统固定线程池</option>
                             </select>
-                            <div id="strategyHint" class="field-help">库存来源：Redis Hash。预热库存后从这里开始扣减。</div>
                         </label>
                         <label>
-                            <span>请求 ID</span>
-                            <input id="rushRequestId">
-                            <div class="field-help">用于演示重复请求幂等控制</div>
+                            <span>任务数量</span>
+                            <input id="benchmarkTaskCount" inputmode="numeric" value="1000">
                         </label>
                         <label>
-                            <span>幂等 Key</span>
-                            <input id="rushIdempotentKey">
-                            <div class="field-help">同一个 Key 不会重复扣库存</div>
+                            <span>每任务阻塞毫秒</span>
+                            <input id="benchmarkBlockingMillis" inputmode="numeric" value="20">
                         </label>
-                        <button id="rushButton" type="button">发起抢票</button>
+                        <label>
+                            <span>CPU 计算量</span>
+                            <input id="benchmarkCpuTokens" inputmode="numeric" value="0">
+                        </label>
                     </div>
-
+                    <div class="status-row" style="margin-top: 12px;">
+                        <span class="badge">总耗时 <strong id="benchElapsed">-</strong></span>
+                        <span class="badge">吞吐量 <strong id="benchThroughput">-</strong></span>
+                        <span class="badge">线程数 <strong id="benchThreads">-</strong></span>
+                        <span class="badge">虚拟线程任务 <strong id="benchVirtualTasks">-</strong></span>
+                    </div>
                 </div>
             </section>
+        </section>
 
+        <section class="section-grid">
             <section class="panel" aria-labelledby="searchHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="searchHeading">3. 票档检索读模型</h2>
-                        <p>Elasticsearch 只承担查询展示，不参与抢票写链路</p>
+                        <h2 id="searchHeading">票档检索读模型</h2>
+                        <p>Elasticsearch 是辅助查询能力，不参与抢票写链路</p>
                     </div>
                 </div>
-                <div class="panel-body grid">
-                    <div class="form-row compact">
+                <div class="panel-body">
+                    <div class="form-grid three">
                         <label>
                             <span>重建索引的活动 ID</span>
                             <input id="indexEventId" inputmode="numeric" placeholder="9101781814509">
@@ -719,7 +790,7 @@
                         <button id="indexEventButton" type="button">重建活动索引</button>
                         <button id="searchButton" class="secondary" type="button">查询票档</button>
                     </div>
-                    <div class="form-row">
+                    <div class="form-grid" style="margin-top: 12px;">
                         <label>
                             <span>关键词</span>
                             <input id="searchKeyword" value="VIP">
@@ -749,59 +820,8 @@
                             </select>
                         </label>
                     </div>
-                    <div id="searchSummary" class="status-strip">
+                    <div id="searchSummary" class="status-row" style="margin-top: 12px;">
                         <span class="badge">命中数量 -</span>
-                    </div>
-                </div>
-            </section>
-
-            <section class="panel" aria-labelledby="benchmarkHeading">
-                <div class="panel-header">
-                    <div class="panel-title">
-                        <h2 id="benchmarkHeading">4. 虚拟线程压测对比</h2>
-                        <p>同样任务量下对比 Virtual Threads 和传统固定线程池</p>
-                    </div>
-                    <button id="benchmarkButton" class="secondary" type="button">运行压测</button>
-                </div>
-                <div class="panel-body grid">
-                    <div class="form-row">
-                        <label>
-                            <span>执行模式</span>
-                            <select id="benchmarkMode">
-                                <option value="VIRTUAL_THREAD">Java 21 虚拟线程</option>
-                                <option value="TRADITIONAL_THREAD_POOL">传统固定线程池</option>
-                            </select>
-                        </label>
-                        <label>
-                            <span>任务数量</span>
-                            <input id="benchmarkTaskCount" inputmode="numeric" value="1000">
-                        </label>
-                        <label>
-                            <span>每任务阻塞毫秒</span>
-                            <input id="benchmarkBlockingMillis" inputmode="numeric" value="20">
-                        </label>
-                        <label>
-                            <span>CPU 计算量</span>
-                            <input id="benchmarkCpuTokens" inputmode="numeric" value="0">
-                        </label>
-                    </div>
-                    <div class="grid four">
-                        <div class="metric">
-                            <span>总耗时</span>
-                            <strong id="benchElapsed">-</strong>
-                        </div>
-                        <div class="metric">
-                            <span>吞吐量</span>
-                            <strong id="benchThroughput">-</strong>
-                        </div>
-                        <div class="metric">
-                            <span>线程数</span>
-                            <strong id="benchThreads">-</strong>
-                        </div>
-                        <div class="metric">
-                            <span>虚拟线程任务</span>
-                            <strong id="benchVirtualTasks">-</strong>
-                        </div>
                     </div>
                 </div>
             </section>
@@ -809,52 +829,28 @@
             <section class="panel" aria-labelledby="opsHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="opsHeading">5. 观测入口</h2>
-                        <p>压测时查看 Prometheus、Grafana、Elasticsearch 和 Actuator 指标</p>
+                        <h2 id="opsHeading">观测入口</h2>
+                        <p>压测或排查时再打开这些辅助证据</p>
                     </div>
                 </div>
                 <div class="panel-body">
-                    <div class="links">
-                        <div class="link-item">
-                            <a href="http://localhost:9090" target="_blank" rel="noreferrer">Prometheus</a>
-                            <span>http://localhost:9090</span>
-                        </div>
-                        <div class="link-item">
-                            <a href="http://localhost:3000" target="_blank" rel="noreferrer">Grafana</a>
-                            <span>http://localhost:3000</span>
-                        </div>
-                        <div class="link-item">
-                            <a href="http://localhost:9200" target="_blank" rel="noreferrer">Elasticsearch</a>
-                            <span>http://localhost:9200</span>
-                        </div>
-                        <div class="link-item">
-                            <a href="/actuator/prometheus" target="_blank" rel="noreferrer">Actuator 指标</a>
-                            <span>/actuator/prometheus</span>
-                        </div>
+                    <div class="link-row">
+                        <a class="badge" href="http://localhost:9090" target="_blank" rel="noreferrer">Prometheus</a>
+                        <a class="badge" href="http://localhost:3000" target="_blank" rel="noreferrer">Grafana</a>
+                        <a class="badge" href="http://localhost:9200" target="_blank" rel="noreferrer">Elasticsearch</a>
+                        <a class="badge" href="/actuator/prometheus" target="_blank" rel="noreferrer">Actuator 指标</a>
                     </div>
                 </div>
             </section>
         </section>
-
-        <aside class="panel result-panel" aria-labelledby="resultHeading">
-            <div class="panel-header">
-                <div class="panel-title">
-                    <h2 id="resultHeading">执行结果</h2>
-                    <p id="resultSubtitle">最近一次接口返回</p>
-                </div>
-                <div class="result-toolbar">
-                    <button id="clearResultButton" class="secondary" type="button">清空结果</button>
-                </div>
-            </div>
-            <div class="panel-body">
-                <pre id="resultBody">准备就绪。</pre>
-            </div>
-        </aside>
     </main>
 </div>
 
 <script>
     const $ = (id) => document.getElementById(id);
+    let lastRushPayload = null;
+    let lastKnownStock = null;
+    let currentStockLabel = 'Redis 剩余库存';
 
     function toNumber(id) {
         const value = $(id).value.trim();
@@ -874,6 +870,11 @@
         return JSON.stringify(value, null, 2);
     }
 
+    function setBadge(id, text, state) {
+        $(id).className = `badge ${state || ''}`.trim();
+        $(id).textContent = text;
+    }
+
     function showResult(title, value, ok = true) {
         $('resultSubtitle').textContent = title;
         $('resultBody').textContent = typeof value === 'string' ? value : formatJson(value);
@@ -881,23 +882,36 @@
         $('overallStatus').textContent = ok ? '就绪' : '需要查看结果';
     }
 
+    function setSummary({ outcome, message, stock, strategy, source, thread, idempotent }) {
+        if (outcome) $('summaryOutcome').textContent = outcome;
+        if (message) $('summaryMessage').textContent = message;
+        if (stock) $('summaryStock').textContent = stock;
+        if (strategy) $('summaryStrategy').textContent = strategy;
+        if (source) $('rushSourceBadge').textContent = source;
+        if (thread) $('summaryThread').textContent = thread;
+        if (idempotent) $('summaryIdempotent').textContent = idempotent;
+    }
+
     function strategyMeta(strategy) {
         if (strategy === 'MYSQL_OPTIMISTIC_LOCK') {
             return {
-                source: 'MySQL 库存表',
+                name: 'MySQL 乐观锁',
+                source: '库存来源 MySQL 库存表',
                 stockLabel: 'MySQL 剩余库存',
-                hint: '库存来源：MySQL 库存表。它不会被上方 Redis 预热按钮重置，适合演示数据库热点行乐观锁冲突。'
+                hint: '库存来源：MySQL 库存表。它不会被 Redis 预热按钮重置，用来对比数据库热点行版本冲突。'
             };
         }
         if (strategy === 'REDIS_LOCK') {
             return {
-                source: 'Redis Hash',
+                name: 'Redis 分布式锁',
+                source: '库存来源 Redis Hash',
                 stockLabel: 'Redis 剩余库存',
-                hint: '库存来源：Redis Hash。它和 Redis Lua 共享同一份预热库存，适合对比加锁路径的额外开销。'
+                hint: '库存来源：Redis Hash。它和 Redis Lua 共享同一份预热库存，用来对比加锁路径开销。'
             };
         }
         return {
-            source: 'Redis Hash',
+            name: 'Redis Lua',
+            source: '库存来源 Redis Hash',
             stockLabel: 'Redis 剩余库存',
             hint: '库存来源：Redis Hash。推荐主演示链路，预热库存后从这里开始扣减。'
         };
@@ -905,8 +919,10 @@
 
     function updateStrategyHint() {
         const meta = strategyMeta($('rushStrategy').value);
+        currentStockLabel = meta.stockLabel;
         $('strategyHint').textContent = meta.hint;
-        $('rushSourceBadge').textContent = `库存来源 ${meta.source}`;
+        $('summaryStrategy').textContent = meta.name;
+        $('rushSourceBadge').textContent = meta.source;
     }
 
     function setBusy(button, busy) {
@@ -983,10 +999,24 @@
         const requestId = `demo-${suffix}`;
         $('rushRequestId').value = requestId;
         $('rushIdempotentKey').value = `rush:${$('rushUserId').value}:${$('rushEventId').value}:${$('rushSkuId').value}:${requestId}`;
+        lastRushPayload = null;
+        setSummary({ idempotent: '待验证' });
+    }
+
+    function buildRushPayload() {
+        return {
+            requestId: optionalText('rushRequestId'),
+            userId: toNumber('rushUserId'),
+            eventId: toNumber('rushEventId'),
+            skuId: toNumber('rushSkuId'),
+            quantity: toNumber('rushQuantity'),
+            strategy: $('rushStrategy').value,
+            idempotentKey: optionalText('rushIdempotentKey')
+        };
     }
 
     async function preloadInventory() {
-        await runAction($('preloadButton'), '库存预热结果', async () => {
+        const result = await runAction($('preloadButton'), '库存预热结果', async () => {
             const payload = {
                 skuId: toNumber('preloadSkuId'),
                 totalStock: toNumber('preloadStock')
@@ -996,41 +1026,103 @@
                 body: JSON.stringify(payload)
             });
         });
-        $('rushAcceptedBadge').className = 'badge';
-        $('rushAcceptedBadge').textContent = '是否接单 -';
-        $('rushStockBadge').className = 'badge green';
-        $('rushStockBadge').textContent = `Redis 剩余库存 ${$('preloadStock').value || '-'}`;
-        updateStrategyHint();
+        if (result) {
+            lastKnownStock = Number($('preloadStock').value || result?.data?.availableStock || 0);
+            setBadge('proofOversell', '防超卖待验证', '');
+            setBadge('proofIdempotent', '幂等待验证', '');
+            setBadge('proofVirtualThread', '虚拟线程待验证', '');
+            setBadge('rushAcceptedBadge', '是否接单 -', '');
+            setText('rushStockBadge', `Redis 剩余库存 ${lastKnownStock}`);
+            setSummary({
+                outcome: '库存已初始化',
+                message: `票档 ${$('preloadSkuId').value} 的 Redis 预热库存已重置。`,
+                stock: `${lastKnownStock} -> ${lastKnownStock}`,
+                source: '库存来源 Redis Hash',
+                thread: '-',
+                idempotent: '待验证'
+            });
+        }
     }
 
-    async function rushTicket() {
-        const result = await runAction($('rushButton'), '抢票结果', async () => {
-            const payload = {
-                requestId: optionalText('rushRequestId'),
-                userId: toNumber('rushUserId'),
-                eventId: toNumber('rushEventId'),
-                skuId: toNumber('rushSkuId'),
-                quantity: toNumber('rushQuantity'),
-                strategy: $('rushStrategy').value,
-                idempotentKey: optionalText('rushIdempotentKey')
-            };
-            return requestJson('/api/rush/tickets', {
+    async function sendRush(payload, title, button) {
+        setBusy(button, true);
+        try {
+            const result = await requestJson('/api/rush/tickets', {
                 method: 'POST',
                 body: JSON.stringify(payload)
             });
-        });
-        const data = result?.data;
-        if (data) {
-            const meta = strategyMeta(String(data.strategy || $('rushStrategy').value));
-            $('rushAcceptedBadge').className = `badge ${data.accepted ? 'green' : 'red'}`;
-            $('rushAcceptedBadge').textContent = `是否接单 ${data.accepted ? '是' : '否'}`;
-            $('rushStockBadge').className = 'badge green';
-            $('rushStockBadge').textContent = `${meta.stockLabel} ${data.remainingStock ?? '-'}`;
-            $('rushSourceBadge').textContent = `库存来源 ${meta.source}`;
-            $('rushThreadBadge').className = `badge ${data.processedByVirtualThread ? 'green' : 'amber'}`;
-            $('rushThreadBadge').textContent = `虚拟线程 ${data.processedByVirtualThread ? '是' : '否'}`;
-            generateRequestIds();
+            showResult(title, result, true);
+            applyRushResult(result, false);
+            return result;
+        } catch (error) {
+            showResult(`${title}失败`, {
+                status: error.status,
+                message: error.message,
+                payload: error.payload
+            }, false);
+            applyRushFailure(error);
+            return null;
+        } finally {
+            setBusy(button, false);
         }
+    }
+
+    async function rushTicket() {
+        const payload = buildRushPayload();
+        lastRushPayload = { ...payload };
+        await sendRush(payload, '抢票结果', $('rushButton'));
+    }
+
+    async function repeatRushTicket() {
+        const payload = lastRushPayload || buildRushPayload();
+        await sendRush(payload, '重复提交结果', $('repeatRushButton'));
+    }
+
+    function applyRushResult(result) {
+        const data = result?.data;
+        if (!data) return;
+        const meta = strategyMeta(String(data.strategy || $('rushStrategy').value));
+        const before = Number.isFinite(lastKnownStock) ? lastKnownStock : null;
+        const after = data.remainingStock ?? '-';
+        const stockFlow = before == null ? `${meta.stockLabel} ${after}` : `${before} -> ${after}`;
+        lastKnownStock = typeof data.remainingStock === 'number' ? data.remainingStock : lastKnownStock;
+
+        setBadge('proofOversell', '防超卖通过', 'green');
+        setBadge('proofVirtualThread', data.processedByVirtualThread ? '虚拟线程通过' : '虚拟线程未命中', data.processedByVirtualThread ? 'green' : 'amber');
+        setBadge('proofAsyncOrder', '异步下单已触发', 'green');
+        setBadge('rushAcceptedBadge', `是否接单 ${data.accepted ? '是' : '否'}`, data.accepted ? 'green' : 'red');
+        setText('rushStockBadge', `${meta.stockLabel} ${after}`);
+        setText('rushThreadBadge', `虚拟线程 ${data.processedByVirtualThread ? '是' : '否'}`);
+        setSummary({
+            outcome: data.accepted ? '抢票成功' : '抢票未受理',
+            message: data.message || '抢票请求已处理。',
+            stock: stockFlow,
+            strategy: meta.name,
+            source: meta.source,
+            thread: data.processedByVirtualThread ? 'Virtual Thread' : 'Platform Thread'
+        });
+    }
+
+    function applyRushFailure(error) {
+        const message = error.message || '请求失败';
+        const duplicated = message.includes('重复') || error.payload?.code === 'A0429';
+        if (duplicated) {
+            $('resultSubtitle').textContent = '重复提交结果';
+            $('overallStatus').className = 'badge green';
+            $('overallStatus').textContent = '幂等通过';
+            setBadge('proofIdempotent', '幂等通过', 'green');
+            setSummary({
+                outcome: '重复请求被拦截',
+                message: '同一个幂等 Key 不会重复扣库存。',
+                idempotent: '通过'
+            });
+            return;
+        }
+        setSummary({
+            outcome: '请求未成功',
+            message,
+            idempotent: '未验证'
+        });
     }
 
     async function indexEvent() {
@@ -1082,7 +1174,25 @@
             setText('benchThroughput', `${Number(data.throughputPerSecond).toFixed(2)}/s`);
             setText('benchThreads', data.distinctThreadCount);
             setText('benchVirtualTasks', data.virtualThreadTaskCount);
+            setSummary({
+                outcome: '压测完成',
+                message: `${data.mode} 吞吐量 ${Number(data.throughputPerSecond).toFixed(2)}/s。`
+            });
         }
+    }
+
+    function clearResult() {
+        showResult('最近一次接口返回', '准备就绪。');
+        setSummary({
+            outcome: '等待演示',
+            message: '先初始化库存，再发起抢票。',
+            stock: '-',
+            thread: '-',
+            idempotent: '待验证'
+        });
+        setBadge('rushAcceptedBadge', '是否接单 -', '');
+        setText('rushStockBadge', '剩余库存 -');
+        setText('rushThreadBadge', '虚拟线程 -');
     }
 
     $('refreshHealthButton').addEventListener('click', refreshHealth);
@@ -1090,11 +1200,12 @@
     $('generateRequestButton').addEventListener('click', generateRequestIds);
     $('preloadButton').addEventListener('click', preloadInventory);
     $('rushButton').addEventListener('click', rushTicket);
+    $('repeatRushButton').addEventListener('click', repeatRushTicket);
     $('rushStrategy').addEventListener('change', updateStrategyHint);
     $('indexEventButton').addEventListener('click', indexEvent);
     $('searchButton').addEventListener('click', searchTickets);
     $('benchmarkButton').addEventListener('click', runBenchmark);
-    $('clearResultButton').addEventListener('click', () => showResult('最近一次接口返回', '准备就绪。'));
+    $('clearResultButton').addEventListener('click', clearResult);
 
     ['rushEventId', 'rushSkuId', 'rushUserId'].forEach((id) => {
         $(id).addEventListener('change', generateRequestIds);
