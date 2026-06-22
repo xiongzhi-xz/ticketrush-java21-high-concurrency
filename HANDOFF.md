@@ -1,5 +1,45 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-22 One-Click Demo Story
+
+Current goal:
+- Turn the local TicketRush page into a focused one-click rush-ticket story instead of a manual API/control console.
+
+Current stage:
+- Implemented and verified.
+- No backend API, schema, proxy, payment, auth, or production config changes were made.
+- The page still only calls existing APIs.
+
+Completed:
+- Reworked the first screen around `开始抢票演示`.
+- Main visible flow:
+  - reset Redis hot inventory to `1000`;
+  - submit one rush request and show inventory `1000 -> 999`;
+  - submit again with a new `requestId` and the same `idempotentKey`;
+  - final evidence shows `1000 -> 999 -> 999`, requestId `A -> B`, idempotency passed, and async order not duplicated.
+- Kept manual params and inventory strategy switching under `手动参数和高级策略`.
+- Kept health, Elasticsearch search, executor benchmark, Prometheus/Grafana links in the secondary `高级验证` area.
+- Removed the old main-flow dependency on separate visible buttons for initialize/rush/repeat.
+- Updated `StaticDemoConsoleHtmlTest`, `README.md`, `docs/demo-runbook.md`, and `docs/github-showcase.md`.
+- Regenerated all desktop README screenshots under `docs/screenshots/desktop/*.png`.
+
+Verified:
+- Inline JavaScript syntax check: passed.
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 5 tests passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker app redeploy: `docker compose up -d --no-deps --force-recreate app`; health became `UP`.
+- Browser/CDP desktop walkthrough at `1440x900`:
+  - visible heading `一场抢票请求怎么被系统接住`;
+  - one-click demo completed with `stockStory = 1000 -> 999 -> 999`;
+  - idempotency showed `通过`;
+  - async order showed `未重复触发`;
+  - no horizontal overflow.
+- Screenshot dimension check: all `docs/screenshots/desktop/*.png` are `1440x900`.
+- `git diff --check`: passed with README CRLF/LF warning only.
+
+Next step only:
+- Commit this one-click demo page slice, then stop unless the user asks for another TicketRush scope.
+
 ## Latest Snapshot - 2026-06-22 Demo Page Redesign Complete
 
 Current goal:

@@ -17,7 +17,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 ```text
 这个项目不是 CRUD 票务系统，而是聚焦高并发抢票主链路。入口先经过 Sentinel 全局限流和热点票档限流，再经过 Redis 准入令牌，避免所有请求打进库存扣减。库存层提供 Redis Lua、Redis 分布式锁、MySQL 乐观锁三种策略，默认推荐 Redis Lua，因为热点票档库存扣减需要原子性和低延迟。抢票成功后入口快速返回，同时通过 RocketMQ 异步创建订单，消费端用 idempotentKey 保证幂等，订单超时任务负责释放锁定库存。
 
-为了让项目能被验证，我补了 k6 压测、Virtual Threads vs 固定线程池 benchmark、Prometheus/Grafana 指标证据、Seata AT 示例、Elasticsearch 活动/票档读模型和本地演示页。演示时可以直接打开 http://localhost:8080/ 走初始化库存、抢票、用新 requestId 重复提交同一个幂等 Key、检索和 benchmark。
+为了让项目能被验证，我补了 k6 压测、Virtual Threads vs 固定线程池 benchmark、Prometheus/Grafana 指标证据、Seata AT 示例、Elasticsearch 活动/票档读模型和本地演示页。演示时可以直接打开 http://localhost:8080/ 点 `开始抢票演示`，页面会自动完成库存归位、抢票受理、用新 requestId 重复提交同一个幂等 Key，并把检索和 benchmark 放在补充验证区。
 ```
 
 ## 演示前检查
@@ -40,39 +40,38 @@ http://localhost:8080/
 
 ## 5 分钟演示路径
 
-1. 打开 `TicketRush 抢票链路演示台`，先看首屏主流程：初始化库存、准备请求、发起抢票、用新请求重复提交。
+1. 打开首屏 `一场抢票请求怎么被系统接住`，主流程只看一个按钮、库存轨迹、链路节点和右侧证据面板。
 2. 顶部状态为 `UP` 后，说明应用和本地 Compose 环境可用；详细健康信息只作为辅助验证。
-3. 点 `初始化库存`：
+3. 点 `开始抢票演示`，页面会自动跑完三步：
 
    ```text
-   skuId=1001
-   totalStock=1000
+   库存归位：1000 -> 1000 -> ?
+   第一次抢票：1000 -> 999 -> ?
+   重复提交：1000 -> 999 -> 999
    ```
 
-4. 点 `生成新请求`，确认 requestId 和业务幂等 Key 都刷新。
-5. 点 `发起抢票`，重点看右侧 `证据面板`：
+4. 重点看右侧 `证据面板`：
 
    ```text
-   抢票结果：抢票成功
-   库存变化：1000 -> 999
+   抢票结果：抢票成功 / 幂等验证通过
+   请求编号：requestId A -> requestId B
+   幂等判定：通过
    虚拟线程：Virtual Thread
-   异步下单：已触发
+   异步下单：第一次触发，重复提交未重复触发
    ```
 
-6. 点 `用新请求重复提交`，确认 requestId 从 A 变成 B，但业务幂等 Key 不变。
-7. 右侧应显示重复请求被拦截、库存不再变化、异步下单未重复触发。
-8. 需要解释策略差异时，打开 `高级参数和策略对比`：
-   - `Redis Lua` 是默认主演示链路。
-   - `Redis 分布式锁` 共享 Redis 预热库存。
-   - `MySQL 乐观锁` 读取 MySQL 库存表，是数据库热点行对比路径，剩余库存可能和 Redis 路径不同。
-9. 讲主链路：
+5. 讲主链路：
 
    ```text
    Sentinel -> Redis admission token -> Virtual Thread -> Redis Lua inventory reservation -> RocketMQ async order -> timeout compensation
    ```
 
-10. 需要补充证据时，再到 `高级验证` 区跑 `虚拟线程压测对比`：先跑 `Java 21 虚拟线程`，再改成 `传统固定线程池`。
-11. 需要展示读模型时，到 `票档检索读模型` 用 smoke 数据：
+6. 需要解释策略差异时，打开 `手动参数和高级策略`：
+   - `Redis Lua` 是默认主演示链路。
+   - `Redis 分布式锁` 共享 Redis 预热库存。
+   - `MySQL 乐观锁` 读取 MySQL 库存表，是数据库热点行对比路径，剩余库存可能和 Redis 路径不同。
+7. 需要补充证据时，再到 `高级验证` 区跑 `虚拟线程压测对比`：先跑 `Java 21 虚拟线程`，再改成 `传统固定线程池`。
+8. 需要展示读模型时，到 `票档检索读模型` 用 smoke 数据：
 
    ```text
    重建索引的活动 ID: 9101781814509
@@ -81,8 +80,8 @@ http://localhost:8080/
    票档状态: 上架中
    ```
 
-12. 点 `重建活动索引` 后点 `查询票档`，展示 Elasticsearch 是读模型，不参与抢票写链路。
-13. 打开 Prometheus/Grafana 链接，说明指标证据和压测报告在 docs 中。
+9. 点 `重建活动索引` 后点 `查询票档`，展示 Elasticsearch 是读模型，不参与抢票写链路。
+10. 打开 Prometheus/Grafana 链接，说明指标证据和压测报告在 docs 中。
 
 ## CLI 替代演示
 
