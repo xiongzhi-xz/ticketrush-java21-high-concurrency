@@ -13,34 +13,41 @@
 
 ## 推荐浏览顺序
 
-1. [README.md](../README.md)：先看项目定位、架构图、界面截图、核心链路、快速启动和验证状态。
-2. [docs/demo-runbook.md](demo-runbook.md)：看 5 分钟演示路径、CLI 替代演示和设计取舍。
-3. [docs/architecture.md](architecture.md)：看抢票主链路、补偿链路和部署视图。
-4. [docs/rush-benchmark-report.md](rush-benchmark-report.md)：看三种库存策略 baseline。
-5. [docs/executor-benchmark-report.md](executor-benchmark-report.md)：看 Virtual Threads vs 固定线程池对比。
-6. [SPEC.md](../SPEC.md)：看阶段进度、验收标准和不继续扩展的边界。
+1. [README.md](../README.md)：先看后端工程动图、核心 smoke、架构图、压测摘要和验证状态。
+2. 运行 `.\scripts\demo-smoke.ps1`：看 `1000 -> 999 -> 999`、`A0429` 和 `processedByVirtualThread=true`。
+3. [docs/demo-runbook.md](demo-runbook.md)：看 5 分钟演示路径、CLI 替代演示和设计取舍。
+4. [docs/architecture.md](architecture.md)：看抢票主链路、补偿链路和部署视图。
+5. [docs/rush-benchmark-report.md](rush-benchmark-report.md)：看三种库存策略 baseline。
+6. [docs/executor-benchmark-report.md](executor-benchmark-report.md)：看 Virtual Threads vs 固定线程池对比。
+7. [SPEC.md](../SPEC.md)：看阶段进度、验收标准和不继续扩展的边界。
 
-## 本地演示入口
+## 本地核心 smoke
 
-本地演示台：
+推荐演示入口：
+
+```powershell
+.\scripts\demo-smoke.ps1
+```
+
+这条脚本会真实调用本地接口：
+
+1. 健康检查：`/actuator/health = UP`。
+2. 初始化热点票档库存：`1000`。
+3. 第一次抢票：库存变为 `999`，`processedByVirtualThread=true`。
+4. 第二次请求：换新的 `requestId`，复用同一个 `idempotentKey`。
+5. 重复请求返回 `A0429`，库存仍是 `999`。
+
+备用页面入口：
 
 ```text
 http://localhost:8080/
 ```
 
-推荐演示顺序：
-
-1. 点 `开始抢票演示`：页面自动完成库存归位、第一次抢票、换 requestId 重复提交。
-2. 观察证据面板：库存轨迹应为 `1000 -> 999 -> 999`，requestId 从 A 变 B，幂等 Key 不变。
-3. 打开 `手动参数和高级策略`：按需解释 Redis Lua、Redis 分布式锁、MySQL 乐观锁的定位差异。
-4. 打开高级验证运行压测：对比虚拟线程和传统固定线程池。
-5. 重建活动索引 / 查询票档：演示 Elasticsearch 是读模型，不参与抢票写链路。
-
 ## 已验证证据
 
 - `mvn test`：52 tests，0 failures，0 errors。
 - Docker Compose 全链路启动：应用和核心中间件容器已验证。
-- 本地演示页已在运行态访问并串联一键抢票演示、用新 requestId 重复提交同一个幂等 Key、检索和 benchmark。
+- 核心 smoke 已覆盖库存预热、抢票成功、用新 requestId 重复提交同一个幂等 Key 和 `A0429` 幂等拦截。
 - k6 压测报告覆盖库存策略 baseline、稳定性治理 before/after 和热点分摊对比。
 - Prometheus API 导出过压测指标证据。
 - Seata AT 示例、Elasticsearch 查询、Redis Lua/Lock、MySQL 乐观锁、RocketMQ Stream binder、MyBatis XML/schema 均有测试或报告覆盖。

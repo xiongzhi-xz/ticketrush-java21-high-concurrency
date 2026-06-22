@@ -293,6 +293,7 @@ src/main/java/com/ticketrush
 - [x] 专业 README
 - [x] GitHub 展示首页 README 收口（抢票主链路、启动、压测、API、验证状态）
 - [x] GitHub 展示补充页（快速看点、浏览顺序、项目摘要和边界说明）
+- [x] GitHub 后端工程展示包（核心链路 GIF、`demo-smoke.ps1`、压测摘要、设计取舍入口）
 - [x] GitHub README 桌面横屏步骤截图（总览、健康检查、库存预热、抢票、检索、执行器 benchmark）
 - [x] 本地轻量演示控制台（只串联现有 API，不扩完整后台）
 - [x] 架构图
@@ -363,6 +364,7 @@ src/main/java/com/ticketrush
 - [x] Elasticsearch 活动/票档查询集成
 - [x] Kubernetes/K3s 部署配置
 - [x] 专业 README
+- [x] 后端工程展示入口和核心 smoke 脚本
 - [x] 本地轻量演示控制台
 - [x] Virtual Threads vs 传统线程池压测报告
 - [x] 架构图

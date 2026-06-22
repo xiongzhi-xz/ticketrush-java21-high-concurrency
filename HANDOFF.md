@@ -1,5 +1,54 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-22 Backend Showcase Package
+
+Current goal:
+- Stop treating TicketRush as a UI/page demo and present it as a backend engineering showcase.
+
+Current stage:
+- Implemented and verified.
+- The current direction is: README first screen = engineering evidence, not product UI.
+- The local page remains only as an auxiliary entry.
+
+Completed in this slice:
+- Added `scripts/demo-smoke.ps1`:
+  - checks actuator health;
+  - preloads stock `1000`;
+  - submits rush request A;
+  - submits request B with a new `requestId` and the same `idempotentKey`;
+  - prints `StockFlow`, `DuplicateCode=A0429`, and `VirtualThread=True`.
+- Added README media assets:
+  - `docs/media/ticketrush-core-demo.gif`;
+  - `docs/media/ticketrush-core-demo.png`.
+- Reworked README top into `后端工程展示`:
+  - core GIF;
+  - smoke script;
+  - expected evidence;
+  - benchmark/governance evidence table.
+- Updated `docs/demo-runbook.md` and `docs/github-showcase.md` so the main demonstration path starts from the smoke script and architecture evidence, not the UI page.
+- Updated `SPEC.md` phase 7 checklist for the backend showcase package.
+
+Main demo script now:
+- Show README core GIF.
+- Run `.\scripts\demo-smoke.ps1`.
+- Explain `1000 -> 999 -> 999`, `requestId A -> B`, unchanged `idempotentKey`, `A0429`, `processedByVirtualThread=true`.
+- Then show architecture and benchmark reports.
+
+Verified:
+- `powershell -ExecutionPolicy Bypass -File .\scripts\demo-smoke.ps1`: passed.
+  - `StockFlow = 1000 -> 999 -> 999`;
+  - `DuplicateCode = A0429`;
+  - `VirtualThread = True`.
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 5 tests passed.
+- Markdown link scan for README/runbook/showcase: passed.
+- Media dimensions:
+  - `docs/media/ticketrush-core-demo.gif`: `960x540`, 8 frames;
+  - `docs/media/ticketrush-core-demo.png`: `960x540`.
+- `git diff --check`: passed with README CRLF/LF warning only.
+
+Next step only:
+- Commit this backend showcase package, then stop unless the user asks for another TicketRush scope.
+
 ## Latest Snapshot - 2026-06-22 One-Click Demo Story
 
 Current goal:

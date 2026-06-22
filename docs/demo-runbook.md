@@ -17,7 +17,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 ```text
 这个项目不是 CRUD 票务系统，而是聚焦高并发抢票主链路。入口先经过 Sentinel 全局限流和热点票档限流，再经过 Redis 准入令牌，避免所有请求打进库存扣减。库存层提供 Redis Lua、Redis 分布式锁、MySQL 乐观锁三种策略，默认推荐 Redis Lua，因为热点票档库存扣减需要原子性和低延迟。抢票成功后入口快速返回，同时通过 RocketMQ 异步创建订单，消费端用 idempotentKey 保证幂等，订单超时任务负责释放锁定库存。
 
-为了让项目能被验证，我补了 k6 压测、Virtual Threads vs 固定线程池 benchmark、Prometheus/Grafana 指标证据、Seata AT 示例、Elasticsearch 活动/票档读模型和本地演示页。演示时可以直接打开 http://localhost:8080/ 点 `开始抢票演示`，页面会自动完成库存归位、抢票受理、用新 requestId 重复提交同一个幂等 Key，并把检索和 benchmark 放在补充验证区。
+为了让项目能被验证，我补了 k6 压测、Virtual Threads vs 固定线程池 benchmark、Prometheus/Grafana 指标证据、Seata AT 示例、Elasticsearch 活动/票档读模型和本地辅助演示页。正式展示时优先运行 `.\scripts\demo-smoke.ps1`，用 CLI 证据证明库存 `1000 -> 999 -> 999`、重复请求返回 `A0429`、抢票链路命中 Virtual Thread；页面只作为备用入口。
 ```
 
 ## 演示前检查
@@ -32,46 +32,48 @@ docker compose up -d
 Invoke-RestMethod http://localhost:8080/actuator/health
 ```
 
-打开演示页：
+运行核心 smoke：
 
-```text
-http://localhost:8080/
+```powershell
+.\scripts\demo-smoke.ps1
 ```
 
 ## 5 分钟演示路径
 
-1. 打开首屏 `一场抢票请求怎么被系统接住`，主流程只看一个按钮、库存轨迹、链路节点和右侧证据面板。
-2. 顶部状态为 `UP` 后，说明应用和本地 Compose 环境可用；详细健康信息只作为辅助验证。
-3. 点 `开始抢票演示`，页面会自动跑完三步：
+1. 打开 README 顶部的 `TicketRush core demo` 动图，先给结论：这不是票务 CRUD，而是高并发抢票主链路。
+2. 运行 `.\scripts\demo-smoke.ps1`，用真实接口跑核心证据：
 
    ```text
-   库存归位：1000 -> 1000 -> ?
-   第一次抢票：1000 -> 999 -> ?
-   重复提交：1000 -> 999 -> 999
+   StockFlow     : 1000 -> 999 -> 999
+   DuplicateCode : A0429
+   VirtualThread : True
    ```
 
-4. 重点看右侧 `证据面板`：
+3. 解释这三个值的含义：
 
    ```text
-   抢票结果：抢票成功 / 幂等验证通过
-   请求编号：requestId A -> requestId B
-   幂等判定：通过
-   虚拟线程：Virtual Thread
-   异步下单：第一次触发，重复提交未重复触发
+   第一次请求扣库存：1000 -> 999
+   第二次请求换 requestId：A -> B
+   幂等 Key 不变，重复请求被 A0429 拦截
+   库存仍然 999，异步下单不重复触发
    ```
 
-5. 讲主链路：
+4. 打开 README 架构图，讲主链路：
 
    ```text
    Sentinel -> Redis admission token -> Virtual Thread -> Redis Lua inventory reservation -> RocketMQ async order -> timeout compensation
    ```
 
-6. 需要解释策略差异时，打开 `手动参数和高级策略`：
+5. 展示压测摘要，不现场跑大压测：
+   - `docs/rush-benchmark-report.md`：Redis Lua / Redis Lock / MySQL 乐观锁 baseline。
+   - `docs/governance-comparison-report.md`：治理开关前后对比。
+   - `docs/executor-benchmark-report.md`：Virtual Threads vs 固定线程池。
+   - `docs/observability-benchmark-report.md`：Prometheus 指标证据。
+6. 解释策略差异：
    - `Redis Lua` 是默认主演示链路。
    - `Redis 分布式锁` 共享 Redis 预热库存。
    - `MySQL 乐观锁` 读取 MySQL 库存表，是数据库热点行对比路径，剩余库存可能和 Redis 路径不同。
-7. 需要补充证据时，再到 `高级验证` 区跑 `虚拟线程压测对比`：先跑 `Java 21 虚拟线程`，再改成 `传统固定线程池`。
-8. 需要展示读模型时，到 `票档检索读模型` 用 smoke 数据：
+7. 需要展示读模型时，再演示 Elasticsearch smoke：
 
    ```text
    重建索引的活动 ID: 9101781814509
@@ -80,10 +82,17 @@ http://localhost:8080/
    票档状态: 上架中
    ```
 
-9. 点 `重建活动索引` 后点 `查询票档`，展示 Elasticsearch 是读模型，不参与抢票写链路。
-10. 打开 Prometheus/Grafana 链接，说明指标证据和压测报告在 docs 中。
+8. 最后说明边界：本项目不做支付、实名制、完整后台；重点是高并发后端工程闭环。
 
 ## CLI 替代演示
+
+优先使用一键脚本：
+
+```powershell
+.\scripts\demo-smoke.ps1
+```
+
+如果需要手动拆开看每一步，再执行下面命令。
 
 健康检查：
 
