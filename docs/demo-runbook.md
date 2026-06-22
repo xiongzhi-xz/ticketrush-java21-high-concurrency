@@ -40,17 +40,17 @@ http://localhost:8080/
 
 ## 5 分钟演示路径
 
-1. 打开 Demo Console，先点 `Refresh Health`。
+1. 打开 `TicketRush 高并发抢票演示台`，先点 `刷新健康状态`。
 2. 讲 Java 21、Virtual Threads、Actuator、MySQL、Redis、RocketMQ、ES 都在本地 Compose 环境里。
-3. 在 `Rush Workflow` 点 `Preload Inventory`：
+3. 在 `抢票主链路` 点 `预热库存`：
 
    ```text
    skuId=1001
    totalStock=1000
    ```
 
-4. 点 `New Request`，确认 requestId/idempotentKey 已刷新。
-5. 策略选 `REDIS_LUA`，点 `Rush Ticket`。
+4. 点 `生成新请求`，确认 requestId/idempotentKey 已刷新。
+5. 库存扣减方案选 `Redis Lua 原子扣减`，点 `发起抢票`。
 6. 重点看结果：
 
    ```text
@@ -65,17 +65,17 @@ http://localhost:8080/
    Sentinel -> Redis admission token -> Virtual Thread -> Redis Lua inventory reservation -> RocketMQ async order -> timeout compensation
    ```
 
-8. 切到 `Executor Benchmark`，先跑 `VIRTUAL_THREAD`，再改成 `TRADITIONAL_THREAD_POOL` 做对比。
-9. 切到 `Ticket Search`，用 smoke 数据：
+8. 切到 `虚拟线程压测对比`，先跑 `Java 21 虚拟线程`，再改成 `传统固定线程池` 做对比。
+9. 切到 `票档检索读模型`，用 smoke 数据：
 
    ```text
-   Index Event ID: 9101781814509
-   Keyword: Codex Smoke
-   Event Status: SELLING
-   SKU Status: ON_SALE
+   重建索引的活动 ID: 9101781814509
+   关键词: Codex Smoke
+   活动状态: 售卖中
+   票档状态: 上架中
    ```
 
-10. 点 `Index Event` 后点 `Search`，展示 Elasticsearch 是读模型，不参与抢票写链路。
+10. 点 `重建活动索引` 后点 `查询票档`，展示 Elasticsearch 是读模型，不参与抢票写链路。
 11. 打开 Prometheus/Grafana 链接，说明指标证据和压测报告在 docs 中。
 
 ## CLI 替代演示

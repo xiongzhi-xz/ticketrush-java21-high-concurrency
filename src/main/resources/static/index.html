@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>TicketRush Demo Console</title>
+    <title>TicketRush 高并发抢票演示台</title>
     <style>
         :root {
             color-scheme: light;
@@ -96,7 +96,6 @@
             color: var(--muted);
             font-size: 12px;
             font-weight: 700;
-            text-transform: uppercase;
         }
 
         input,
@@ -301,7 +300,6 @@
             color: var(--muted);
             font-size: 12px;
             font-weight: 750;
-            text-transform: uppercase;
         }
 
         .metric strong {
@@ -344,7 +342,7 @@
 
         .flow {
             display: grid;
-            grid-template-columns: repeat(4, minmax(0, 1fr));
+            grid-template-columns: repeat(5, minmax(0, 1fr));
             gap: 10px;
         }
 
@@ -373,6 +371,27 @@
             display: block;
             margin-top: 8px;
             font-size: 13px;
+        }
+
+        .step small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .tech-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .field-help {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
         }
 
         .links {
@@ -493,15 +512,15 @@
             <div class="brand">
                 <div class="mark">TR</div>
                 <div>
-                    <h1>TicketRush Demo Console</h1>
-                    <p class="subtitle">Local demo surface</p>
+                    <h1>TicketRush 高并发抢票演示台</h1>
+                    <p class="subtitle">从健康检查、库存预热到抢票、检索和虚拟线程压测</p>
                 </div>
             </div>
             <div class="top-actions">
-                <span id="overallStatus" class="badge amber">Checking</span>
-                <button id="refreshHealthButton" class="secondary" type="button">Refresh Health</button>
+                <span id="overallStatus" class="badge amber">检查中</span>
+                <button id="refreshHealthButton" class="secondary" type="button">刷新健康状态</button>
                 <a class="badge" href="/actuator/health" target="_blank" rel="noreferrer">Actuator</a>
-                <a class="badge" href="/actuator/prometheus" target="_blank" rel="noreferrer">Metrics</a>
+                <a class="badge" href="/actuator/prometheus" target="_blank" rel="noreferrer">Prometheus 指标</a>
             </div>
         </div>
     </header>
@@ -511,27 +530,27 @@
             <section class="panel" aria-labelledby="systemHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="systemHeading">System Status</h2>
-                        <p>Runtime snapshot</p>
+                        <h2 id="systemHeading">1. 系统健康检查</h2>
+                        <p>确认应用、Java 21、虚拟线程和 Actuator 都可用</p>
                     </div>
-                    <button id="systemHealthButton" class="secondary" type="button">Check</button>
+                    <button id="systemHealthButton" class="secondary" type="button">检查系统</button>
                 </div>
                 <div class="panel-body">
                     <div class="grid four">
                         <div class="metric green">
-                            <span>App</span>
+                            <span>应用状态</span>
                             <strong id="metricApp">-</strong>
                         </div>
                         <div class="metric">
-                            <span>Java</span>
+                            <span>Java 版本</span>
                             <strong id="metricJava">-</strong>
                         </div>
                         <div class="metric">
-                            <span>Virtual Threads</span>
+                            <span>虚拟线程</span>
                             <strong id="metricVirtualThreads">-</strong>
                         </div>
                         <div class="metric">
-                            <span>Actuator</span>
+                            <span>监控端点</span>
                             <strong id="metricActuator">-</strong>
                         </div>
                     </div>
@@ -541,74 +560,85 @@
             <section class="panel" aria-labelledby="flowHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="flowHeading">Rush Workflow</h2>
-                        <p>Main path</p>
+                        <h2 id="flowHeading">2. 抢票主链路</h2>
+                        <p>演示限流、准入、库存原子扣减、异步下单和最终一致性补偿</p>
                     </div>
-                    <button id="generateRequestButton" class="subtle" type="button">New Request</button>
+                    <button id="generateRequestButton" class="subtle" type="button">生成新请求</button>
                 </div>
                 <div class="panel-body grid">
                     <div class="flow">
-                        <div class="step"><span>1</span><strong>Preload</strong></div>
-                        <div class="step"><span>2</span><strong>Sentinel</strong></div>
-                        <div class="step"><span>3</span><strong>Redis</strong></div>
-                        <div class="step"><span>4</span><strong>RocketMQ</strong></div>
+                        <div class="step"><span>1</span><strong>库存预热</strong><small>把热门票档写入 Redis</small></div>
+                        <div class="step"><span>2</span><strong>限流准入</strong><small>Sentinel + Redis 令牌</small></div>
+                        <div class="step"><span>3</span><strong>库存预扣</strong><small>Lua / 分布式锁 / 乐观锁</small></div>
+                        <div class="step"><span>4</span><strong>异步下单</strong><small>RocketMQ 削峰</small></div>
+                        <div class="step"><span>5</span><strong>超时补偿</strong><small>释放锁定库存</small></div>
+                    </div>
+
+                    <div class="tech-tags" aria-label="核心能力标签">
+                        <span class="badge green">防超卖</span>
+                        <span class="badge green">幂等请求</span>
+                        <span class="badge">热点限流</span>
+                        <span class="badge">Java 21 Virtual Threads</span>
+                        <span class="badge">最终一致性</span>
                     </div>
 
                     <div class="form-row compact">
                         <label>
-                            <span>Preload SKU</span>
+                            <span>预热票档 ID</span>
                             <input id="preloadSkuId" inputmode="numeric" value="1001">
                         </label>
                         <label>
-                            <span>Total Stock</span>
+                            <span>预热库存数</span>
                             <input id="preloadStock" inputmode="numeric" value="1000">
                         </label>
-                        <button id="preloadButton" type="button">Preload Inventory</button>
+                        <button id="preloadButton" type="button">预热库存</button>
                     </div>
 
                     <div class="form-row">
                         <label>
-                            <span>Event ID</span>
+                            <span>活动 ID</span>
                             <input id="rushEventId" inputmode="numeric" value="3001">
                         </label>
                         <label>
-                            <span>SKU ID</span>
+                            <span>票档 ID</span>
                             <input id="rushSkuId" inputmode="numeric" value="1001">
                         </label>
                         <label>
-                            <span>User ID</span>
+                            <span>用户 ID</span>
                             <input id="rushUserId" inputmode="numeric" value="2001">
                         </label>
                         <label>
-                            <span>Quantity</span>
+                            <span>购买数量</span>
                             <input id="rushQuantity" inputmode="numeric" value="1">
                         </label>
                     </div>
 
                     <div class="form-row">
                         <label>
-                            <span>Strategy</span>
+                            <span>库存扣减方案</span>
                             <select id="rushStrategy">
-                                <option value="REDIS_LUA">REDIS_LUA</option>
-                                <option value="REDIS_LOCK">REDIS_LOCK</option>
-                                <option value="MYSQL_OPTIMISTIC_LOCK">MYSQL_OPTIMISTIC_LOCK</option>
+                                <option value="REDIS_LUA">Redis Lua 原子扣减</option>
+                                <option value="REDIS_LOCK">Redis 分布式锁扣减</option>
+                                <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减</option>
                             </select>
                         </label>
                         <label>
-                            <span>Request ID</span>
+                            <span>请求 ID</span>
                             <input id="rushRequestId">
+                            <div class="field-help">用于演示重复请求幂等控制</div>
                         </label>
                         <label>
-                            <span>Idempotent Key</span>
+                            <span>幂等 Key</span>
                             <input id="rushIdempotentKey">
+                            <div class="field-help">同一个 Key 不会重复扣库存</div>
                         </label>
-                        <button id="rushButton" type="button">Rush Ticket</button>
+                        <button id="rushButton" type="button">发起抢票</button>
                     </div>
 
                     <div class="status-strip">
-                        <span id="rushAcceptedBadge" class="badge">Accepted -</span>
-                        <span id="rushStockBadge" class="badge">Remaining -</span>
-                        <span id="rushThreadBadge" class="badge">Virtual Thread -</span>
+                        <span id="rushAcceptedBadge" class="badge">是否接单 -</span>
+                        <span id="rushStockBadge" class="badge">剩余库存 -</span>
+                        <span id="rushThreadBadge" class="badge">虚拟线程 -</span>
                     </div>
                 </div>
             </section>
@@ -616,51 +646,51 @@
             <section class="panel" aria-labelledby="searchHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="searchHeading">Ticket Search</h2>
-                        <p>Elasticsearch read model</p>
+                        <h2 id="searchHeading">3. 票档检索读模型</h2>
+                        <p>Elasticsearch 只承担查询展示，不参与抢票写链路</p>
                     </div>
                 </div>
                 <div class="panel-body grid">
                     <div class="form-row compact">
                         <label>
-                            <span>Index Event ID</span>
+                            <span>重建索引的活动 ID</span>
                             <input id="indexEventId" inputmode="numeric" placeholder="9101781814509">
                         </label>
-                        <button id="indexEventButton" type="button">Index Event</button>
-                        <button id="searchButton" class="secondary" type="button">Search</button>
+                        <button id="indexEventButton" type="button">重建活动索引</button>
+                        <button id="searchButton" class="secondary" type="button">查询票档</button>
                     </div>
                     <div class="form-row">
                         <label>
-                            <span>Keyword</span>
+                            <span>关键词</span>
                             <input id="searchKeyword" value="VIP">
                         </label>
                         <label>
-                            <span>Event Filter</span>
+                            <span>活动过滤</span>
                             <input id="searchEventId" inputmode="numeric">
                         </label>
                         <label>
-                            <span>Event Status</span>
+                            <span>活动状态</span>
                             <select id="searchEventStatus">
-                                <option value="">Any</option>
-                                <option value="SELLING">SELLING</option>
-                                <option value="CREATED">CREATED</option>
-                                <option value="SOLD_OUT">SOLD_OUT</option>
-                                <option value="CLOSED">CLOSED</option>
+                                <option value="">全部</option>
+                                <option value="SELLING">售卖中</option>
+                                <option value="CREATED">已创建</option>
+                                <option value="SOLD_OUT">已售罄</option>
+                                <option value="CLOSED">已关闭</option>
                             </select>
                         </label>
                         <label>
-                            <span>SKU Status</span>
+                            <span>票档状态</span>
                             <select id="searchSkuStatus">
-                                <option value="">Any</option>
-                                <option value="ON_SALE">ON_SALE</option>
-                                <option value="CREATED">CREATED</option>
-                                <option value="SOLD_OUT">SOLD_OUT</option>
-                                <option value="OFF_SALE">OFF_SALE</option>
+                                <option value="">全部</option>
+                                <option value="ON_SALE">上架中</option>
+                                <option value="CREATED">已创建</option>
+                                <option value="SOLD_OUT">已售罄</option>
+                                <option value="OFF_SALE">已下架</option>
                             </select>
                         </label>
                     </div>
                     <div id="searchSummary" class="status-strip">
-                        <span class="badge">Total -</span>
+                        <span class="badge">命中数量 -</span>
                     </div>
                 </div>
             </section>
@@ -668,48 +698,48 @@
             <section class="panel" aria-labelledby="benchmarkHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="benchmarkHeading">Executor Benchmark</h2>
-                        <p>Executor comparison</p>
+                        <h2 id="benchmarkHeading">4. 虚拟线程压测对比</h2>
+                        <p>同样任务量下对比 Virtual Threads 和传统固定线程池</p>
                     </div>
-                    <button id="benchmarkButton" class="secondary" type="button">Run Benchmark</button>
+                    <button id="benchmarkButton" class="secondary" type="button">运行压测</button>
                 </div>
                 <div class="panel-body grid">
                     <div class="form-row">
                         <label>
-                            <span>Mode</span>
+                            <span>执行模式</span>
                             <select id="benchmarkMode">
-                                <option value="VIRTUAL_THREAD">VIRTUAL_THREAD</option>
-                                <option value="TRADITIONAL_THREAD_POOL">TRADITIONAL_THREAD_POOL</option>
+                                <option value="VIRTUAL_THREAD">Java 21 虚拟线程</option>
+                                <option value="TRADITIONAL_THREAD_POOL">传统固定线程池</option>
                             </select>
                         </label>
                         <label>
-                            <span>Tasks</span>
+                            <span>任务数量</span>
                             <input id="benchmarkTaskCount" inputmode="numeric" value="1000">
                         </label>
                         <label>
-                            <span>Blocking ms</span>
+                            <span>每任务阻塞毫秒</span>
                             <input id="benchmarkBlockingMillis" inputmode="numeric" value="20">
                         </label>
                         <label>
-                            <span>CPU Tokens</span>
+                            <span>CPU 计算量</span>
                             <input id="benchmarkCpuTokens" inputmode="numeric" value="0">
                         </label>
                     </div>
                     <div class="grid four">
                         <div class="metric">
-                            <span>Elapsed</span>
+                            <span>总耗时</span>
                             <strong id="benchElapsed">-</strong>
                         </div>
                         <div class="metric">
-                            <span>Throughput</span>
+                            <span>吞吐量</span>
                             <strong id="benchThroughput">-</strong>
                         </div>
                         <div class="metric">
-                            <span>Threads</span>
+                            <span>线程数</span>
                             <strong id="benchThreads">-</strong>
                         </div>
                         <div class="metric">
-                            <span>Virtual Tasks</span>
+                            <span>虚拟线程任务</span>
                             <strong id="benchVirtualTasks">-</strong>
                         </div>
                     </div>
@@ -719,8 +749,8 @@
             <section class="panel" aria-labelledby="opsHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="opsHeading">Operational Links</h2>
-                        <p>Runtime endpoints</p>
+                        <h2 id="opsHeading">5. 观测入口</h2>
+                        <p>压测时查看 Prometheus、Grafana、Elasticsearch 和 Actuator 指标</p>
                     </div>
                 </div>
                 <div class="panel-body">
@@ -738,7 +768,7 @@
                             <span>http://localhost:9200</span>
                         </div>
                         <div class="link-item">
-                            <a href="/actuator/prometheus" target="_blank" rel="noreferrer">Actuator Metrics</a>
+                            <a href="/actuator/prometheus" target="_blank" rel="noreferrer">Actuator 指标</a>
                             <span>/actuator/prometheus</span>
                         </div>
                     </div>
@@ -749,15 +779,15 @@
         <aside class="panel result-panel" aria-labelledby="resultHeading">
             <div class="panel-header">
                 <div class="panel-title">
-                    <h2 id="resultHeading">Result</h2>
-                    <p id="resultSubtitle">Latest API response</p>
+                    <h2 id="resultHeading">执行结果</h2>
+                    <p id="resultSubtitle">最近一次接口返回</p>
                 </div>
                 <div class="result-toolbar">
-                    <button id="clearResultButton" class="secondary" type="button">Clear</button>
+                    <button id="clearResultButton" class="secondary" type="button">清空结果</button>
                 </div>
             </div>
             <div class="panel-body">
-                <pre id="resultBody">Ready.</pre>
+                <pre id="resultBody">准备就绪。</pre>
             </div>
         </aside>
     </main>
@@ -788,7 +818,7 @@
         $('resultSubtitle').textContent = title;
         $('resultBody').textContent = typeof value === 'string' ? value : formatJson(value);
         $('overallStatus').className = `badge ${ok ? 'green' : 'red'}`;
-        $('overallStatus').textContent = ok ? 'Ready' : 'Check Result';
+        $('overallStatus').textContent = ok ? '就绪' : '需要查看结果';
     }
 
     function setBusy(button, busy) {
@@ -796,7 +826,7 @@
             button.dataset.label = button.textContent;
         }
         button.disabled = busy;
-        button.textContent = busy ? 'Running' : button.dataset.label;
+        button.textContent = busy ? '执行中' : button.dataset.label;
     }
 
     async function requestJson(path, options = {}) {
@@ -813,7 +843,7 @@
             payload = text;
         }
         if (!response.ok || payload?.success === false) {
-            const message = payload?.message || payload?.error || response.statusText || 'Request failed';
+            const message = payload?.message || payload?.error || response.statusText || '请求失败';
             const failure = new Error(message);
             failure.payload = payload;
             failure.status = response.status;
@@ -829,7 +859,7 @@
             showResult(title, result, true);
             return result;
         } catch (error) {
-            showResult(`${title} failed`, {
+            showResult(`${title}失败`, {
                 status: error.status,
                 message: error.message,
                 payload: error.payload
@@ -841,7 +871,7 @@
     }
 
     async function refreshHealth() {
-        const result = await runAction($('systemHealthButton'), 'System health', async () => {
+        const result = await runAction($('systemHealthButton'), '系统健康检查', async () => {
             const system = await requestJson('/api/system/health');
             const actuator = await requestJson('/actuator/health');
             return { system, actuator };
@@ -854,7 +884,7 @@
         const data = result.system?.data || {};
         setText('metricApp', data.status || data.application);
         setText('metricJava', data.javaVersion);
-        setText('metricVirtualThreads', data.virtualThreadsEnabled ? 'enabled' : 'disabled');
+        setText('metricVirtualThreads', data.virtualThreadsEnabled ? '已启用' : '未启用');
         setText('metricActuator', result.actuator?.status || '-');
         $('overallStatus').className = 'badge green';
         $('overallStatus').textContent = 'UP';
@@ -868,7 +898,7 @@
     }
 
     async function preloadInventory() {
-        await runAction($('preloadButton'), 'Inventory preload', async () => {
+        await runAction($('preloadButton'), '库存预热结果', async () => {
             const payload = {
                 skuId: toNumber('preloadSkuId'),
                 totalStock: toNumber('preloadStock')
@@ -881,7 +911,7 @@
     }
 
     async function rushTicket() {
-        const result = await runAction($('rushButton'), 'Rush ticket', async () => {
+        const result = await runAction($('rushButton'), '抢票结果', async () => {
             const payload = {
                 requestId: optionalText('rushRequestId'),
                 userId: toNumber('rushUserId'),
@@ -899,27 +929,27 @@
         const data = result?.data;
         if (data) {
             $('rushAcceptedBadge').className = `badge ${data.accepted ? 'green' : 'red'}`;
-            $('rushAcceptedBadge').textContent = `Accepted ${data.accepted}`;
+            $('rushAcceptedBadge').textContent = `是否接单 ${data.accepted ? '是' : '否'}`;
             $('rushStockBadge').className = 'badge green';
-            $('rushStockBadge').textContent = `Remaining ${data.remainingStock ?? '-'}`;
+            $('rushStockBadge').textContent = `剩余库存 ${data.remainingStock ?? '-'}`;
             $('rushThreadBadge').className = `badge ${data.processedByVirtualThread ? 'green' : 'amber'}`;
-            $('rushThreadBadge').textContent = `Virtual Thread ${data.processedByVirtualThread}`;
+            $('rushThreadBadge').textContent = `虚拟线程 ${data.processedByVirtualThread ? '是' : '否'}`;
             generateRequestIds();
         }
     }
 
     async function indexEvent() {
-        await runAction($('indexEventButton'), 'Index event', async () => {
+        await runAction($('indexEventButton'), '活动索引重建结果', async () => {
             const eventId = optionalText('indexEventId');
             if (!eventId) {
-                throw new Error('Event ID is required');
+                throw new Error('活动 ID 不能为空');
             }
             return requestJson(`/api/search/events/${encodeURIComponent(eventId)}/index`, { method: 'POST' });
         });
     }
 
     async function searchTickets() {
-        const result = await runAction($('searchButton'), 'Ticket search', async () => {
+        const result = await runAction($('searchButton'), '票档检索结果', async () => {
             const params = new URLSearchParams();
             const keyword = optionalText('searchKeyword');
             const eventId = optionalText('searchEventId');
@@ -934,11 +964,11 @@
             return requestJson(`/api/search/ticket-skus?${params.toString()}`);
         });
         const total = result?.data?.total ?? '-';
-        $('searchSummary').innerHTML = `<span class="badge green">Total ${total}</span>`;
+        $('searchSummary').innerHTML = `<span class="badge green">命中数量 ${total}</span>`;
     }
 
     async function runBenchmark() {
-        const result = await runAction($('benchmarkButton'), 'Executor benchmark', async () => {
+        const result = await runAction($('benchmarkButton'), '执行器压测结果', async () => {
             const payload = {
                 mode: $('benchmarkMode').value,
                 taskCount: toNumber('benchmarkTaskCount'),
@@ -968,7 +998,7 @@
     $('indexEventButton').addEventListener('click', indexEvent);
     $('searchButton').addEventListener('click', searchTickets);
     $('benchmarkButton').addEventListener('click', runBenchmark);
-    $('clearResultButton').addEventListener('click', () => showResult('Latest API response', 'Ready.'));
+    $('clearResultButton').addEventListener('click', () => showResult('最近一次接口返回', '准备就绪。'));
 
     ['rushEventId', 'rushSkuId', 'rushUserId'].forEach((id) => {
         $(id).addEventListener('change', generateRequestIds);

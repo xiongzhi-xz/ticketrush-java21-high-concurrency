@@ -1,5 +1,35 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-22 Demo Console Chinese Workflow
+
+Current goal:
+- Make the TicketRush local demo page Chinese, business-oriented, and easier to understand from screenshots.
+
+Current stage:
+- No backend feature expansion.
+- The static demo console still only calls existing APIs.
+- README desktop screenshots have been regenerated from the updated Chinese UI.
+
+Recently completed:
+- Updated `src/main/resources/static/index.html` from an English Demo Console to `TicketRush 高并发抢票演示台`.
+- Reworked visible sections into a clearer flow: 系统健康检查、抢票主链路、票档检索读模型、虚拟线程压测对比、观测入口.
+- Added visible high-concurrency capability tags: 防超卖、幂等请求、热点限流、Java 21 Virtual Threads、最终一致性.
+- Localized buttons, fields, result titles, busy/error text, status badges, and select option labels.
+- Updated `StaticDemoConsoleHtmlTest` to assert the Chinese business labels while preserving IDs and API paths.
+- Updated `README.md`, `docs/demo-runbook.md`, and `docs/github-showcase.md` to match the new Chinese operation path.
+- Regenerated all README desktop screenshots under `docs/screenshots/desktop/*.png`.
+
+Verified latest:
+- Inline JavaScript syntax check: passed.
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 5 tests passed.
+- Browser walkthrough against local backend via preview proxy: health, preload, rush, index/search, and executor benchmark all produced visible results.
+- Screenshot dimension check: all `docs/screenshots/desktop/*.png` are `1440x900`.
+- Browser layout check: no horizontal overflow at the desktop screenshot viewport.
+- `git diff --check`: passed with the existing README CRLF/LF warning only.
+
+Next step only:
+- Commit this UI/demo-doc slice, then stop unless the user asks for another TicketRush scope.
+
 ## Latest Snapshot - 2026-06-21 Desktop Screenshot Showcase
 
 Current goal:

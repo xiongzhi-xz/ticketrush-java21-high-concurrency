@@ -22,7 +22,7 @@
 
 ## 本地演示入口
 
-Demo Console：
+本地演示台：
 
 ```text
 http://localhost:8080/
@@ -30,11 +30,11 @@ http://localhost:8080/
 
 推荐演示顺序：
 
-1. Refresh Health：确认 Java 21、虚拟线程和运行状态。
-2. Preload Inventory：预热票档库存。
-3. Rush Ticket：发起抢票并观察 `processedByVirtualThread=true`。
-4. Executor Benchmark：对比虚拟线程和传统线程池。
-5. Index Event / Search：演示 Elasticsearch 是读模型，不参与抢票写链路。
+1. 刷新健康状态：确认 Java 21、虚拟线程和运行状态。
+2. 预热库存：把热门票档库存写入 Redis。
+3. 发起抢票：观察 `processedByVirtualThread=true` 和剩余库存变化。
+4. 运行压测：对比虚拟线程和传统固定线程池。
+5. 重建活动索引 / 查询票档：演示 Elasticsearch 是读模型，不参与抢票写链路。
 
 ## 已验证证据
 

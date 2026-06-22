@@ -22,7 +22,11 @@ class StaticDemoConsoleHtmlTest {
         String html = readIndexHtml();
 
         assertThat(html).contains(
-                "TicketRush Demo Console",
+                "TicketRush 高并发抢票演示台",
+                "系统健康检查",
+                "抢票主链路",
+                "票档检索读模型",
+                "虚拟线程压测对比",
                 "id=\"refreshHealthButton\"",
                 "id=\"preloadButton\"",
                 "id=\"rushButton\"",
@@ -31,6 +35,24 @@ class StaticDemoConsoleHtmlTest {
                 "id=\"benchmarkButton\"",
                 "href=\"/actuator/health\"",
                 "href=\"/actuator/prometheus\""
+        );
+    }
+
+    @Test
+    void shouldUseChineseBusinessActionLabels() throws IOException {
+        String html = readIndexHtml();
+
+        assertThat(html).contains(
+                "刷新健康状态",
+                "预热库存",
+                "发起抢票",
+                "重建活动索引",
+                "查询票档",
+                "运行压测",
+                "清空结果",
+                "防超卖",
+                "幂等请求",
+                "最终一致性"
         );
     }
 
