@@ -23,11 +23,11 @@ class StaticDemoConsoleHtmlTest {
 
         assertThat(html).contains(
                 "TicketRush 高并发抢票演示",
-                "一键演示剧本",
-                "一场抢票请求怎么被系统接住",
+                "核心链路 Smoke",
+                "抢票主链路验证",
                 "开始抢票演示",
                 "库存轨迹",
-                "证据面板",
+                "执行结果",
                 "高级验证",
                 "系统健康检查",
                 "票档检索读模型",

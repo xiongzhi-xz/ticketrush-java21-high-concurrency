@@ -8,7 +8,7 @@ TicketRush 不是一个 CRUD 示例，而是一个围绕真实高并发票务链
 
 ![TicketRush core demo](docs/media/ticketrush-core-demo.gif)
 
-这张动图展示的是项目最核心的后端证据流，而不是产品页面：
+这张动图只展示核心后端链路，而不是产品页面：
 
 ```text
 热门票档库存 1000
@@ -39,9 +39,9 @@ VirtualThread : True
 PASS: no oversell, idempotency works, virtual thread path hit.
 ```
 
-压测和治理证据：
+压测和治理结果：
 
-| 证据 | 结果摘要 | 详情 |
+| 项目 | 结果摘要 | 详情 |
 | --- | --- | --- |
 | 热点抢票 baseline | 三种库存策略均完成低负载本地压测，HTTP failed 为 0 | [docs/rush-benchmark-report.md](docs/rush-benchmark-report.md) |
 | 稳定性治理 before/after | 默认治理开启时单热点流量 86.25% 被限流，关闭治理后几乎全部进入核心链路 | [docs/governance-comparison-report.md](docs/governance-comparison-report.md) |
@@ -57,7 +57,7 @@ PASS: no oversell, idempotency works, virtual thread path hit.
 2. 运行 `.\scripts\demo-smoke.ps1`，看 `1000 -> 999 -> 999`、`A0429` 和 `processedByVirtualThread=true`。
 3. [docs/demo-runbook.md](docs/demo-runbook.md)：5 分钟讲解脚本、CLI 替代演示和设计取舍。
 4. [docs/github-showcase.md](docs/github-showcase.md)：快速展示摘要、推荐浏览顺序、项目摘要和边界说明。
-5. [docs/rush-benchmark-report.md](docs/rush-benchmark-report.md) 与 [docs/executor-benchmark-report.md](docs/executor-benchmark-report.md)：压测和 Virtual Threads 证据。
+5. [docs/rush-benchmark-report.md](docs/rush-benchmark-report.md) 与 [docs/executor-benchmark-report.md](docs/executor-benchmark-report.md)：压测和 Virtual Threads 结果。
 
 展示边界：TicketRush 是本地可运行、可压测、可解释的 Java 21 高并发票务作品项目；本地演示页用于走通核心链路，不是完整后台管理系统，真实支付、短信、实名制、多租户 SaaS 和生产订单系统不在当前范围。
 
@@ -115,12 +115,12 @@ flowchart LR
 
 ## 辅助页面截图
 
-本项目的主展示是后端链路证据。下面的页面截图只作为本地辅助入口，避免把项目误解成完整票务后台或前端产品。
+本项目主展示是后端链路和压测结果。下面的页面截图只作为本地辅助入口，避免把项目误解成完整票务后台或前端产品。
 
 | 步骤 | 桌面横屏截图 |
 | --- | --- |
 | 1. 一键演示入口 | ![TicketRush 一键抢票演示入口](docs/screenshots/desktop/ticketrush-01-demo-console-overview.png) |
-| 2. 抢票与幂等证据 | ![TicketRush 抢票与幂等证据](docs/screenshots/desktop/ticketrush-02-system-health.png) |
+| 2. 抢票与幂等结果 | ![TicketRush 抢票与幂等结果](docs/screenshots/desktop/ticketrush-02-system-health.png) |
 | 3. 手动参数与策略 | ![TicketRush 手动参数与库存策略](docs/screenshots/desktop/ticketrush-03-inventory-preload.png) |
 | 4. 高级验证区 | ![TicketRush 高级验证区](docs/screenshots/desktop/ticketrush-04-rush-ticket.png) |
 | 5. 票档检索查询 | ![TicketRush 票档检索查询](docs/screenshots/desktop/ticketrush-05-ticket-search.png) |
@@ -174,7 +174,7 @@ POST /api/rush/tickets
 
 ### 本地演示页
 
-- `http://localhost:8080/` 提供一键抢票链路演示页，主流程自动串联库存归位、发起抢票、用新 requestId 重复提交同一个幂等 Key，并展示库存轨迹、requestId 变化、虚拟线程和异步下单证据。
+- `http://localhost:8080/` 提供一键抢票链路演示页，主流程自动串联库存归位、发起抢票、用新 requestId 重复提交同一个幂等 Key，并展示库存轨迹、requestId 变化、虚拟线程和异步下单结果。
 - 健康检查、策略切换、Elasticsearch 查询和执行器 benchmark 保留为补充验证区；页面只调用现有 API，不引入登录、后台管理、支付或订单管理页面。
 
 ### 稳定性治理
@@ -192,7 +192,7 @@ POST /api/rush/tickets
 - Virtual Threads 执行器基准报告：[docs/executor-benchmark-report.md](./docs/executor-benchmark-report.md)。
 - 稳定性治理 before/after 报告：[docs/governance-comparison-report.md](./docs/governance-comparison-report.md)。
 - 热点票档分摊压测报告：[docs/hotspot-spread-benchmark-report.md](./docs/hotspot-spread-benchmark-report.md)。
-- Prometheus/Grafana 指标证据报告：[docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md)。
+- Prometheus/Grafana 指标报告：[docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md)。
 - Seata 分布式事务示例：[docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md)。
 - Elasticsearch 活动/票档查询：[docs/elasticsearch-search.md](./docs/elasticsearch-search.md)。
 - 稳定性治理压测脚本：[scripts/k6/stability-governance.js](./scripts/k6/stability-governance.js)。
@@ -380,7 +380,7 @@ k6 run `
 - Virtual Threads vs 传统线程池执行器 benchmark：纯 I/O 等待场景虚拟线程吞吐约为传统固定线程池的 22.55 倍。
 - 稳定性治理 before/after：默认治理开启时单热点流量 86.25% 被限流，关闭治理后几乎全部进入核心链路。
 - 热点票档分摊对比：`SKU_SPREAD=1` 时 87.56% 被限流，`SKU_SPREAD=20` 时本轮 0 次 `C0429`，受理数提升到 7,496。
-- Prometheus/Grafana 指标证据：单热点压测下 Prometheus RPS 峰值 828.63/s，HTTP p95 约 3.1ms，CPU 峰值约 2.15%。
+- Prometheus/Grafana 指标：单热点压测下 Prometheus RPS 峰值 828.63/s，HTTP p95 约 3.1ms，CPU 峰值约 2.15%。
 - Seata AT 示例：MySQL 库存预占和订单落库被 `@GlobalTransactional` 包裹，并有单元测试覆盖事务注解、幂等和失败回滚边界。
 - Elasticsearch 查询：活动/票档读模型、索引重建 API、查询 API 和查询 JSON 构建均有单元测试覆盖。
 - Redis Lua、Redis Lock、MySQL optimistic lock、RocketMQ Stream binder、MyBatis XML/schema 均有测试覆盖。
@@ -435,7 +435,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 | [docs/elasticsearch-search.md](./docs/elasticsearch-search.md) | Elasticsearch 活动/票档查询读模型 |
 | [docs/governance-comparison-report.md](./docs/governance-comparison-report.md) | 稳定性治理 before/after 对照报告 |
 | [docs/hotspot-spread-benchmark-report.md](./docs/hotspot-spread-benchmark-report.md) | 单热点与多票档分摊压测报告 |
-| [docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md) | Prometheus/Grafana 压测指标证据 |
+| [docs/observability-benchmark-report.md](./docs/observability-benchmark-report.md) | Prometheus/Grafana 压测指标报告 |
 | [docs/rush-benchmark-report.md](./docs/rush-benchmark-report.md) | k6 本地压测报告 |
 | [docs/seata-transaction-demo.md](./docs/seata-transaction-demo.md) | Seata AT 分布式事务示例 |
 | [docs/stability-governance.md](./docs/stability-governance.md) | Sentinel、热点参数、Redis 准入令牌 |

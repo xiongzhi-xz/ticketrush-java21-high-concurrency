@@ -286,7 +286,7 @@ src/main/java/com/ticketrush
 - [x] Virtual Threads vs 传统线程池压测报告
 - [x] Prometheus 配置
 - [x] Grafana 面板说明
-- [x] Prometheus/Grafana 压测指标证据
+- [x] Prometheus/Grafana 压测指标
 - [x] Arthas 诊断案例
 - [x] Elasticsearch 活动/票档查询集成
 - [x] Kubernetes/K3s 部署配置
@@ -359,7 +359,7 @@ src/main/java/com/ticketrush
 - [x] JMeter 或 k6 压测脚本
 - [x] Prometheus 配置
 - [x] Grafana 面板说明
-- [x] Prometheus/Grafana 压测指标证据
+- [x] Prometheus/Grafana 压测指标
 - [x] Arthas 诊断案例
 - [x] Elasticsearch 活动/票档查询集成
 - [x] Kubernetes/K3s 部署配置

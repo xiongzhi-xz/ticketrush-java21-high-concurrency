@@ -17,7 +17,7 @@ TicketRush 是我做的 Java 21 高并发票务秒杀系统，场景来自景区
 ```text
 这个项目不是 CRUD 票务系统，而是聚焦高并发抢票主链路。入口先经过 Sentinel 全局限流和热点票档限流，再经过 Redis 准入令牌，避免所有请求打进库存扣减。库存层提供 Redis Lua、Redis 分布式锁、MySQL 乐观锁三种策略，默认推荐 Redis Lua，因为热点票档库存扣减需要原子性和低延迟。抢票成功后入口快速返回，同时通过 RocketMQ 异步创建订单，消费端用 idempotentKey 保证幂等，订单超时任务负责释放锁定库存。
 
-为了让项目能被验证，我补了 k6 压测、Virtual Threads vs 固定线程池 benchmark、Prometheus/Grafana 指标证据、Seata AT 示例、Elasticsearch 活动/票档读模型和本地辅助演示页。正式展示时优先运行 `.\scripts\demo-smoke.ps1`，用 CLI 证据证明库存 `1000 -> 999 -> 999`、重复请求返回 `A0429`、抢票链路命中 Virtual Thread；页面只作为备用入口。
+为了让项目能被验证，我补了 k6 压测、Virtual Threads vs 固定线程池 benchmark、Prometheus/Grafana 指标、Seata AT 示例、Elasticsearch 活动/票档读模型和本地辅助演示页。正式展示时优先运行 `.\scripts\demo-smoke.ps1`，用 CLI 输出确认库存 `1000 -> 999 -> 999`、重复请求返回 `A0429`、抢票链路命中 Virtual Thread；页面只作为备用入口。
 ```
 
 ## 演示前检查
@@ -41,7 +41,7 @@ Invoke-RestMethod http://localhost:8080/actuator/health
 ## 5 分钟演示路径
 
 1. 打开 README 顶部的 `TicketRush core demo` 动图，先给结论：这不是票务 CRUD，而是高并发抢票主链路。
-2. 运行 `.\scripts\demo-smoke.ps1`，用真实接口跑核心证据：
+2. 运行 `.\scripts\demo-smoke.ps1`，用真实接口跑核心校验：
 
    ```text
    StockFlow     : 1000 -> 999 -> 999
@@ -68,7 +68,7 @@ Invoke-RestMethod http://localhost:8080/actuator/health
    - `docs/rush-benchmark-report.md`：Redis Lua / Redis Lock / MySQL 乐观锁 baseline。
    - `docs/governance-comparison-report.md`：治理开关前后对比。
    - `docs/executor-benchmark-report.md`：Virtual Threads vs 固定线程池。
-   - `docs/observability-benchmark-report.md`：Prometheus 指标证据。
+   - `docs/observability-benchmark-report.md`：Prometheus 指标。
 6. 解释策略差异：
    - `Redis Lua` 是默认主演示链路。
    - `Redis 分布式锁` 共享 Redis 预热库存。

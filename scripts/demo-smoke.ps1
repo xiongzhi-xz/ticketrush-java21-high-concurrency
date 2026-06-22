@@ -91,7 +91,7 @@ $repeatMessage = $repeatRush.message
 Write-Host "[4/4] Repeat rush: requestId changed, idempotentKey unchanged, code=$repeatCode message=$repeatMessage" -ForegroundColor Green
 
 Write-Host ""
-Write-Host "Core evidence" -ForegroundColor Cyan
+Write-Host "Core checks" -ForegroundColor Cyan
 [PSCustomObject]@{
     StockFlow = "$Stock -> $($firstRush.data.remainingStock) -> $($firstRush.data.remainingStock)"
     RequestId = "$requestA -> $requestB"

@@ -1,5 +1,37 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-22 Demo Copy Cleanup
+
+Current goal:
+- Remove story-like demo copy and keep TicketRush presented as a backend engineering showcase.
+
+Current stage:
+- Implemented and verified.
+- Main demo path remains README core GIF + `scripts/demo-smoke.ps1` + architecture + benchmark reports.
+- The local page remains auxiliary; this slice only cleaned wording and regenerated affected media/screenshots.
+
+Completed in this slice:
+- Replaced visible page copy with plain engineering terms: `核心链路 Smoke`, `抢票主链路验证`, `执行结果`, `核心校验状态`, `辅助信息`.
+- Updated `StaticDemoConsoleHtmlTest` assertions for the new visible copy.
+- Updated README, runbook, showcase notes, SPEC, and observability report wording from proof-like phrasing to `链路`, `校验`, `结果`, `指标`, and `报告`.
+- Changed `scripts/demo-smoke.ps1` output heading to `Core checks`.
+- Regenerated `docs/media/ticketrush-core-demo.gif`, `docs/media/ticketrush-core-demo.png`, and desktop screenshots under `docs/screenshots/desktop/*.png`.
+
+Verified:
+- Banned/story-like Chinese wording scan: no matches in README, docs, scripts, page HTML, tests, HANDOFF, or SPEC.
+- `powershell -ExecutionPolicy Bypass -File .\scripts\demo-smoke.ps1`: passed; output shows `Core checks`, `StockFlow = 1000 -> 999 -> 999`, `DuplicateCode = A0429`, `VirtualThread = True`.
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 5 tests passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker app redeploy: `docker compose up -d --no-deps --force-recreate app`; health became `UP`.
+- `http://localhost:8080/` now returns the updated heading and no old visible copy.
+- Inline JavaScript syntax check: passed.
+- Markdown link scan for README/runbook/showcase/observability report: passed.
+- Media dimensions: README GIF and PNG are both `960x540`.
+- `git diff --check`: passed with line-ending warnings only.
+
+Next step only:
+- Commit this copy cleanup, then stop unless the user asks for another TicketRush scope.
+
 ## Latest Snapshot - 2026-06-22 Backend Showcase Package
 
 Current goal:
@@ -7,7 +39,7 @@ Current goal:
 
 Current stage:
 - Implemented and verified.
-- The current direction is: README first screen = engineering evidence, not product UI.
+- The current direction is: README first screen = backend engineering summary, not product UI.
 - The local page remains only as an auxiliary entry.
 
 Completed in this slice:
@@ -23,9 +55,9 @@ Completed in this slice:
 - Reworked README top into `后端工程展示`:
   - core GIF;
   - smoke script;
-  - expected evidence;
-  - benchmark/governance evidence table.
-- Updated `docs/demo-runbook.md` and `docs/github-showcase.md` so the main demonstration path starts from the smoke script and architecture evidence, not the UI page.
+  - expected smoke output;
+  - benchmark/governance result table.
+- Updated `docs/demo-runbook.md` and `docs/github-showcase.md` so the main demonstration path starts from the smoke script, architecture, and benchmark results, not the UI page.
 - Updated `SPEC.md` phase 7 checklist for the backend showcase package.
 
 Main demo script now:
@@ -78,7 +110,7 @@ Verified:
 - With JDK 21: `mvn package -DskipTests`: passed.
 - Docker app redeploy: `docker compose up -d --no-deps --force-recreate app`; health became `UP`.
 - Browser/CDP desktop walkthrough at `1440x900`:
-  - visible heading `一场抢票请求怎么被系统接住`;
+  - visible heading `抢票主链路验证`;
   - one-click demo completed with `stockStory = 1000 -> 999 -> 999`;
   - idempotency showed `通过`;
   - async order showed `未重复触发`;
@@ -102,7 +134,7 @@ Current stage:
 Recently completed:
 - Reworked `src/main/resources/static/index.html` first screen into:
   - left side: 主流程演示 with 初始化库存 -> 准备抢票请求 -> 请求凭证 -> 执行抢票实验;
-  - right side: 证据面板 showing 抢票结果、库存变化、幂等判定、虚拟线程、requestId 变化、异步下单、扣减方案;
+  - right side: result panel showing 抢票结果、库存变化、幂等判定、虚拟线程、requestId 变化、异步下单、扣减方案;
   - advanced details: 高级参数和策略对比, with Redis Lua / Redis Lock / MySQL optimistic lock kept out of the main flow.
 - After user feedback that the local page still looked too similar, tightened the first screen again:
   - main flow is now three large experiment buttons: 初始化库存、发起抢票、用新请求重复提交;
@@ -538,7 +570,7 @@ Next step:
 
 ## 当前阶段
 
-Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标证据、多票档热点分摊对比、Seata AT 示例已完成。下一步是 Elasticsearch 活动/票档查询集成。
+Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual Threads vs 传统线程池报告、稳定性治理 before/after 对照、Prometheus/Grafana 指标、多票档热点分摊对比、Seata AT 示例已完成。下一步是 Elasticsearch 活动/票档查询集成。
 
 ## 已完成
 
@@ -560,7 +592,7 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 - Dockerized k6 单热点票档默认治理观察记录。
 - Virtual Threads vs 传统线程池执行器 benchmark 报告。
 - Dockerized k6 稳定性治理 before/after 对照报告。
-- Prometheus/Grafana 压测指标证据报告。
+- Prometheus/Grafana 压测指标报告。
 - Dockerized k6 多票档热点分摊对比报告。
 - Seata AT 模式 MySQL 库存预占 + 订单落库示例。
 - Prometheus 配置、Grafana 说明、Arthas 诊断案例、Kubernetes/K3s 部署清单。
@@ -792,7 +824,7 @@ Verified:
 - Dockerized k6 run passed thresholds.
 - Prometheus API target status showed `ticketrush-app` as healthy.
 - Prometheus query-range exports returned non-empty samples for all report metrics.
-- Raw k6/Prometheus exports were generated under `target/prometheus-evidence/` and were not intended for git.
+- Raw k6/Prometheus exports were generated under `target/prometheus-metrics/` and were not intended for git.
 
 Not verified:
 - Grafana screenshot export; this step uses Prometheus API data as reproducible evidence.

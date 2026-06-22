@@ -43,19 +43,19 @@
 http://localhost:8080/
 ```
 
-## 已验证证据
+## 已验证内容
 
 - `mvn test`：52 tests，0 failures，0 errors。
 - Docker Compose 全链路启动：应用和核心中间件容器已验证。
 - 核心 smoke 已覆盖库存预热、抢票成功、用新 requestId 重复提交同一个幂等 Key 和 `A0429` 幂等拦截。
 - k6 压测报告覆盖库存策略 baseline、稳定性治理 before/after 和热点分摊对比。
-- Prometheus API 导出过压测指标证据。
+- Prometheus API 导出过压测指标。
 - Seata AT 示例、Elasticsearch 查询、Redis Lua/Lock、MySQL 乐观锁、RocketMQ Stream binder、MyBatis XML/schema 均有测试或报告覆盖。
 
 ## 项目摘要
 
 ```text
-TicketRush：基于 Java 21 + Spring Boot 3 的高并发票务秒杀系统，围绕抢票主链路实现 Sentinel 限流、Redis 准入令牌、Virtual Threads 库存预占、Redis Lua/分布式锁/MySQL 乐观锁防超卖、RocketMQ 异步下单、消费幂等、订单超时补偿，并补充 k6 压测、Prometheus/Grafana 指标证据和 Docker/K3s 部署材料。
+TicketRush：基于 Java 21 + Spring Boot 3 的高并发票务秒杀系统，围绕抢票主链路实现 Sentinel 限流、Redis 准入令牌、Virtual Threads 库存预占、Redis Lua/分布式锁/MySQL 乐观锁防超卖、RocketMQ 异步下单、消费幂等、订单超时补偿，并补充 k6 压测、Prometheus/Grafana 指标和 Docker/K3s 部署材料。
 ```
 
 ## 边界说明

@@ -1,4 +1,4 @@
-# TicketRush Prometheus/Grafana 指标证据报告
+# TicketRush Prometheus/Grafana 指标报告
 
 ## 目标
 
@@ -32,7 +32,7 @@ lastError=""
 docker run --rm `
   --network ticketrush-local_ticketrush `
   -v "<repo>/scripts/k6:/scripts:ro" `
-  -v "<repo>/target/prometheus-evidence:/results" `
+  -v "<repo>/target/prometheus-metrics:/results" `
   grafana/k6 run `
   --summary-export /results/prometheus-protected-vus10-60s.json `
   -e BASE_URL=http://app:8080 `
@@ -46,7 +46,7 @@ docker run --rm `
   /scripts/stability-governance.js
 ```
 
-原始 k6 summary 和 Prometheus CSV 导出在 `target/prometheus-evidence/`，属于本地构建产物，不提交到 git。
+原始 k6 summary 和 Prometheus CSV 导出在 `target/prometheus-metrics/`，属于本地构建产物，不提交到 git。
 
 ## k6 入口结果
 
@@ -103,6 +103,6 @@ Prometheus 查询窗口覆盖本轮 k6 run，并在结束后额外等待一次 s
 
 ## 边界
 
-- 本报告没有提交截图，使用 Prometheus API 导出的数值作为可复现证据。
+- 本报告没有提交截图，保留 Prometheus API 导出的数值，便于复现和对比。
 - 这轮只覆盖默认治理开启下的单热点压测，没有导出 RocketMQ、MySQL 和 Redis 容器自身的系统指标。
 - 后续如果要做更像生产的容量评估，需要延长压测时间并补充容器 CPU、内存、磁盘和网络指标。

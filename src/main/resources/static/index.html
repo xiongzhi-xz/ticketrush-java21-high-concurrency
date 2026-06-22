@@ -1078,9 +1078,9 @@
                 <div class="panel-body hero-copy demo-screen">
                     <div class="demo-lead">
                         <div>
-                            <p class="demo-kicker">一键演示剧本</p>
-                            <h2 id="mainHeading">一场抢票请求怎么被系统接住</h2>
-                            <p>点击开始后，页面会自动跑完库存归位、抢票受理、重复提交三步，并点亮限流、库存预扣、虚拟线程和异步下单链路。</p>
+                            <p class="demo-kicker">核心链路 Smoke</p>
+                            <h2 id="mainHeading">抢票主链路验证</h2>
+                            <p>点击开始后，页面会依次执行库存初始化、抢票请求、重复提交校验，并更新库存、requestId、幂等和异步下单结果。</p>
                         </div>
                         <div class="demo-actions">
                             <button id="startDemoButton" class="start-button" type="button">开始抢票演示</button>
@@ -1203,7 +1203,7 @@
             <aside class="panel" aria-labelledby="resultHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="resultHeading">证据面板</h2>
+                        <h2 id="resultHeading">执行结果</h2>
                         <p id="resultSubtitle">等待初始化库存</p>
                     </div>
                     <button id="clearResultButton" class="secondary" type="button">清空结果</button>
@@ -1262,7 +1262,7 @@
                         </div>
                     </div>
 
-                    <div class="proof-row evidence-badges" aria-label="核心证据状态">
+                    <div class="proof-row evidence-badges" aria-label="核心校验状态">
                         <span id="proofOversell" class="badge">防超卖待验证</span>
                         <span id="proofIdempotent" class="badge">幂等待验证</span>
                         <span id="proofRateLimit" class="badge">限流准入</span>
@@ -1413,7 +1413,7 @@
                 <div class="panel-header">
                     <div class="panel-title">
                         <h2 id="opsHeading">观测入口</h2>
-                        <p>压测或排查时再打开这些辅助证据</p>
+                        <p>压测或排查时再打开这些辅助信息</p>
                     </div>
                 </div>
                 <div class="panel-body">
