@@ -563,7 +563,7 @@ Next step:
 
 把 TicketRush 收口为可本地运行、可压测、可设计说明的 Java 21 高并发票务秒杀系统。
 
-它在求职叙事中的定位：
+它在项目展示中的定位：
 
 - 证明 8 年 Java 后端基本盘：高并发、Redis、RocketMQ、MySQL、Sentinel、幂等、一致性、监控和部署。
 - 作为 SmartKB/Agent 工程平台的真实 Java 项目样本，用于后续验证项目接管、代码上下文检索、任务规划和 eval 能力。
@@ -596,7 +596,7 @@ Docker Compose 全链路启动、第一轮 Dockerized k6 本地压测、Virtual 
 - Dockerized k6 多票档热点分摊对比报告。
 - Seata AT 模式 MySQL 库存预占 + 订单落库示例。
 - Prometheus 配置、Grafana 说明、Arthas 诊断案例、Kubernetes/K3s 部署清单。
-- README、架构图、数据库 schema、踩坑记录等求职展示文档。
+- README、架构图、数据库 schema、踩坑记录等项目展示文档。
 - **Docker Compose 全链路一键启动**（app + 9 中间件）。
 - **RocketMQ Broker 容器启动修复**（NPE 根因：Docker named volume 权限 → bind mount + entrypoint 脚本）。
 - **application-docker.yml** profile（Docker 内部服务名覆盖）。

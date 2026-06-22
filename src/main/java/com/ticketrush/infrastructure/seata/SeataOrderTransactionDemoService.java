@@ -23,7 +23,7 @@ import java.time.LocalDateTime;
  * Seata AT 模式示例服务。
  *
  * <p>主抢票链路优先使用 Redis/RocketMQ 的最终一致性方案。该服务用于演示
- * MySQL 库存预占和订单落库如何放在一个 Seata 全局事务中，方便面试时说明
+ * MySQL 库存预占和订单落库如何放在一个 Seata 全局事务中，用于说明
  * 强一致示例和最终一致性主链路的取舍。</p>
  */
 @Service
