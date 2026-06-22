@@ -280,6 +280,174 @@
             line-height: 1.55;
         }
 
+        .demo-stage {
+            display: grid;
+            gap: 14px;
+            border: 1px solid #b7c3d7;
+            border-radius: 8px;
+            padding: 14px;
+            background: #fbfcfd;
+        }
+
+        .stage-actions {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        button.stage-button {
+            min-height: 104px;
+            display: grid;
+            align-content: start;
+            justify-items: start;
+            gap: 6px;
+            border-color: #c9d5e8;
+            background: #ffffff;
+            color: var(--text);
+            text-align: left;
+            white-space: normal;
+        }
+
+        button.stage-button.primary {
+            border-color: #18243a;
+            background: var(--ink);
+            color: #ffffff;
+        }
+
+        button.stage-button:disabled {
+            background: #f3f6fa;
+            color: var(--muted);
+        }
+
+        .stage-button span {
+            display: inline-flex;
+            min-height: 24px;
+            align-items: center;
+            border-radius: 999px;
+            padding: 3px 8px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .stage-button.primary span {
+            background: rgba(255, 255, 255, .16);
+            color: #ffffff;
+        }
+
+        .stage-button strong {
+            display: block;
+            font-size: 17px;
+            line-height: 1.2;
+        }
+
+        .stage-button small {
+            display: block;
+            color: inherit;
+            font-size: 12px;
+            font-weight: 650;
+            line-height: 1.35;
+            opacity: .78;
+        }
+
+        .experiment-params {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) minmax(150px, .8fr);
+            gap: 10px;
+            align-items: end;
+        }
+
+        .credential-board {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr);
+            gap: 10px;
+            border-top: 1px solid var(--line);
+            padding-top: 12px;
+        }
+
+        .credential-board input[readonly] {
+            background: #ffffff;
+            color: var(--ink);
+            font-weight: 750;
+        }
+
+        .evidence-board {
+            display: grid;
+            gap: 12px;
+        }
+
+        .outcome-banner {
+            border: 1px solid #bce5d8;
+            border-radius: 8px;
+            padding: 14px;
+            background: var(--green-soft);
+        }
+
+        .outcome-banner span {
+            display: block;
+            color: var(--green);
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        .outcome-banner strong {
+            display: block;
+            margin-top: 7px;
+            font-size: 24px;
+            line-height: 1.15;
+        }
+
+        .outcome-banner small {
+            display: block;
+            margin-top: 6px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .evidence-list {
+            display: grid;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            background: #fbfcfd;
+        }
+
+        .evidence-row {
+            display: grid;
+            grid-template-columns: minmax(120px, .75fr) minmax(0, 1.25fr);
+            gap: 12px;
+            border-bottom: 1px solid var(--line);
+            padding: 12px;
+            align-items: start;
+        }
+
+        .evidence-row:last-child {
+            border-bottom: 0;
+        }
+
+        .evidence-row span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        .evidence-row strong {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 17px;
+            line-height: 1.2;
+        }
+
+        .evidence-row small {
+            display: block;
+            margin-top: 5px;
+            overflow-wrap: anywhere;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
         .demo-flow {
             display: grid;
             gap: 16px;
@@ -444,49 +612,8 @@
             line-height: 1.4;
         }
 
-        .evidence-list {
-            display: grid;
-            gap: 10px;
-        }
-
         .evidence-badges {
             margin-top: 14px;
-        }
-
-        .evidence-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 12px;
-            border-bottom: 1px solid var(--line);
-            padding-bottom: 10px;
-        }
-
-        .evidence-row:last-child {
-            border-bottom: 0;
-            padding-bottom: 0;
-        }
-
-        .evidence-row span {
-            color: var(--muted);
-            font-size: 12px;
-            font-weight: 800;
-        }
-
-        .evidence-row strong,
-        .evidence-row small {
-            overflow-wrap: anywhere;
-            text-align: right;
-        }
-
-        .evidence-row strong {
-            font-size: 14px;
-        }
-
-        .evidence-row small {
-            color: var(--muted);
-            font-size: 12px;
-            line-height: 1.35;
         }
 
         .secondary-heading {
@@ -755,6 +882,10 @@
             .form-grid,
             .form-grid.three,
             .metric-grid,
+            .stage-actions,
+            .experiment-params,
+            .credential-board,
+            .evidence-row,
             .control-row,
             .compact-fields,
             .compact-fields.with-action,
@@ -796,79 +927,57 @@
                     <div>
                         <p class="demo-kicker">主流程演示</p>
                         <h2 id="mainHeading">TicketRush 抢票链路演示台</h2>
-                        <p>先重置热点票档库存，再发起一次抢票，最后用新的请求编号重复提交同一个幂等键。页面只把关键证据放到台前，接口原始响应和策略对比放到高级验证里。</p>
+                        <p>按三个按钮跑一次抢票实验：先归位库存，再发起抢票，最后用新的 requestId 重复提交同一个幂等 Key。</p>
                     </div>
 
-                    <div class="workflow-steps" aria-label="演示主流程">
-                        <div class="workflow-step"><span>1</span><strong>初始化库存</strong><small>Redis 热点库存从明确数值开始</small></div>
-                        <div class="workflow-step"><span>2</span><strong>发起抢票</strong><small>真实请求进入系统</small></div>
-                        <div class="workflow-step"><span>3</span><strong>重复提交</strong><small>requestId 变化，幂等 Key 不变</small></div>
-                        <div class="workflow-step"><span>4</span><strong>读取证据</strong><small>看库存、幂等、线程和异步下单</small></div>
-                    </div>
-
-                    <div class="control-stack" aria-label="主流程操作">
-                        <div class="control-row">
-                            <div class="control-copy">
-                                <strong>1. 初始化库存</strong>
-                                <span>把热门票档库存重置为 1000，让后面的库存变化可见。</span>
-                            </div>
-                            <div class="compact-fields with-action">
-                                <label>
-                                    <span>票档 ID</span>
-                                    <input id="preloadSkuId" inputmode="numeric" value="1001">
-                                </label>
-                                <label>
-                                    <span>库存数</span>
-                                    <input id="preloadStock" inputmode="numeric" value="1000">
-                                </label>
-                                <button id="preloadButton" type="button">初始化库存</button>
-                            </div>
+                    <div class="demo-stage" aria-label="抢票实验操作台">
+                        <div class="stage-actions">
+                            <button id="preloadButton" class="stage-button" type="button">
+                                <span>1</span>
+                                <strong>初始化库存</strong>
+                                <small>Redis 热点票档从明确库存开始</small>
+                            </button>
+                            <button id="rushButton" class="stage-button primary" type="button">
+                                <span>2</span>
+                                <strong>发起抢票</strong>
+                                <small>真实请求进入限流、库存和异步下单链路</small>
+                            </button>
+                            <button id="repeatRushButton" class="stage-button" type="button" disabled>
+                                <span>3</span>
+                                <strong>用新请求重复提交</strong>
+                                <small>换 requestId，复用同一个幂等 Key</small>
+                            </button>
                         </div>
 
-                        <div class="control-row">
-                            <div class="control-copy">
-                                <strong>2. 准备抢票请求</strong>
-                                <span>生成新请求会同时刷新 requestId 和业务幂等 Key。</span>
-                            </div>
-                            <div class="compact-fields with-action">
-                                <label>
-                                    <span>用户 ID</span>
-                                    <input id="rushUserId" inputmode="numeric" value="2001">
-                                </label>
-                                <label>
-                                    <span>购买数量</span>
-                                    <input id="rushQuantity" inputmode="numeric" value="1">
-                                </label>
-                                <button id="generateRequestButton" class="subtle" type="button">生成新请求</button>
-                            </div>
+                        <div class="experiment-params">
+                            <label>
+                                <span>票档 ID</span>
+                                <input id="preloadSkuId" inputmode="numeric" value="1001">
+                            </label>
+                            <label>
+                                <span>库存数</span>
+                                <input id="preloadStock" inputmode="numeric" value="1000">
+                            </label>
+                            <label>
+                                <span>用户 ID</span>
+                                <input id="rushUserId" inputmode="numeric" value="2001">
+                            </label>
+                            <label>
+                                <span>购买数量</span>
+                                <input id="rushQuantity" inputmode="numeric" value="1">
+                            </label>
+                            <button id="generateRequestButton" class="secondary" type="button">生成新请求</button>
                         </div>
 
-                        <div class="control-row">
-                            <div class="control-copy">
-                                <strong>3. 请求凭证</strong>
-                                <span>重复提交时会换新的 requestId，但复用同一个幂等 Key。</span>
-                            </div>
-                            <div class="request-ledger">
-                                <label>
-                                    <span>本次 requestId</span>
-                                    <input id="rushRequestId" readonly>
-                                </label>
-                                <label>
-                                    <span>业务幂等 Key</span>
-                                    <input id="rushIdempotentKey" readonly>
-                                </label>
-                            </div>
-                        </div>
-
-                        <div class="control-row">
-                            <div class="control-copy">
-                                <strong>4. 执行抢票实验</strong>
-                                <span>先发起抢票，再用新请求编号重复提交，观察是否重复扣库存。</span>
-                            </div>
-                            <div class="primary-actions">
-                                <button id="rushButton" type="button">发起抢票</button>
-                                <button id="repeatRushButton" class="secondary" type="button" disabled>用新请求重复提交</button>
-                            </div>
+                        <div class="credential-board">
+                            <label>
+                                <span>本次 requestId</span>
+                                <input id="rushRequestId" readonly>
+                            </label>
+                            <label>
+                                <span>业务幂等 Key</span>
+                                <input id="rushIdempotentKey" readonly>
+                            </label>
                         </div>
                     </div>
 
@@ -920,41 +1029,56 @@
                     <button id="clearResultButton" class="secondary" type="button">清空结果</button>
                 </div>
                 <div class="panel-body">
-                    <div class="result-grid">
-                        <div class="result-card primary">
+                    <div class="evidence-board">
+                        <div class="outcome-banner">
                             <span>抢票结果</span>
                             <strong id="summaryOutcome">等待演示</strong>
                             <small id="summaryMessage">先初始化库存，再发起抢票。</small>
                         </div>
-                        <div class="result-card">
-                            <span>库存变化</span>
-                            <strong id="summaryStock">-</strong>
-                            <small id="rushStockBadge">剩余库存 -</small>
-                        </div>
-                        <div class="result-card">
-                            <span>幂等判定</span>
-                            <strong id="summaryIdempotent">待验证</strong>
-                            <small id="rushAcceptedBadge">是否接单 -</small>
-                        </div>
-                        <div class="result-card">
-                            <span>虚拟线程</span>
-                            <strong id="summaryThread">-</strong>
-                            <small id="rushThreadBadge">虚拟线程 -</small>
-                        </div>
-                        <div class="result-card">
-                            <span>请求编号</span>
-                            <strong id="summaryRequest">-</strong>
-                            <small>重复提交会生成新的 requestId</small>
-                        </div>
-                        <div class="result-card">
-                            <span>异步下单</span>
-                            <strong id="summaryAsync">-</strong>
-                            <small>抢票成功后发布订单创建消息</small>
-                        </div>
-                        <div class="result-card">
-                            <span>扣减方案</span>
-                            <strong id="summaryStrategy">Redis Lua</strong>
-                            <small id="rushSourceBadge">库存来源 Redis Hash</small>
+
+                        <div class="evidence-list">
+                            <div class="evidence-row">
+                                <span>库存变化</span>
+                                <div>
+                                    <strong id="summaryStock">-</strong>
+                                    <small id="rushStockBadge">剩余库存 -</small>
+                                </div>
+                            </div>
+                            <div class="evidence-row">
+                                <span>幂等判定</span>
+                                <div>
+                                    <strong id="summaryIdempotent">待验证</strong>
+                                    <small id="rushAcceptedBadge">是否接单 -</small>
+                                </div>
+                            </div>
+                            <div class="evidence-row">
+                                <span>请求编号</span>
+                                <div>
+                                    <strong id="summaryRequest">-</strong>
+                                    <small>重复提交会生成新的 requestId</small>
+                                </div>
+                            </div>
+                            <div class="evidence-row">
+                                <span>虚拟线程</span>
+                                <div>
+                                    <strong id="summaryThread">-</strong>
+                                    <small id="rushThreadBadge">虚拟线程 -</small>
+                                </div>
+                            </div>
+                            <div class="evidence-row">
+                                <span>异步下单</span>
+                                <div>
+                                    <strong id="summaryAsync">-</strong>
+                                    <small>抢票成功后发布订单创建消息</small>
+                                </div>
+                            </div>
+                            <div class="evidence-row">
+                                <span>扣减方案</span>
+                                <div>
+                                    <strong id="summaryStrategy">Redis Lua</strong>
+                                    <small id="rushSourceBadge">库存来源 Redis Hash</small>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -1219,9 +1343,10 @@
     function setBusy(button, busy) {
         if (!button.dataset.label) {
             button.dataset.label = button.textContent;
+            button.dataset.html = button.innerHTML;
         }
         button.disabled = busy;
-        button.textContent = busy ? '执行中' : button.dataset.label;
+        button.innerHTML = busy ? '执行中' : button.dataset.html;
     }
 
     async function requestJson(path, options = {}) {

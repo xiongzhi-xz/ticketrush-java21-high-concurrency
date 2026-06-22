@@ -15,6 +15,10 @@ Recently completed:
   - left side: 主流程演示 with 初始化库存 -> 准备抢票请求 -> 请求凭证 -> 执行抢票实验;
   - right side: 证据面板 showing 抢票结果、库存变化、幂等判定、虚拟线程、requestId 变化、异步下单、扣减方案;
   - advanced details: 高级参数和策略对比, with Redis Lua / Redis Lock / MySQL optimistic lock kept out of the main flow.
+- After user feedback that the local page still looked too similar, tightened the first screen again:
+  - main flow is now three large experiment buttons: 初始化库存、发起抢票、用新请求重复提交;
+  - requestId and idempotentKey are shown as experiment credentials under the action buttons;
+  - the evidence panel is now a vertical evidence list instead of the previous card grid.
 - Changed duplicate-submit behavior:
   - first rush uses requestId A + idempotentKey X;
   - duplicate submit generates requestId B while reusing idempotentKey X;
@@ -38,10 +42,10 @@ Verified latest:
   - Elasticsearch smoke search showed `命中数量 2`;
   - executor benchmark produced throughput;
   - mobile width check showed no horizontal overflow and no offscreen elements.
-- Screenshot dimension check should be rerun before commit if more screenshot edits happen.
+- Regenerated all 6 desktop screenshots again after the second visual pass; all are `1440x900`.
 
 Next step only:
-- Run final diff/status checks, commit this UI redesign slice, then stop unless the user asks for another TicketRush scope.
+- Run final diff/status checks, commit the second visual pass, then stop unless the user asks for another TicketRush scope.
 
 ## Latest Snapshot - 2026-06-22 UI Direction Pause
 
