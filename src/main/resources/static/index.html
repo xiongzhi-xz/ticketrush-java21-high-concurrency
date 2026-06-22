@@ -280,6 +280,237 @@
             line-height: 1.55;
         }
 
+        .demo-flow {
+            display: grid;
+            gap: 16px;
+        }
+
+        .demo-kicker {
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 850;
+        }
+
+        .workflow-steps {
+            display: grid;
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+            gap: 8px;
+        }
+
+        .workflow-step {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px;
+            background: #fbfcfd;
+        }
+
+        .workflow-step span {
+            display: inline-flex;
+            width: 24px;
+            height: 24px;
+            align-items: center;
+            justify-content: center;
+            border-radius: 999px;
+            background: var(--blue-soft);
+            color: var(--blue);
+            font-size: 12px;
+            font-weight: 900;
+        }
+
+        .workflow-step strong {
+            display: block;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .workflow-step small {
+            display: block;
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .control-stack {
+            display: grid;
+            gap: 12px;
+        }
+
+        .control-row {
+            display: grid;
+            grid-template-columns: minmax(180px, .8fr) minmax(0, 1.2fr);
+            gap: 12px;
+            align-items: start;
+            border-top: 1px solid var(--line);
+            padding-top: 12px;
+        }
+
+        .control-row:first-child {
+            border-top: 0;
+            padding-top: 0;
+        }
+
+        .control-copy strong {
+            display: block;
+            font-size: 14px;
+        }
+
+        .control-copy span {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.45;
+        }
+
+        .compact-fields {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+            align-items: end;
+        }
+
+        .compact-fields.with-action {
+            grid-template-columns: repeat(2, minmax(0, 1fr)) minmax(150px, .8fr);
+        }
+
+        .request-ledger {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .request-ledger input[readonly] {
+            background: #fbfcfd;
+            color: var(--ink);
+            font-weight: 700;
+        }
+
+        .primary-actions {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .path-strip {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .path-strip strong {
+            color: var(--text);
+        }
+
+        .advanced-panel {
+            border-top: 1px solid var(--line);
+            margin-top: 2px;
+            padding-top: 12px;
+        }
+
+        .advanced-panel summary {
+            color: var(--text);
+        }
+
+        .advanced-fields {
+            margin-top: 12px;
+        }
+
+        .strategy-note {
+            min-width: 0;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 9px 10px;
+            background: #fbfcfd;
+        }
+
+        .strategy-note span {
+            display: block;
+            margin-bottom: 5px;
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 750;
+        }
+
+        .strategy-note strong {
+            display: block;
+            overflow-wrap: anywhere;
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
+        .evidence-list {
+            display: grid;
+            gap: 10px;
+        }
+
+        .evidence-badges {
+            margin-top: 14px;
+        }
+
+        .evidence-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            border-bottom: 1px solid var(--line);
+            padding-bottom: 10px;
+        }
+
+        .evidence-row:last-child {
+            border-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .evidence-row span {
+            color: var(--muted);
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .evidence-row strong,
+        .evidence-row small {
+            overflow-wrap: anywhere;
+            text-align: right;
+        }
+
+        .evidence-row strong {
+            font-size: 14px;
+        }
+
+        .evidence-row small {
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.35;
+        }
+
+        .secondary-heading {
+            display: flex;
+            align-items: end;
+            justify-content: space-between;
+            gap: 12px;
+            padding-top: 8px;
+        }
+
+        .secondary-heading h2 {
+            font-size: 16px;
+        }
+
+        .secondary-heading p {
+            margin-top: 4px;
+            color: var(--muted);
+            font-size: 12px;
+        }
+
+        .spaced-row {
+            margin-top: 12px;
+        }
+
         .flow-line {
             display: grid;
             grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -518,11 +749,17 @@
             }
 
             .flow-line,
+            .workflow-steps,
             .operation-grid,
             .result-grid,
             .form-grid,
             .form-grid.three,
-            .metric-grid {
+            .metric-grid,
+            .control-row,
+            .compact-fields,
+            .compact-fields.with-action,
+            .request-ledger,
+            .primary-actions {
                 grid-template-columns: 1fr;
             }
 
@@ -555,104 +792,121 @@
     <main class="main">
         <section class="hero">
             <section class="panel" aria-labelledby="mainHeading">
-                <div class="panel-body hero-copy">
+                <div class="panel-body hero-copy demo-flow">
                     <div>
-                        <h2 id="mainHeading">5 分钟证明一个高并发抢票链路</h2>
-                        <p>按顺序初始化库存、发起抢票、重复提交验证幂等，再用不同库存扣减方案和虚拟线程压测解释工程取舍。</p>
+                        <p class="demo-kicker">主流程演示</p>
+                        <h2 id="mainHeading">TicketRush 抢票链路演示台</h2>
+                        <p>先重置热点票档库存，再发起一次抢票，最后用新的请求编号重复提交同一个幂等键。页面只把关键证据放到台前，接口原始响应和策略对比放到高级验证里。</p>
                     </div>
 
-                    <div class="proof-row" aria-label="核心证明点">
-                        <span id="proofOversell" class="badge">防超卖待验证</span>
-                        <span id="proofIdempotent" class="badge">幂等待验证</span>
-                        <span id="proofRateLimit" class="badge">限流准入</span>
-                        <span id="proofVirtualThread" class="badge">虚拟线程待验证</span>
-                        <span id="proofAsyncOrder" class="badge">RocketMQ 异步下单</span>
+                    <div class="workflow-steps" aria-label="演示主流程">
+                        <div class="workflow-step"><span>1</span><strong>初始化库存</strong><small>Redis 热点库存从明确数值开始</small></div>
+                        <div class="workflow-step"><span>2</span><strong>发起抢票</strong><small>真实请求进入系统</small></div>
+                        <div class="workflow-step"><span>3</span><strong>重复提交</strong><small>requestId 变化，幂等 Key 不变</small></div>
+                        <div class="workflow-step"><span>4</span><strong>读取证据</strong><small>看库存、幂等、线程和异步下单</small></div>
                     </div>
 
-                    <div class="flow-line" aria-label="抢票主链路">
-                        <div class="flow-step"><span>1</span><strong>请求进入</strong><small>用户提交抢票</small></div>
-                        <div class="flow-step"><span>2</span><strong>限流准入</strong><small>Sentinel + Redis 令牌</small></div>
-                        <div class="flow-step"><span>3</span><strong>库存预扣</strong><small>Redis Lua 主链路</small></div>
-                        <div class="flow-step"><span>4</span><strong>异步下单</strong><small>RocketMQ 削峰</small></div>
-                        <div class="flow-step"><span>5</span><strong>超时补偿</strong><small>释放锁定库存</small></div>
-                    </div>
-
-                    <div class="operation-grid" aria-label="演示操作顺序">
-                        <div class="operation">
-                            <strong>1. 初始化库存</strong>
-                            <span>重置 Redis 热点票档库存，让库存变化从明确数值开始。</span>
+                    <div class="control-stack" aria-label="主流程操作">
+                        <div class="control-row">
+                            <div class="control-copy">
+                                <strong>1. 初始化库存</strong>
+                                <span>把热门票档库存重置为 1000，让后面的库存变化可见。</span>
+                            </div>
+                            <div class="compact-fields with-action">
+                                <label>
+                                    <span>票档 ID</span>
+                                    <input id="preloadSkuId" inputmode="numeric" value="1001">
+                                </label>
+                                <label>
+                                    <span>库存数</span>
+                                    <input id="preloadStock" inputmode="numeric" value="1000">
+                                </label>
+                                <button id="preloadButton" type="button">初始化库存</button>
+                            </div>
                         </div>
-                        <div class="operation">
-                            <strong>2. 发起抢票</strong>
-                            <span>观察抢票是否受理、库存是否扣减、是否由虚拟线程处理。</span>
+
+                        <div class="control-row">
+                            <div class="control-copy">
+                                <strong>2. 准备抢票请求</strong>
+                                <span>生成新请求会同时刷新 requestId 和业务幂等 Key。</span>
+                            </div>
+                            <div class="compact-fields with-action">
+                                <label>
+                                    <span>用户 ID</span>
+                                    <input id="rushUserId" inputmode="numeric" value="2001">
+                                </label>
+                                <label>
+                                    <span>购买数量</span>
+                                    <input id="rushQuantity" inputmode="numeric" value="1">
+                                </label>
+                                <button id="generateRequestButton" class="subtle" type="button">生成新请求</button>
+                            </div>
                         </div>
-                        <div class="operation">
-                            <strong>3. 重复提交</strong>
-                            <span>复用同一个幂等 Key，验证不会重复扣库存。</span>
+
+                        <div class="control-row">
+                            <div class="control-copy">
+                                <strong>3. 请求凭证</strong>
+                                <span>重复提交时会换新的 requestId，但复用同一个幂等 Key。</span>
+                            </div>
+                            <div class="request-ledger">
+                                <label>
+                                    <span>本次 requestId</span>
+                                    <input id="rushRequestId" readonly>
+                                </label>
+                                <label>
+                                    <span>业务幂等 Key</span>
+                                    <input id="rushIdempotentKey" readonly>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="control-row">
+                            <div class="control-copy">
+                                <strong>4. 执行抢票实验</strong>
+                                <span>先发起抢票，再用新请求编号重复提交，观察是否重复扣库存。</span>
+                            </div>
+                            <div class="primary-actions">
+                                <button id="rushButton" type="button">发起抢票</button>
+                                <button id="repeatRushButton" class="secondary" type="button" disabled>用新请求重复提交</button>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="form-grid three">
-                        <label>
-                            <span>预热票档 ID</span>
-                            <input id="preloadSkuId" inputmode="numeric" value="1001">
-                        </label>
-                        <label>
-                            <span>预热库存数</span>
-                            <input id="preloadStock" inputmode="numeric" value="1000">
-                        </label>
-                        <button id="preloadButton" type="button">1 初始化库存</button>
-                    </div>
+                    <details class="advanced-panel">
+                        <summary>高级参数和策略对比</summary>
+                        <div class="form-grid advanced-fields">
+                            <label>
+                                <span>活动 ID</span>
+                                <input id="rushEventId" inputmode="numeric" value="3001">
+                            </label>
+                            <label>
+                                <span>票档 ID</span>
+                                <input id="rushSkuId" inputmode="numeric" value="1001">
+                            </label>
+                            <label>
+                                <span>库存扣减方案</span>
+                                <select id="rushStrategy">
+                                    <option value="REDIS_LUA">Redis Lua 原子扣减（主推荐链路）</option>
+                                    <option value="REDIS_LOCK">Redis 分布式锁扣减（共享 Redis 预热库存）</option>
+                                    <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减（独立数据库库存）</option>
+                                </select>
+                            </label>
+                            <div class="strategy-note">
+                                <span>策略说明</span>
+                                <strong id="strategyHint">库存来源：Redis Hash。推荐主演示链路，预热库存后从这里开始扣减。</strong>
+                            </div>
+                        </div>
+                    </details>
 
-                    <div class="form-grid">
-                        <label>
-                            <span>活动 ID</span>
-                            <input id="rushEventId" inputmode="numeric" value="3001">
-                        </label>
-                        <label>
-                            <span>票档 ID</span>
-                            <input id="rushSkuId" inputmode="numeric" value="1001">
-                        </label>
-                        <label>
-                            <span>用户 ID</span>
-                            <input id="rushUserId" inputmode="numeric" value="2001">
-                        </label>
-                        <label>
-                            <span>购买数量</span>
-                            <input id="rushQuantity" inputmode="numeric" value="1">
-                        </label>
-                    </div>
-
-                    <div class="form-grid">
-                        <label>
-                            <span>库存扣减方案</span>
-                            <select id="rushStrategy">
-                                <option value="REDIS_LUA">Redis Lua 原子扣减（主推荐链路）</option>
-                                <option value="REDIS_LOCK">Redis 分布式锁扣减（共享 Redis 库存）</option>
-                                <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减（独立数据库库存）</option>
-                            </select>
-                            <div id="strategyHint" class="field-help">库存来源：Redis Hash。推荐主演示链路，预热库存后从这里开始扣减。</div>
-                        </label>
-                        <label>
-                            <span>请求 ID</span>
-                            <input id="rushRequestId">
-                            <div class="field-help">点击“生成新请求”会刷新</div>
-                        </label>
-                        <label>
-                            <span>幂等 Key</span>
-                            <input id="rushIdempotentKey">
-                            <div class="field-help">重复提交会复用这个 Key</div>
-                        </label>
-                        <button id="rushButton" type="button">2 发起抢票</button>
-                    </div>
-
-                    <div class="action-row">
-                        <button id="repeatRushButton" class="secondary" type="button">3 重复提交验证幂等</button>
-                        <button id="generateRequestButton" class="subtle" type="button">生成新请求</button>
-                    </div>
-
-                    <div class="notice">
-                        先用 Redis Lua 演示主链路。Redis Lua 和 Redis 分布式锁共享 Redis 预热库存；MySQL 乐观锁读取 MySQL 库存表，因此剩余库存可能和 Redis 路径不同。
+                    <div class="path-strip">
+                        <strong>抢票主链路：</strong>
+                        <span>Sentinel 限流准入</span>
+                        <span>→</span>
+                        <span>Redis Lua 库存预扣</span>
+                        <span>→</span>
+                        <span>Java 21 Virtual Thread</span>
+                        <span>→</span>
+                        <span>RocketMQ 异步下单</span>
                     </div>
                 </div>
             </section>
@@ -660,7 +914,7 @@
             <aside class="panel" aria-labelledby="resultHeading">
                 <div class="panel-header">
                     <div class="panel-title">
-                        <h2 id="resultHeading">本次演示结论</h2>
+                        <h2 id="resultHeading">证据面板</h2>
                         <p id="resultSubtitle">等待初始化库存</p>
                     </div>
                     <button id="clearResultButton" class="secondary" type="button">清空结果</button>
@@ -678,9 +932,9 @@
                             <small id="rushStockBadge">剩余库存 -</small>
                         </div>
                         <div class="result-card">
-                            <span>扣减方案</span>
-                            <strong id="summaryStrategy">Redis Lua</strong>
-                            <small id="rushSourceBadge">库存来源 Redis Hash</small>
+                            <span>幂等判定</span>
+                            <strong id="summaryIdempotent">待验证</strong>
+                            <small id="rushAcceptedBadge">是否接单 -</small>
                         </div>
                         <div class="result-card">
                             <span>虚拟线程</span>
@@ -688,10 +942,28 @@
                             <small id="rushThreadBadge">虚拟线程 -</small>
                         </div>
                         <div class="result-card">
-                            <span>幂等验证</span>
-                            <strong id="summaryIdempotent">待验证</strong>
-                            <small id="rushAcceptedBadge">是否接单 -</small>
+                            <span>请求编号</span>
+                            <strong id="summaryRequest">-</strong>
+                            <small>重复提交会生成新的 requestId</small>
                         </div>
+                        <div class="result-card">
+                            <span>异步下单</span>
+                            <strong id="summaryAsync">-</strong>
+                            <small>抢票成功后发布订单创建消息</small>
+                        </div>
+                        <div class="result-card">
+                            <span>扣减方案</span>
+                            <strong id="summaryStrategy">Redis Lua</strong>
+                            <small id="rushSourceBadge">库存来源 Redis Hash</small>
+                        </div>
+                    </div>
+
+                    <div class="proof-row evidence-badges" aria-label="核心证据状态">
+                        <span id="proofOversell" class="badge">防超卖待验证</span>
+                        <span id="proofIdempotent" class="badge">幂等待验证</span>
+                        <span id="proofRateLimit" class="badge">限流准入</span>
+                        <span id="proofVirtualThread" class="badge">虚拟线程待验证</span>
+                        <span id="proofAsyncOrder" class="badge">异步下单待触发</span>
                     </div>
 
                     <details>
@@ -701,6 +973,13 @@
                 </div>
             </aside>
         </section>
+
+        <div class="secondary-heading">
+            <div>
+                <h2>高级验证</h2>
+                <p>这些能力保留在主流程之后，演示时按需要再打开。</p>
+            </div>
+        </div>
 
         <section class="section-grid">
             <section class="panel" aria-labelledby="systemHeading">
@@ -763,7 +1042,7 @@
                             <input id="benchmarkCpuTokens" inputmode="numeric" value="0">
                         </label>
                     </div>
-                    <div class="status-row" style="margin-top: 12px;">
+                    <div class="status-row spaced-row">
                         <span class="badge">总耗时 <strong id="benchElapsed">-</strong></span>
                         <span class="badge">吞吐量 <strong id="benchThroughput">-</strong></span>
                         <span class="badge">线程数 <strong id="benchThreads">-</strong></span>
@@ -790,7 +1069,7 @@
                         <button id="indexEventButton" type="button">重建活动索引</button>
                         <button id="searchButton" class="secondary" type="button">查询票档</button>
                     </div>
-                    <div class="form-grid" style="margin-top: 12px;">
+                    <div class="form-grid spaced-row">
                         <label>
                             <span>关键词</span>
                             <input id="searchKeyword" value="VIP">
@@ -820,7 +1099,7 @@
                             </select>
                         </label>
                     </div>
-                    <div id="searchSummary" class="status-row" style="margin-top: 12px;">
+                    <div id="searchSummary" class="status-row spaced-row">
                         <span class="badge">命中数量 -</span>
                     </div>
                 </div>
@@ -866,6 +1145,16 @@
         $(id).textContent = value == null || value === '' ? '-' : String(value);
     }
 
+    function setTextOrValue(id, value) {
+        const element = $(id);
+        const safeValue = value == null || value === '' ? '-' : String(value);
+        if ('value' in element) {
+            element.value = safeValue;
+            return;
+        }
+        element.textContent = safeValue;
+    }
+
     function formatJson(value) {
         return JSON.stringify(value, null, 2);
     }
@@ -882,7 +1171,7 @@
         $('overallStatus').textContent = ok ? '就绪' : '需要查看结果';
     }
 
-    function setSummary({ outcome, message, stock, strategy, source, thread, idempotent }) {
+    function setSummary({ outcome, message, stock, strategy, source, thread, idempotent, request, asyncOrder }) {
         if (outcome) $('summaryOutcome').textContent = outcome;
         if (message) $('summaryMessage').textContent = message;
         if (stock) $('summaryStock').textContent = stock;
@@ -890,6 +1179,8 @@
         if (source) $('rushSourceBadge').textContent = source;
         if (thread) $('summaryThread').textContent = thread;
         if (idempotent) $('summaryIdempotent').textContent = idempotent;
+        if (request) $('summaryRequest').textContent = request;
+        if (asyncOrder) $('summaryAsync').textContent = asyncOrder;
     }
 
     function strategyMeta(strategy) {
@@ -920,7 +1211,7 @@
     function updateStrategyHint() {
         const meta = strategyMeta($('rushStrategy').value);
         currentStockLabel = meta.stockLabel;
-        $('strategyHint').textContent = meta.hint;
+        setTextOrValue('strategyHint', meta.hint);
         $('summaryStrategy').textContent = meta.name;
         $('rushSourceBadge').textContent = meta.source;
     }
@@ -994,13 +1285,22 @@
         $('overallStatus').textContent = 'UP';
     }
 
-    function generateRequestIds() {
+    function nextRequestId() {
         const suffix = `${Date.now().toString(36)}${Math.floor(Math.random() * 1000)}`;
-        const requestId = `demo-${suffix}`;
+        return `demo-${suffix}`;
+    }
+
+    function generateRequestIds() {
+        const requestId = nextRequestId();
         $('rushRequestId').value = requestId;
         $('rushIdempotentKey').value = `rush:${$('rushUserId').value}:${$('rushEventId').value}:${$('rushSkuId').value}:${requestId}`;
         lastRushPayload = null;
-        setSummary({ idempotent: '待验证' });
+        $('repeatRushButton').disabled = true;
+        setSummary({
+            idempotent: '待验证',
+            request: requestId,
+            asyncOrder: '-'
+        });
     }
 
     function buildRushPayload() {
@@ -1028,9 +1328,13 @@
         });
         if (result) {
             lastKnownStock = Number($('preloadStock').value || result?.data?.availableStock || 0);
+            lastRushPayload = null;
+            $('repeatRushButton').disabled = true;
             setBadge('proofOversell', '防超卖待验证', '');
             setBadge('proofIdempotent', '幂等待验证', '');
+            setBadge('proofRateLimit', '限流准入', '');
             setBadge('proofVirtualThread', '虚拟线程待验证', '');
+            setBadge('proofAsyncOrder', '异步下单待触发', '');
             setBadge('rushAcceptedBadge', '是否接单 -', '');
             setText('rushStockBadge', `Redis 剩余库存 ${lastKnownStock}`);
             setSummary({
@@ -1039,7 +1343,8 @@
                 stock: `${lastKnownStock} -> ${lastKnownStock}`,
                 source: '库存来源 Redis Hash',
                 thread: '-',
-                idempotent: '待验证'
+                idempotent: '待验证',
+                asyncOrder: '-'
             });
         }
     }
@@ -1060,7 +1365,7 @@
                 message: error.message,
                 payload: error.payload
             }, false);
-            applyRushFailure(error);
+            applyRushFailure(error, payload);
             return null;
         } finally {
             setBusy(button, false);
@@ -1070,11 +1375,21 @@
     async function rushTicket() {
         const payload = buildRushPayload();
         lastRushPayload = { ...payload };
-        await sendRush(payload, '抢票结果', $('rushButton'));
+        const result = await sendRush(payload, '抢票结果', $('rushButton'));
+        $('repeatRushButton').disabled = !result?.data;
     }
 
     async function repeatRushTicket() {
-        const payload = lastRushPayload || buildRushPayload();
+        const firstPayload = lastRushPayload || buildRushPayload();
+        const repeatRequestId = nextRequestId();
+        const payload = {
+            ...firstPayload,
+            requestId: repeatRequestId,
+            idempotentKey: firstPayload.idempotentKey
+        };
+        $('rushRequestId').value = repeatRequestId;
+        $('rushIdempotentKey').value = payload.idempotentKey;
+        setSummary({ request: `${firstPayload.requestId} -> ${repeatRequestId}` });
         await sendRush(payload, '重复提交结果', $('repeatRushButton'));
     }
 
@@ -1088,8 +1403,9 @@
         lastKnownStock = typeof data.remainingStock === 'number' ? data.remainingStock : lastKnownStock;
 
         setBadge('proofOversell', '防超卖通过', 'green');
+        setBadge('proofRateLimit', '限流准入通过', 'green');
         setBadge('proofVirtualThread', data.processedByVirtualThread ? '虚拟线程通过' : '虚拟线程未命中', data.processedByVirtualThread ? 'green' : 'amber');
-        setBadge('proofAsyncOrder', '异步下单已触发', 'green');
+        setBadge('proofAsyncOrder', data.accepted ? '异步下单已触发' : '异步下单未触发', data.accepted ? 'green' : 'amber');
         setBadge('rushAcceptedBadge', `是否接单 ${data.accepted ? '是' : '否'}`, data.accepted ? 'green' : 'red');
         setText('rushStockBadge', `${meta.stockLabel} ${after}`);
         setText('rushThreadBadge', `虚拟线程 ${data.processedByVirtualThread ? '是' : '否'}`);
@@ -1099,11 +1415,13 @@
             stock: stockFlow,
             strategy: meta.name,
             source: meta.source,
-            thread: data.processedByVirtualThread ? 'Virtual Thread' : 'Platform Thread'
+            thread: data.processedByVirtualThread ? 'Virtual Thread' : 'Platform Thread',
+            request: data.requestId || $('rushRequestId').value,
+            asyncOrder: data.accepted ? '已触发' : '-'
         });
     }
 
-    function applyRushFailure(error) {
+    function applyRushFailure(error, payload) {
         const message = error.message || '请求失败';
         const duplicated = message.includes('重复') || error.payload?.code === 'A0429';
         if (duplicated) {
@@ -1111,17 +1429,23 @@
             $('overallStatus').className = 'badge green';
             $('overallStatus').textContent = '幂等通过';
             setBadge('proofIdempotent', '幂等通过', 'green');
+            setBadge('rushAcceptedBadge', '重复请求未接单', 'green');
             setSummary({
                 outcome: '重复请求被拦截',
                 message: '同一个幂等 Key 不会重复扣库存。',
-                idempotent: '通过'
+                idempotent: '通过',
+                request: lastRushPayload?.requestId && payload?.requestId
+                    ? `${lastRushPayload.requestId} -> ${payload.requestId}`
+                    : payload?.requestId,
+                asyncOrder: '未重复触发'
             });
             return;
         }
         setSummary({
             outcome: '请求未成功',
             message,
-            idempotent: '未验证'
+            idempotent: '未验证',
+            request: payload?.requestId
         });
     }
 
@@ -1188,8 +1512,11 @@
             message: '先初始化库存，再发起抢票。',
             stock: '-',
             thread: '-',
-            idempotent: '待验证'
+            idempotent: '待验证',
+            request: $('rushRequestId').value,
+            asyncOrder: '-'
         });
+        $('repeatRushButton').disabled = true;
         setBadge('rushAcceptedBadge', '是否接单 -', '');
         setText('rushStockBadge', '剩余库存 -');
         setText('rushThreadBadge', '虚拟线程 -');

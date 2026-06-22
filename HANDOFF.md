@@ -1,5 +1,84 @@
 # HANDOFF - TicketRush
 
+## Latest Snapshot - 2026-06-22 Demo Page Redesign Complete
+
+Current goal:
+- Make the TicketRush local demo page feel like a focused抢票链路演示台, not a broad API console or slogan-heavy UI.
+
+Current stage:
+- Page direction has been reset and implemented.
+- No backend API, schema, proxy, payment, auth, or production config changes were made.
+- The page still only calls existing APIs.
+
+Recently completed:
+- Reworked `src/main/resources/static/index.html` first screen into:
+  - left side: 主流程演示 with 初始化库存 -> 准备抢票请求 -> 请求凭证 -> 执行抢票实验;
+  - right side: 证据面板 showing 抢票结果、库存变化、幂等判定、虚拟线程、requestId 变化、异步下单、扣减方案;
+  - advanced details: 高级参数和策略对比, with Redis Lua / Redis Lock / MySQL optimistic lock kept out of the main flow.
+- Changed duplicate-submit behavior:
+  - first rush uses requestId A + idempotentKey X;
+  - duplicate submit generates requestId B while reusing idempotentKey X;
+  - evidence panel shows `A -> B`, 幂等通过, and 异步下单未重复触发.
+- Removed the old slogan-style page headline `5 分钟证明一个高并发抢票链路`.
+- Updated `StaticDemoConsoleHtmlTest`, `README.md`, `docs/demo-runbook.md`, and `docs/github-showcase.md`.
+- Regenerated all desktop README screenshots under `docs/screenshots/desktop/*.png`.
+
+Verified latest:
+- Inline JavaScript syntax check: passed.
+- With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 5 tests passed.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker app redeploy: `docker compose up -d --no-deps --force-recreate app`.
+- `http://localhost:8080/actuator/health`: `UP`.
+- Browser/CDP walkthrough at desktop size:
+  - preload inventory -> rush ticket -> duplicate submit all worked;
+  - first rush showed `1000 -> 999`, `Virtual Thread`, and async order triggered;
+  - duplicate submit showed requestId A -> B, same idempotentKey, no repeated stock deduction, and async order not repeated;
+  - no horizontal overflow.
+- Browser/CDP advanced checks:
+  - Elasticsearch smoke search showed `命中数量 2`;
+  - executor benchmark produced throughput;
+  - mobile width check showed no horizontal overflow and no offscreen elements.
+- Screenshot dimension check should be rerun before commit if more screenshot edits happen.
+
+Next step only:
+- Run final diff/status checks, commit this UI redesign slice, then stop unless the user asks for another TicketRush scope.
+
+## Latest Snapshot - 2026-06-22 UI Direction Pause
+
+Current goal:
+- Pause TicketRush demo-page coding and rethink the page direction with the user before making more changes.
+
+Current stage:
+- The latest UI iterations were not accepted by the user.
+- Do not continue patching the current page by inertia.
+- Next window should first align on what the page must make visible and what should be removed or hidden.
+
+User feedback to preserve:
+- The page still feels messy and not meaningfully different.
+- It should not rely on slogans such as "证明：高并发抢票不超卖、重复请求不重复扣库存".
+- The page should let people see the system's core value through the demo process itself.
+- The current behavior where request ID appears unchanged makes the demo feel fake or confusing.
+- The user is asking whether a new window is needed because the direction is getting worse.
+
+Important next-step guidance:
+- Start the next window by reading this file, `PROJECT.md`, `SPEC.md`, `AGENTS.md`, `README.md`, current `git status`, and recent commits.
+- Do not immediately code.
+- First propose a simplified product/storyboard direction in plain Chinese:
+  - what the first screen should show;
+  - what operation sequence should be visible;
+  - how request ID / idempotency should behave;
+  - what evidence should be shown without dumping raw JSON;
+  - what functions should be hidden, collapsed, or removed from the main view.
+- Only after user confirms the direction should code changes continue.
+
+Current local git note:
+- There are recent local commits ahead of origin for UI changes:
+  - `1f5dc72 style: localize ticket demo console`
+  - `1e58051 fix: clarify inventory strategy demo`
+  - `81e8dbc style: focus ticket demo page`
+- These commits may need to be revised, reverted, or replaced depending on the user's next confirmed direction.
+- Do not push before the user reviews the direction.
+
 ## Latest Snapshot - 2026-06-22 Demo Console Chinese Workflow
 
 Current goal:
