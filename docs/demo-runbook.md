@@ -51,6 +51,8 @@ http://localhost:8080/
 
 4. 点 `生成新请求`，确认 requestId/idempotentKey 已刷新。
 5. 库存扣减方案选 `Redis Lua 原子扣减`，点 `发起抢票`。
+   - `Redis Lua` 和 `Redis 分布式锁` 共享 Redis 预热库存。
+   - `MySQL 乐观锁` 读取 MySQL 库存表，是数据库热点行对比路径，剩余库存可能和 Redis 路径不同。
 6. 重点看结果：
 
    ```text

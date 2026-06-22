@@ -52,7 +52,11 @@ class StaticDemoConsoleHtmlTest {
                 "清空结果",
                 "防超卖",
                 "幂等请求",
-                "最终一致性"
+                "最终一致性",
+                "库存来源：Redis Hash",
+                "库存来源：MySQL 库存表",
+                "共享同一份 Redis 预热库存",
+                "独立数据库库存"
         );
     }
 
@@ -110,6 +114,8 @@ class StaticDemoConsoleHtmlTest {
                 "metricApp",
                 "preloadSkuId",
                 "rushRequestId",
+                "strategyHint",
+                "rushSourceBadge",
                 "searchSummary",
                 "benchThroughput",
                 "resultBody"

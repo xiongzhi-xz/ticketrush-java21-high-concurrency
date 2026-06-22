@@ -4,6 +4,7 @@
 
 Current goal:
 - Make the TicketRush local demo page Chinese, business-oriented, and easier to understand from screenshots.
+- Clarify why different inventory deduction strategies can show different remaining stock.
 
 Current stage:
 - No backend feature expansion.
@@ -18,14 +19,22 @@ Recently completed:
 - Updated `StaticDemoConsoleHtmlTest` to assert the Chinese business labels while preserving IDs and API paths.
 - Updated `README.md`, `docs/demo-runbook.md`, and `docs/github-showcase.md` to match the new Chinese operation path.
 - Regenerated all README desktop screenshots under `docs/screenshots/desktop/*.png`.
+- Added an explicit inventory-source explanation in the rush workflow:
+  - Redis Lua and Redis Lock share the same Redis preloaded inventory.
+  - MySQL optimistic lock reads the MySQL inventory table and is a comparison path.
+- Moved rush result badges upward so `是否接单`、`Redis/MySQL 剩余库存`、`库存来源`、`虚拟线程` are visible in the main rush panel.
 
 Verified latest:
 - Inline JavaScript syntax check: passed.
 - With JDK 21: `mvn "-Dtest=StaticDemoConsoleHtmlTest" test`: 5 tests passed.
-- Browser walkthrough against local backend via preview proxy: health, preload, rush, index/search, and executor benchmark all produced visible results.
+- With JDK 21: `mvn package -DskipTests`: passed.
+- Docker app redeploy: `docker compose up -d --no-deps --force-recreate app`.
+- `http://localhost:8080/actuator/health`: `UP`.
+- `http://localhost:8080/`: contains the strategy source explanation and `rushSourceBadge`.
+- Browser walkthrough against local backend: health, preload, rush, index/search, and executor benchmark all produced visible results.
 - Screenshot dimension check: all `docs/screenshots/desktop/*.png` are `1440x900`.
 - Browser layout check: no horizontal overflow at the desktop screenshot viewport.
-- `git diff --check`: passed with the existing README CRLF/LF warning only.
+- `git diff --check`: passed.
 
 Next step only:
 - Commit this UI/demo-doc slice, then stop unless the user asks for another TicketRush scope.

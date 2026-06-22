@@ -394,6 +394,43 @@
             line-height: 1.35;
         }
 
+        .notice {
+            border: 1px solid #c8d7f2;
+            border-radius: 8px;
+            padding: 10px 12px;
+            background: var(--blue-soft);
+            color: #1d3f78;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .strategy-guide {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 10px;
+        }
+
+        .strategy-card {
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 10px;
+            background: #fbfcfd;
+            min-width: 0;
+        }
+
+        .strategy-card strong {
+            display: block;
+            font-size: 13px;
+        }
+
+        .strategy-card span {
+            display: block;
+            margin-top: 5px;
+            color: var(--muted);
+            font-size: 12px;
+            line-height: 1.4;
+        }
+
         .links {
             display: grid;
             grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -488,6 +525,7 @@
             .grid.three,
             .grid.four,
             .flow,
+            .strategy-guide,
             .links,
             .form-row,
             .form-row.compact {
@@ -582,6 +620,17 @@
                         <span class="badge">最终一致性</span>
                     </div>
 
+                    <div class="status-strip">
+                        <span id="rushAcceptedBadge" class="badge">是否接单 -</span>
+                        <span id="rushStockBadge" class="badge">剩余库存 -</span>
+                        <span id="rushSourceBadge" class="badge">库存来源 Redis Hash</span>
+                        <span id="rushThreadBadge" class="badge">虚拟线程 -</span>
+                    </div>
+
+                    <div class="notice">
+                        推荐演示先使用 Redis Lua。下方三个扣减方案用于对比不同技术路径：Redis Lua 和 Redis 分布式锁共享同一份 Redis 预热库存；MySQL 乐观锁读取数据库库存表，因此剩余库存可能和 Redis 路径不同。
+                    </div>
+
                     <div class="form-row compact">
                         <label>
                             <span>预热票档 ID</span>
@@ -592,6 +641,21 @@
                             <input id="preloadStock" inputmode="numeric" value="1000">
                         </label>
                         <button id="preloadButton" type="button">预热库存</button>
+                    </div>
+
+                    <div class="strategy-guide" aria-label="库存扣减方案说明">
+                        <div class="strategy-card">
+                            <strong>Redis Lua：主推荐链路</strong>
+                            <span>库存来源：Redis Hash。预热按钮会重置这份库存，用来演示原子扣减、防超卖和幂等。</span>
+                        </div>
+                        <div class="strategy-card">
+                            <strong>Redis 分布式锁：对比链路</strong>
+                            <span>库存来源：同一份 Redis Hash。它和 Redis Lua 会连续扣同一份 Redis 剩余库存。</span>
+                        </div>
+                        <div class="strategy-card">
+                            <strong>MySQL 乐观锁：数据库对比</strong>
+                            <span>库存来源：MySQL 库存表。它不是 Redis 预热库存，用来观察热点行版本冲突和长尾延迟。</span>
+                        </div>
                     </div>
 
                     <div class="form-row">
@@ -617,10 +681,11 @@
                         <label>
                             <span>库存扣减方案</span>
                             <select id="rushStrategy">
-                                <option value="REDIS_LUA">Redis Lua 原子扣减</option>
-                                <option value="REDIS_LOCK">Redis 分布式锁扣减</option>
-                                <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减</option>
+                                <option value="REDIS_LUA">Redis Lua 原子扣减（推荐主链路）</option>
+                                <option value="REDIS_LOCK">Redis 分布式锁扣减（共享 Redis 库存）</option>
+                                <option value="MYSQL_OPTIMISTIC_LOCK">MySQL 乐观锁扣减（独立数据库库存）</option>
                             </select>
+                            <div id="strategyHint" class="field-help">库存来源：Redis Hash。预热库存后从这里开始扣减。</div>
                         </label>
                         <label>
                             <span>请求 ID</span>
@@ -635,11 +700,6 @@
                         <button id="rushButton" type="button">发起抢票</button>
                     </div>
 
-                    <div class="status-strip">
-                        <span id="rushAcceptedBadge" class="badge">是否接单 -</span>
-                        <span id="rushStockBadge" class="badge">剩余库存 -</span>
-                        <span id="rushThreadBadge" class="badge">虚拟线程 -</span>
-                    </div>
                 </div>
             </section>
 
@@ -821,6 +881,34 @@
         $('overallStatus').textContent = ok ? '就绪' : '需要查看结果';
     }
 
+    function strategyMeta(strategy) {
+        if (strategy === 'MYSQL_OPTIMISTIC_LOCK') {
+            return {
+                source: 'MySQL 库存表',
+                stockLabel: 'MySQL 剩余库存',
+                hint: '库存来源：MySQL 库存表。它不会被上方 Redis 预热按钮重置，适合演示数据库热点行乐观锁冲突。'
+            };
+        }
+        if (strategy === 'REDIS_LOCK') {
+            return {
+                source: 'Redis Hash',
+                stockLabel: 'Redis 剩余库存',
+                hint: '库存来源：Redis Hash。它和 Redis Lua 共享同一份预热库存，适合对比加锁路径的额外开销。'
+            };
+        }
+        return {
+            source: 'Redis Hash',
+            stockLabel: 'Redis 剩余库存',
+            hint: '库存来源：Redis Hash。推荐主演示链路，预热库存后从这里开始扣减。'
+        };
+    }
+
+    function updateStrategyHint() {
+        const meta = strategyMeta($('rushStrategy').value);
+        $('strategyHint').textContent = meta.hint;
+        $('rushSourceBadge').textContent = `库存来源 ${meta.source}`;
+    }
+
     function setBusy(button, busy) {
         if (!button.dataset.label) {
             button.dataset.label = button.textContent;
@@ -908,6 +996,11 @@
                 body: JSON.stringify(payload)
             });
         });
+        $('rushAcceptedBadge').className = 'badge';
+        $('rushAcceptedBadge').textContent = '是否接单 -';
+        $('rushStockBadge').className = 'badge green';
+        $('rushStockBadge').textContent = `Redis 剩余库存 ${$('preloadStock').value || '-'}`;
+        updateStrategyHint();
     }
 
     async function rushTicket() {
@@ -928,10 +1021,12 @@
         });
         const data = result?.data;
         if (data) {
+            const meta = strategyMeta(String(data.strategy || $('rushStrategy').value));
             $('rushAcceptedBadge').className = `badge ${data.accepted ? 'green' : 'red'}`;
             $('rushAcceptedBadge').textContent = `是否接单 ${data.accepted ? '是' : '否'}`;
             $('rushStockBadge').className = 'badge green';
-            $('rushStockBadge').textContent = `剩余库存 ${data.remainingStock ?? '-'}`;
+            $('rushStockBadge').textContent = `${meta.stockLabel} ${data.remainingStock ?? '-'}`;
+            $('rushSourceBadge').textContent = `库存来源 ${meta.source}`;
             $('rushThreadBadge').className = `badge ${data.processedByVirtualThread ? 'green' : 'amber'}`;
             $('rushThreadBadge').textContent = `虚拟线程 ${data.processedByVirtualThread ? '是' : '否'}`;
             generateRequestIds();
@@ -995,6 +1090,7 @@
     $('generateRequestButton').addEventListener('click', generateRequestIds);
     $('preloadButton').addEventListener('click', preloadInventory);
     $('rushButton').addEventListener('click', rushTicket);
+    $('rushStrategy').addEventListener('change', updateStrategyHint);
     $('indexEventButton').addEventListener('click', indexEvent);
     $('searchButton').addEventListener('click', searchTickets);
     $('benchmarkButton').addEventListener('click', runBenchmark);
@@ -1005,6 +1101,7 @@
     });
 
     generateRequestIds();
+    updateStrategyHint();
     refreshHealth();
 </script>
 </body>
